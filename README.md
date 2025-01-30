@@ -4,7 +4,7 @@
 
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
-| [Full Name] | [CCID] | [@username]     |
+| Xinyuan Zhang | 1818573 | 777should    |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
