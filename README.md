@@ -5,7 +5,7 @@
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
 | Xinyuan Zhang | 1818573 | 777should    |
-| [Full Name] | [CCID] | [@username]     |
+| Adil Tapal  | 1720610 | AdilTapal      |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
