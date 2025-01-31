@@ -4,7 +4,7 @@
 
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
-| Xinyuan Zhang | 1818573 | 777should    |
+| Xinyuan Zhang | xinyua18 | 777should    |
 | Adil Tapal  | atapal | AdilTapal       |
 | Saarah Mahtaab| mahtaab | saarahm05    |
 | Xinmeng Zheng | xinmeng6 | Philistine233     |
