@@ -8,7 +8,7 @@
 | Adil Tapal  | 1720610 | AdilTapal      |
 | Saarah Mahtaab| 1802977 | saarahm05    |
 | Xinmeng Zheng | 1808526 | Philistine233     |
-| [Full Name] | [CCID] | [@username]     |
+| Zige Lei | zige3 | Zige3     |
 | [Full Name] | [CCID] | [@username]     |
 
 ## Project Description
