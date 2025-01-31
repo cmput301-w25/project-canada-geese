@@ -6,7 +6,7 @@
 | ----------- | ------ | --------------- |
 | Xinyuan Zhang | 1818573 | 777should    |
 | Adil Tapal  | 1720610 | AdilTapal      |
-| [Full Name] | [CCID] | [@username]     |
+| Saarah Mahtaab| 1802977 | saarahm05    |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
