@@ -1,4 +1,4 @@
-# CMPUT 301 W25 - Team [Team Name]
+# CMPUT 301 W25 - Team [Canada Geese]
 
 ## Team Members
 
@@ -7,7 +7,7 @@
 | Xinyuan Zhang | 1818573 | 777should    |
 | Adil Tapal  | 1720610 | AdilTapal      |
 | Saarah Mahtaab| 1802977 | saarahm05    |
-| [Full Name] | [CCID] | [@username]     |
+| Xinmeng Zheng | 1808526 | Philistine233     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 
