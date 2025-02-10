@@ -29,7 +29,7 @@
 
 ## Documentation
 
-- https://github.com/cmput301-w25/project-canada-geese/wiki
-- [Scrum Board]
+- [Wiki](https://github.com/cmput301-w25/project-canada-geese/wiki)
+- [Scrum Board](https://github.com/cmput301-w25/project-canada-geese/wiki)
 - [UI Mockups]
 - [UML]
