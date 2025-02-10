@@ -30,6 +30,6 @@
 ## Documentation
 
 - [Wiki Link](https://github.com/cmput301-w25/project-canada-geese/wiki)
-- [Scrum Board](https://github.com/cmput301-w25/project-canada-geese/wiki)
+- [Scrum Board](https://github.com/orgs/cmput301-w25/projects/93)
 - [UI Mockups]
 - [UML]
