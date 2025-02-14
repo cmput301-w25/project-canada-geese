@@ -31,5 +31,5 @@
 
 - [Wiki Link](https://github.com/cmput301-w25/project-canada-geese/wiki)
 - [Scrum Board](https://github.com/orgs/cmput301-w25/projects/93)
-- [UI Mockups]
-- [UML]
+- [UI Mockups](https://github.com/cmput301-w25/project-canada-geese/wiki/UI-Mockups-&-Storyboard-(Diagrams-in-Figma))
+- [UML](https://github.com/cmput301-w25/project-canada-geese/wiki/CRC-Cards-(Part-2))
