@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.canada_geese.Managers.AuthManager;
+import com.example.canada_geese.R;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText identifierField, passwordField;

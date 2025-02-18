@@ -1,7 +1,7 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Managers;
 
 import android.content.Context;
-import android.widget.Toast;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
