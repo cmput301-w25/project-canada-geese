@@ -1,3 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">canada-geese</string>
+    <!-- Application Name -->
+    <string name="app_name">canada_geese</string>
+
+    <!-- Login and Register -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account and Login</string>
+    <string name="remember_me">Remember me</string>
+    <string name="dont_have_account">Don\'t have an account? Sign up</string>
+    <string name="have_account">Have an account? Sign in</string>
+
+    <!-- Main interface greeting -->
+    <string name="greeting">Hi, User! :)</string>
+    <string name="mood_question">How are you doing today?</string>
+
+    <!-- Emotional state -->
+    <string name="mood_happiness">Happiness</string>
+    <string name="mood_anger">Anger</string>
+    <string name="mood_sadness">Sadness</string>
+    <string name="mood_fear">Fear</string>
+    <string name="mood_calm">Calm</string>
+    <string name="mood_confusion">Confusion</string>
+    <string name="mood_disgust">Disgust</string>
+    <string name="mood_shame">Shame</string>
+    <string name="mood_surprise">Surprise</string>
+
+    <!-- Form Tags -->
+    <string name="mood_name">Mood Name</string>
+    <string name="trigger_warning">Trigger warning</string>
+    <string name="additional_info">Additional information</string>
+    <string name="social_situation">Social Situation</string>
+
+    <!-- Social situation selection -->
+    <string name="alone">Alone</string>
+    <string name="with_one">With one other person</string>
+    <string name="with_several">With two to several people</string>
+    <string name="with_crowd">With a crowd</string>
+
+    <!-- Button Text -->
+    <string name="add_mood">Add Mood</string>
+    <string name="edit_mood">Edit Mood</string>
+    <string name="delete_mood">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+
+    <!-- Delete confirmation dialog -->
+    <string name="delete_confirmation_title">Are You Sure You Want to Delete?</string>
+    <string name="delete_confirmation_message">This process can\'t be undone</string>
+
+    <!-- Filters -->
+    <string name="filter_by">Filter By</string>
+    <string name="last_7_days">Last 7 Days</string>
+    <string name="filter_by_mood">Filter by mood</string>
+
+    <!-- Offline status -->
+    <string name="offline_indicator">You are offline</string>
+    <string name="offline_message">Mood will be updated when you\'re back online</string>
+
+    <!-- Error message -->
+    <string name="error_username_exists">Username already exists</string>
+    <string name="error_invalid_credentials">Invalid username or password</string>
+    <string name="error_mood_name_required">Mood name is required</string>
+    <string name="error_mood_name_too_long">Mood name cannot exceed 20 characters</string>
+
+    <!-- other -->
+    <string name="location_permission_title">\'canada_geese\' Would Like to Access Your Location</string>
+    <string name="allow_while_using">Allow While Using App</string>
+    <string name="allow_once">Allow Once</string>
+    <string name="dont_allow">Don\'t Allow</string>
 </resources>

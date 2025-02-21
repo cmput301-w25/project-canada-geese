@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Apply theme colors -->
+    <color name="primary">#A7C7E7</color>
+    <color name="primary_dark">#89A9C9</color>
+    <color name="accent">#FF4081</color>
+
+    <!-- Emotional state color -->
+    <color name="mood_happiness">#FFE082</color>  <!-- yellow -->
+    <color name="mood_anger">#EF9A9A</color>      <!-- red -->
+    <color name="mood_sadness">#90CAF9</color>    <!-- blue -->
+    <color name="mood_fear">#CE93D8</color>       <!-- purple -->
+    <color name="mood_calm">#A5D6A7</color>       <!-- green -->
+    <color name="mood_confusion">#B0BEC5</color>  <!-- gray -->
+    <color name="mood_disgust">#80CBC4</color>    <!-- cyan -->
+    <color name="mood_shame">#FFAB91</color>      <!-- orange -->
+    <color name="mood_surprise">#81D4FA</color>   <!-- light blue -->
+
+    <!-- Interface base color -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="background">#F5F5F5</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#BDBDBD</color>
+
+    <!-- Functional Color -->
+    <color name="delete_button">#FF5252</color>
+    <color name="cancel_button">#757575</color>
+    <color name="offline_indicator">#FF9800</color>
 </resources>
