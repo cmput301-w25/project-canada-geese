@@ -1,4 +1,4 @@
-package com.example.canada_geese.Fragments;
+package com.example.canada_geese.pageResources;
 
 
 

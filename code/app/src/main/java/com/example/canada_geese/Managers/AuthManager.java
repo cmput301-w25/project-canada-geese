@@ -1,3 +1,5 @@
+
+/*
 package com.example.canada_geese.Managers;
 
 import android.content.Context;
@@ -94,3 +96,5 @@ public class AuthManager {
         void onFailure(String errorMessage);
     }
 }
+
+ */

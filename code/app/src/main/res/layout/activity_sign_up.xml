@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F1ED"
-    tools:context=".SignUpActivity">
+    tools:context=".Pages.SignUpActivity">
 
     <!-- Sign Up -->
     <TextView
@@ -124,7 +124,7 @@
 
     <!-- Create Account Link -->
     <Button
-        android:id="@+id/create_account_button"
+        android:id="@+id/button_sign_in"
         android:layout_width="343dp"
         android:layout_height="50dp"
         android:layout_below="@id/remember_me"
@@ -137,13 +137,13 @@
 
     <!-- Sign In Link -->
     <TextView
-        android:id="@+id/sign_in_text"
+        android:id="@+id/sign_up_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Have an account? Sign in"
         android:textSize="14sp"
         android:textColor="#6B4F3F"
-        android:layout_below="@id/create_account_button"
+        android:layout_below="@id/button_sign_in"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"/>
 </RelativeLayout>
