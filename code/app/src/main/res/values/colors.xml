@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Apply theme colors -->
-    <color name="primary">#A7C7E7</color>
-    <color name="primary_dark">#89A9C9</color>
-    <color name="accent">#FF4081</color>
-
-    <!-- Emotional state color -->
-    <color name="mood_happiness">#FFE082</color>  <!-- yellow -->
-    <color name="mood_anger">#EF9A9A</color>      <!-- red -->
-    <color name="mood_sadness">#90CAF9</color>    <!-- blue -->
-    <color name="mood_fear">#CE93D8</color>       <!-- purple -->
-    <color name="mood_calm">#A5D6A7</color>       <!-- green -->
-    <color name="mood_confusion">#B0BEC5</color>  <!-- gray -->
-    <color name="mood_disgust">#80CBC4</color>    <!-- cyan -->
-    <color name="mood_shame">#FFAB91</color>      <!-- orange -->
-    <color name="mood_surprise">#81D4FA</color>   <!-- light blue -->
-
-    <!-- Interface base color -->
-    <color name="white">#FFFFFF</color>
+    <!-- Primary Theme Colors -->
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryVariant">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="colorBackground">#F5F1ED</color>
+    <color name="colorText">#000000</color>
     <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Green Themed Colors -->
+    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="light_green">#DFF0D8</color>
+    <color name="dark_green">#91B4A4</color>
+    <color name="circle_green">#36FF0F</color>
+
+    <!-- Emotional State Colors -->
+    <color name="color_happiness">#F4D06F</color>
+    <color name="color_anger">#D98E8E</color>
+    <color name="color_sadness">#A1C3D1</color>
+    <color name="color_fear">#DAB1DA</color>
+    <color name="color_calm">#BDD4BC</color>
+    <color name="color_confusion">#FF9800</color>
+    <color name="color_disgust">#8BC34A</color>
+    <color name="color_shame">#FF5722</color>
+    <color name="color_surprise">#9C27B0</color>
+
+    <!-- Alternative Emotional State Colors (Retained from Main) -->
+    <color name="mood_happiness">#FFE082</color>  <!-- Yellow -->
+    <color name="mood_anger">#EF9A9A</color>      <!-- Red -->
+    <color name="mood_sadness">#90CAF9</color>    <!-- Blue -->
+    <color name="mood_fear">#CE93D8</color>       <!-- Purple -->
+    <color name="mood_calm">#A5D6A7</color>       <!-- Green -->
+    <color name="mood_confusion">#B0BEC5</color>  <!-- Gray -->
+    <color name="mood_disgust">#80CBC4</color>    <!-- Cyan -->
+    <color name="mood_shame">#FFAB91</color>      <!-- Orange -->
+    <color name="mood_surprise">#81D4FA</color>   <!-- Light Blue -->
+
+    <!-- UI Text and Background Colors -->
     <color name="background">#F5F5F5</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="divider">#BDBDBD</color>
 
-    <!-- Functional Color -->
+    <!-- Functional Colors -->
     <color name="delete_button">#FF5252</color>
     <color name="cancel_button">#757575</color>
     <color name="offline_indicator">#FF9800</color>

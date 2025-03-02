@@ -5,81 +5,120 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@color/colorBackground"
+    tools:context=".Fragments.MoodEventFragment">
 
-    <!-- Welcome -->
-    <TextView
-        android:id="@+id/tv_greeting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hi, User! :)"
-        android:textSize="24sp"
-        android:textStyle="bold"
+
+    <View
+        android:id="@+id/top_bar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <TextView
-        android:id="@+id/tv_question"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="How are you doing today?"
-        android:textSize="16sp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_greeting"
-        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Emotional status List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_emotional_states"
-        android:layout_width="match_parent"
+    <View
+        android:id="@+id/search_icon_background"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/circle_background"
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintBottom_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        app:layout_constraintVertical_bias="0.5"/>
+
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/search_bar_background"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search..."
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintBottom_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toEndOf="@id/search_icon_background"
+        app:layout_constraintEnd_toStartOf="@id/filter_button"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintVertical_bias="0.5"/>
+
+
+    <ImageButton
+        android:id="@+id/filter_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_filter"
+        android:background="@null"
+        android:contentDescription="@string/filter_button_desc"
+        app:layout_constraintTop_toTopOf="@id/top_bar"
+        app:layout_constraintBottom_toBottomOf="@id/top_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintVertical_bias="0.5"/>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_question"/>
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-    <!-- Emotional event details card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_mood_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/rv_emotional_states">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/user_greeting"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:text="Hi, User! :)"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-            <EditText
-                android:id="@+id/et_mood_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Mood Name"
-                android:maxLength="20"/>
 
-            <CheckBox
-                android:id="@+id/cb_trigger_warning"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Trigger warning"
-                android:layout_marginTop="8dp"/>
+        <TextView
+            android:id="@+id/user_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How are you doing today?"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/user_greeting"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <EditText
-                android:id="@+id/et_additional_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Additional information"
-                android:layout_marginTop="8dp"/>
 
-            <Button
-                android:id="@+id/btn_add_mood"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Add Mood"
-                android:layout_marginTop="16dp"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    <Button
+        android:id="@+id/add_mood_event_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Add Mood Event"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/add_mood_event_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="16dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

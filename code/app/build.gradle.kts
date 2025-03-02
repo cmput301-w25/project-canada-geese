@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.example.canada_geese"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -39,6 +39,11 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
 
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-auth")
+
+
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
