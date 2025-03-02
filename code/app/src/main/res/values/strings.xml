@@ -1,8 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
-    <string name="app_name">canada-geese</string>
-</resources>
-=======
     <!-- Application Name -->
     <string name="app_name">canada_geese</string>
 
@@ -93,4 +90,3 @@
     <string name="allow_once">Allow Once</string>
     <string name="dont_allow">Don\'t Allow</string>
 </resources>
->>>>>>> c201bca (Implemented Mood Event UI & Input Handling)

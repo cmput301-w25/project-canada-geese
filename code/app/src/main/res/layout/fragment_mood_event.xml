@@ -19,6 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+
     <View
         android:id="@+id/search_icon_background"
         android:layout_width="40dp"
@@ -120,5 +121,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:padding="16dp"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
