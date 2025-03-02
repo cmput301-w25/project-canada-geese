@@ -1,3 +1,96 @@
 <resources>
+<<<<<<< HEAD
     <string name="app_name">canada-geese</string>
 </resources>
+=======
+    <!-- Application Name -->
+    <string name="app_name">canada_geese</string>
+
+    <!-- Login and Register -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="create_account">Create Account and Login</string>
+    <string name="remember_me">Remember me</string>
+    <string name="dont_have_account">Don\'t have an account? Sign up</string>
+    <string name="have_account">Have an account? Sign in</string>
+
+    <!-- Main Interface Greeting -->
+    <string name="greeting">Hi, User! :)</string>
+    <string name="mood_question">How are you doing today?</string>
+
+    <!-- Emotional States (For Mood Dropdown) -->
+    <string name="mood_happiness">Happiness</string>
+    <string name="mood_anger">Anger</string>
+    <string name="mood_sadness">Sadness</string>
+    <string name="mood_fear">Fear</string>
+    <string name="mood_calm">Calm</string>
+    <string name="mood_confusion">Confusion</string>
+    <string name="mood_disgust">Disgust</string>
+    <string name="mood_shame">Shame</string>
+    <string name="mood_surprise">Surprise</string>
+
+    <string-array name="mood_states">
+        <item>@string/mood_happiness</item>
+        <item>@string/mood_anger</item>
+        <item>@string/mood_sadness</item>
+        <item>@string/mood_fear</item>
+        <item>@string/mood_calm</item>
+        <item>@string/mood_confusion</item>
+        <item>@string/mood_disgust</item>
+        <item>@string/mood_shame</item>
+        <item>@string/mood_surprise</item>
+    </string-array>
+
+    <!-- Form Fields -->
+    <string name="mood_name">Mood Name</string>
+    <string name="description">Description</string>
+    <string name="description_hint">Describe in a few words...</string>
+    <string name="social_situation">Social Situation</string>
+    <string name="attach_location">Attach location</string>
+    <string name="trigger_warning">Trigger warning</string>
+
+    <!-- Social Situation Dropdown -->
+    <string-array name="social_situations">
+        <item>Alone</item>
+        <item>With one other person</item>
+        <item>With two to several people</item>
+        <item>With a crowd</item>
+    </string-array>
+
+    <!-- Button Text -->
+    <string name="add_mood">Add Mood</string>
+    <string name="edit_mood">Edit Mood</string>
+    <string name="delete_mood">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+
+    <!-- Delete Confirmation -->
+    <string name="delete_confirmation_title">Are You Sure You Want to Delete?</string>
+    <string name="delete_confirmation_message">This process can\'t be undone</string>
+
+    <!-- Filters -->
+    <string name="filter_by">Filter By</string>
+    <string name="last_7_days">Last 7 Days</string>
+    <string name="filter_by_mood">Filter by mood</string>
+    <string name="filter_button_desc">Filter Mood Events</string>
+
+    <!-- Offline Status -->
+    <string name="offline_indicator">You are offline</string>
+    <string name="offline_message">Mood will be updated when you\'re back online</string>
+
+    <!-- Error Messages -->
+    <string name="error_username_exists">Username already exists</string>
+    <string name="error_invalid_credentials">Invalid username or password</string>
+    <string name="error_mood_name_required">Mood name is required</string>
+    <string name="error_mood_name_too_long">Mood name cannot exceed 20 characters</string>
+
+    <!-- Permissions -->
+    <string name="location_permission_title">"canada_geese" Would Like to Access Your Location</string>
+    <string name="allow_while_using">Allow While Using App</string>
+    <string name="allow_once">Allow Once</string>
+    <string name="dont_allow">Don\'t Allow</string>
+</resources>
+>>>>>>> c201bca (Implemented Mood Event UI & Input Handling)

@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>
+=======
+
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryVariant">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="colorBackground">#F5F1ED</color>
+    <color name="colorText">#000000</color>
+    <color name="black">#000000</color>
+
+    <color name="colorPrimaryDark">#388E3C</color>
+
+
+    <color name="light_green">#DFF0D8</color>
+    <color name="dark_green">#91B4A4</color>
+    <color name="circle_green">#36FF0F</color>
+
+
+    <color name="color_happiness">#F4D06F</color>
+    <color name="color_anger">#D98E8E</color>
+    <color name="color_sadness">#A1C3D1</color>
+    <color name="color_fear">#DAB1DA</color>
+    <color name="color_calm">#BDD4BC</color>
+    <color name="color_confusion">#FF9800</color>
+    <color name="color_disgust">#8BC34A</color>
+    <color name="color_shame">#FF5722</color>
+    <color name="color_surprise">#9C27B0</color>
+</resources>
+>>>>>>> c201bca (Implemented Mood Event UI & Input Handling)

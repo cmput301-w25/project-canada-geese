@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.Canadageese" parent="Base.Theme.Canadageese" />
+    <style name="CustomDialogTheme" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+        <item name="android:windowSoftInputMode">stateVisible</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>
