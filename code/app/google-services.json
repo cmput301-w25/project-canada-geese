@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173376890893",
+    "project_id": "canadageeseapp",
+    "storage_bucket": "canadageeseapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173376890893:android:4d3eef8a0d4bc4cb05cd44",
+        "android_client_info": {
+          "package_name": "com.example.canada_geese"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd28uL-IppoQU3CAk8YdWi8o392yH2TRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
