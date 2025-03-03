@@ -47,4 +47,6 @@
     <color name="delete_button">#FF5252</color>
     <color name="cancel_button">#757575</color>
     <color name="offline_indicator">#FF9800</color>
+    <color name="primary" />
+
 </resources>

@@ -51,12 +51,12 @@ public class MoodEventFragment extends Fragment implements
     }
 
     private void initViews(View view) {
-        emotionalStateRecyclerView = view.findViewById(R.id.rv_emotional_states);
+        //emotionalStateRecyclerView = view.findViewById(R.id.rv_emotional_states);
         moodDetailsCard = view.findViewById(R.id.card_mood_details);
-        moodNameInput = view.findViewById(R.id.et_mood_name);
+        //moodNameInput = view.findViewById(R.id.et_mood_name);
         triggerWarningCheckbox = view.findViewById(R.id.cb_trigger_warning);
         additionalInfoInput = view.findViewById(R.id.et_additional_info);
-        addMoodButton = view.findViewById(R.id.btn_add_mood);
+        //addMoodButton = view.findViewById(R.id.btn_add_mood);
     }
 
     private void setupRecyclerView() {
