@@ -10,8 +10,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import android.os.Handler;
 import android.os.Looper;
 
@@ -20,6 +24,8 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     private List<MoodEventModel> moodEventListFull;
     private Context context;
     private String currentQuery = "";
+    private String selectedEmotion = "All";
+    private boolean filterLast7Days = false;
 
     public MoodEventAdapter(List<MoodEventModel> moodEventList, Context context) {
         this.moodEventList = new ArrayList<>(moodEventList);
@@ -39,10 +45,10 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         MoodEventModel event = moodEventList.get(position);
 
         if (event != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             holder.moodText.setText(event.getEmotion());
-            holder.timestamp.setText(event.getTimestamp());
+            holder.timestamp.setText(dateFormat.format(event.getTimestamp()));
             holder.moodEmoji.setText(event.getEmoji());
-
 
             int color = event.getColor();
             if (color != 0) {
@@ -71,12 +77,16 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         }
     }
 
-
-    public void updateData(List<MoodEventModel> newData) {
-        this.moodEventListFull = new ArrayList<>(newData);
+    public void setFilters(String selectedEmotion, boolean filterLast7Days) {
+        this.selectedEmotion = selectedEmotion;
+        this.filterLast7Days = filterLast7Days;
         filter(currentQuery);
     }
 
+    public void updateData(List<MoodEventModel> newData) {
+        this.moodEventListFull = new ArrayList<>(newData);
+        filter(currentQuery, selectedEmotion, filterLast7Days);
+    }
 
     public void addItem(MoodEventModel newItem) {
 
@@ -91,18 +101,11 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
 
-    public void updateList(List<MoodEventModel> newList) {
-        this.moodEventList.clear();
-        this.moodEventList.addAll(newList);
-        notifyDataSetChanged();
-    }
-
-
     public void filter(String query) {
         this.currentQuery = query;
         moodEventList.clear();
 
-        long cutofftime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+        long cutoffTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
 
         for (MoodEventModel event : moodEventListFull) {
             boolean matchesQuery = query.isEmpty() || event.getEmotion().toLowerCase().contains(query.toLowerCase());
