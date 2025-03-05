@@ -91,7 +91,6 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
 
-
     public void updateList(List<MoodEventModel> newList) {
         this.moodEventList.clear();
         this.moodEventList.addAll(newList);
@@ -103,13 +102,15 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         this.currentQuery = query;
         moodEventList.clear();
 
-        if (query.isEmpty()) {
-            moodEventList.addAll(moodEventListFull);
-        } else {
-            for (MoodEventModel event : moodEventListFull) {
-                if (event.getEmotion().toLowerCase().contains(query.toLowerCase())) {
-                    moodEventList.add(event);
-                }
+        long cutofftime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+
+        for (MoodEventModel event : moodEventListFull) {
+            boolean matchesQuery = query.isEmpty() || event.getEmotion().toLowerCase().contains(query.toLowerCase());
+            boolean matchesEmotion = selectedEmotion == null || selectedEmotion.equals("All") || event.getEmotion().equalsIgnoreCase(selectedEmotion);
+            boolean matchesDate = !filterLast7Days || event.getTimestamp().getTime() >= cutoffTime;
+
+            if (matchesQuery && matchesEmotion && matchesDate) {
+                moodEventList.add(event);
             }
         }
         notifyDataSetChanged();
