@@ -8,7 +8,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.canada_geese"
+        applicationId = "com.example.testingnavigation"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -33,9 +33,9 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
 
-
+    implementation ("androidx.appcompat:appcompat:1.7.0")  // Use the latest version
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")

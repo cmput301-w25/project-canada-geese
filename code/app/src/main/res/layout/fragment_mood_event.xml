@@ -6,19 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".Fragments.MoodEventFragment">
-
+    tools:context=".Pages.fragment_add_mood_page">
 
     <View
         android:id="@+id/top_bar"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@color/colorPrimaryDark"
         android:layout_marginTop="?attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/dark_green"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/search_icon_background"
@@ -30,7 +28,6 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp"
         app:layout_constraintVertical_bias="0.5"/>
-
 
     <SearchView
         android:id="@+id/searchView"
@@ -47,7 +44,6 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintVertical_bias="0.5"/>
 
-
     <ImageButton
         android:id="@+id/filter_button"
         android:layout_width="48dp"
@@ -61,7 +57,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintVertical_bias="0.5"/>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_layout"
         android:layout_width="0dp"
@@ -73,7 +68,6 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-
         <TextView
             android:id="@+id/user_greeting"
             android:layout_width="wrap_content"
@@ -84,7 +78,6 @@
             android:textColor="@color/colorText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
-
 
         <TextView
             android:id="@+id/user_prompt"
@@ -98,19 +91,19 @@
             app:layout_constraintBottom_toBottomOf="@id/user_greeting"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <Button
         android:id="@+id/add_mood_event_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Add Mood Event"
+        android:layout_margin="16dp"
+        android:layout_marginTop="392dp"
         android:backgroundTint="@color/colorPrimary"
+        android:text="Add Mood Event"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/header_layout"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
-
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
