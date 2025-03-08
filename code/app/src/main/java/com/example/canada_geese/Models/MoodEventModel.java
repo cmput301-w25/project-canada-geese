@@ -2,17 +2,15 @@ package com.example.canada_geese.Models;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
-import java.util.Date;
-
 public class MoodEventModel {
     private String emotion;
     @ServerTimestamp
-    private Date timestamp;
+    private String timestamp;
     private String emoji;
     private int color;
     private boolean triggerWarning;
 
-    public MoodEventModel(String emotion, Date timestamp, String emoji, int color, boolean hasTriggerWarning) {
+    public MoodEventModel(String emotion, String timestamp, String emoji, int color, boolean hasTriggerWarning) {
         this.emotion = emotion;
         this.timestamp = timestamp;
         this.emoji = emoji;
@@ -24,7 +22,7 @@ public class MoodEventModel {
         return emotion;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 

@@ -2,16 +2,13 @@ package com.example.canada_geese.Pages;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.example.canada_geese.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up the initial fragment
         if (savedInstanceState == null) {
-            loadFragment(fragment_user_moods_page.newInstance());
+            // Using fragment_add_mood_page instead of MoodEventFragment
+            loadFragment(fragment_add_mood_page.newInstance());
         }
 
         // Handle bottom navigation item selection
@@ -38,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (itemId == R.id.page2) {
                     fragment = fragment_user_moods_page.newInstance();
                 } else if (itemId == R.id.page3) {
+                    // Using fragment_add_mood_page
                     fragment = fragment_add_mood_page.newInstance();
                 } else if (itemId == R.id.page4) {
                     fragment = fragment_map_view_page.newInstance();
