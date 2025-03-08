@@ -39,7 +39,6 @@
             android:clickable="true"
             android:focusable="true"/>
 
-        <!-- Follow Requests Button -->
         <ImageButton
             android:id="@+id/btnSignOut"
             android:layout_width="48dp"
@@ -59,13 +58,14 @@
         android:id="@+id/profile_image"
         android:layout_width="120dp"
         android:layout_height="120dp"
+        android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/circle_border"
-        android:scaleType="centerCrop"
-        android:src="@drawable/circle_border"
         android:clickable="true"
-        android:focusable="true"/>
+        android:focusable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/circle_border" />
 
     <TextView
         android:id="@+id/username_text"
@@ -73,13 +73,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_image"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="YourUsername"
+        android:textColor="#6B4F3F"
         android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#6B4F3F"/>
+        android:textStyle="bold" />
 
-    <!-- Followers & Following Section -->
     <LinearLayout
         android:id="@+id/follow_stats_container"
         android:layout_width="wrap_content"
