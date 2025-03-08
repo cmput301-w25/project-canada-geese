@@ -2,6 +2,7 @@ package com.example.canada_geese.Fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 
@@ -91,18 +93,22 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             String selectedMood = moodSpinner.getSelectedItem().toString();
             String moodName = selectedMood.split(" ")[0];
 
+            // Create a new MoodEventModel
             MoodEventModel newEvent = new MoodEventModel(
                     moodName,
                     getCurrentTimestamp(),
                     getEmojiForEmotion(moodName),
                     getColorForEmotion(moodName),
-                    false
+                    false  // No trigger warning for now
             );
 
-            if (moodAddedListener != null) {
-                moodAddedListener.onMoodAdded(newEvent);
-            }
+            // Add mood event to Firestore using DatabaseManager
+            DatabaseManager.getInstance().addMoodEvent(newEvent);
 
+            // Log for debugging
+            Log.d("AddMoodEventDialog", "Attempted to add mood event: " + newEvent.getEmotion());
+
+            // Close the dialog
             dismiss();
         });
 
