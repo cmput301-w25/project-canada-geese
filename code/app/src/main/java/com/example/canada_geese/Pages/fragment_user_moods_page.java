@@ -5,9 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,7 +43,7 @@ public class fragment_user_moods_page extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_mood_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_moods_page, container, false);
 
         // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -112,9 +110,9 @@ public class fragment_user_moods_page extends Fragment {
     // Sample data method
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
-        list.add(new MoodEventModel("Fear", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
+        list.add(new MoodEventModel("Happiness","test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
+        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
         return list;
     }
 }
