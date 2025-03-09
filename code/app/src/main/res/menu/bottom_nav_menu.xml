@@ -2,17 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/page1"
-        android:title="FOLLOWERS" />
+        android:title="FOLLOWERS"
+        android:icon="@drawable/baseline_cottage_24"/>
     <item
         android:id="@+id/page2"
-        android:title="USER MOODS" />
+        android:title="USER MOODS"
+        android:icon="@drawable/raven_24dp_2d2d2d_fill0_wght400_grad0_opsz24__1_" />
     <item
         android:id="@+id/page3"
-        android:title="ADD MOOD" />
+        android:title="ADD MOOD"
+        android:icon="@drawable/baseline_add_circle_outline_24"/>
     <item
         android:id="@+id/page4"
-        android:title="MAP VIEW" />
+        android:title="MAP VIEW"
+        android:icon="@drawable/baseline_image_24"/>
     <item
         android:id="@+id/page5"
-        android:title="USER PROF" />
+        android:title="USER PROF"
+        android:icon="@drawable/baseline_account_circle_24"/>
 </menu>
