@@ -12,7 +12,7 @@ public class MoodEventModel {
         this.timestamp = timestamp;
         this.emoji = emoji;
         this.color = color;
-        this.triggerWarning = triggerWarning;
+        this.triggerWarning = hasTriggerWarning;
     }
 
     public String getEmotion() {
