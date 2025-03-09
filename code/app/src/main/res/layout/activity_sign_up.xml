@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="90dp"
-        android:text="Sign Up"
+        android:text="Sign-Up"
         android:textColor="#6B4F3F"
         android:textSize="64sp"
         android:textStyle="normal" />
@@ -49,25 +49,6 @@
             android:hint="Enter your email"
             android:padding="10dp"
             android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="-6dp"
-            android:paddingStart="15dp"
-            android:text="Code"
-            android:textColor="#6B4F3F"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/code_input"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:hint="Enter verification code"
-            android:background="@drawable/edittext_border"
-            android:padding="10dp"
-            android:textSize="16sp"/>
 
         <!-- Username -->
         <TextView
