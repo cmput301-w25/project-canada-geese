@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,6 +34,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -122,36 +127,44 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
 
         addMoodButton.setOnClickListener(v -> {
-            String selectedMood = moodSpinner.getSelectedItem().toString();
-            String moodName = selectedMood.split(" ")[0];
-            boolean hasLocation = addLocationCheckbox.isChecked();
-            double latitude = 0.0;
-            double longitude = 0.0;
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                String selectedMood = moodSpinner.getSelectedItem().toString();
+                String moodName = selectedMood.split(" ")[0];
+                boolean hasLocation = addLocationCheckbox.isChecked();
+                double latitude = 0.0;
+                double longitude = 0.0;
+                String description = "placeholder";
 
-            if (hasLocation) {
-                // Get actual location values (Replace this with your location retrieval method)
-                latitude = 43.6532;
-                longitude = -79.3832;
-            }
+                if (hasLocation) {
+                    // Get actual location values (Replace this with your location retrieval method)
+                    latitude = 43.6532;
+                    longitude = -79.3832;
+                }
 
-            MoodEventModel newEvent = new MoodEventModel(
-                    moodName,
-                    getCurrentTimestamp(),
-                    getEmojiForEmotion(moodName),
-                    getColorForEmotion(moodName),
-                    false,
-                    //addLocationCheckbox.isChecked(),
-                    hasLocation,
-                    latitude,
-                    longitude
+                MoodEventModel newEvent = new MoodEventModel(
+                        moodName,
+                        description,
+                        getCurrentTimestamp(),
+                        getEmojiForEmotion(moodName),
+                        getColorForEmotion(moodName),
+                        false,
+                        //addLocationCheckbox.isChecked(),
+                        hasLocation,
+                        latitude,
+                        longitude
 
-            );
+                );
+                DatabaseManager.getInstance().addMoodEvent(newEvent);
+                Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
 
-            if (moodAddedListener != null) {
-                moodAddedListener.onMoodAdded(newEvent);
-            }
-
-            dismiss();
+                if (moodAddedListener != null) {
+                    moodAddedListener.onMoodAdded(newEvent);
+                }
+                dismiss();
+            }else { Log.e("Auth", "User not logged in! Cannot add mood.");
+            Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_SHORT).show();
+        }
         });
 
         return view;
