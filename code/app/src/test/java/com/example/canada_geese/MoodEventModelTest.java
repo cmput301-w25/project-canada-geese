@@ -10,7 +10,6 @@ public class MoodEventModelTest {
 
     @Test
     public void testConstructorAndGetters() {
-        // 创建 MoodEventModel 的实例
         MoodEventModel moodEvent = new MoodEventModel(
                 "Happy",
                 "2023-10-01",
@@ -22,7 +21,6 @@ public class MoodEventModelTest {
                 0.0
         );
 
-        // 验证属性是否正确初始化
         assertEquals("Happy", moodEvent.getEmotion());
         assertEquals("2023-10-01", moodEvent.getTimestamp());
         assertEquals("😊", moodEvent.getEmoji());

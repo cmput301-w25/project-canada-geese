@@ -12,7 +12,6 @@ import com.example.canada_geese.R;
 public class EmotionalStateTest {
 
 
-    // 测试 getDisplayName 方法
     @Test
     public void testGetDisplayName() {
         assertEquals("Happiness", EmotionalState.HAPPINESS.getDisplayName());
@@ -27,7 +26,6 @@ public class EmotionalStateTest {
     }
 
 
-    // 测试 getColorResId 方法
     @Test
     public void testGetColorResId() {
         assertEquals(R.color.mood_happiness, EmotionalState.HAPPINESS.getColorResId());
@@ -42,7 +40,6 @@ public class EmotionalStateTest {
     }
 
 
-    // 测试 getEmoji 方法
     @Test
     public void testGetEmoji() {
         assertEquals("😊", EmotionalState.HAPPINESS.getEmoji());
@@ -57,38 +54,32 @@ public class EmotionalStateTest {
     }
 
 
-    // 测试 fromString 方法（有效输入）
     @Test
     public void testFromStringValid() {
         assertEquals(EmotionalState.HAPPINESS, EmotionalState.fromString("Happiness"));
         assertEquals(EmotionalState.ANGER, EmotionalState.fromString("Anger"));
-        assertEquals(EmotionalState.SADNESS, EmotionalState.fromString("sadness")); // 大小写不敏感
-        assertEquals(EmotionalState.SURPRISE, EmotionalState.fromString("SurPriSe")); // 大小写不敏感
+        assertEquals(EmotionalState.SADNESS, EmotionalState.fromString("sadness"));
+        assertEquals(EmotionalState.SURPRISE, EmotionalState.fromString("SurPriSe"));
     }
 
 
-    // 测试 fromString 方法（无效输入）
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringInvalid() {
         EmotionalState.fromString("NonexistentEmotion");
     }
 
 
-    // 测试 fromString 方法（空字符串）
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringEmptyString() {
         EmotionalState.fromString("");
     }
 
 
-    // 测试 fromString 方法（null 输入）
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringNull() {
         EmotionalState.fromString(null);
     }
 
-
-    // 测试所有枚举值的属性是否有效
     @Test
     public void testAllStatesHaveValidProperties() {
         for (EmotionalState state : EmotionalState.values()) {
@@ -100,8 +91,6 @@ public class EmotionalStateTest {
         }
     }
 
-
-    // 测试枚举值的数量
     @Test
     public void testEmotionalStateCount() {
         assertEquals(9, EmotionalState.values().length);
