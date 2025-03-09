@@ -177,9 +177,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     }
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0437725025775, -114.06965767333628 ));
-        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 51.043920903413614, -114.07465731086558));
-        list.add(new MoodEventModel("Fear", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Happiness","test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0437725025775, -114.06965767333628 ));
+        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 51.043920903413614, -114.07465731086558));
+        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
 }

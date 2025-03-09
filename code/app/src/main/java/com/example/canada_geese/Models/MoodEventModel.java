@@ -5,6 +5,7 @@ import com.google.firebase.firestore.ServerTimestamp;
 public class MoodEventModel {
     private String emotion;
     @ServerTimestamp
+    private String description;
     private String timestamp;
     private String emoji;
     private int color;
@@ -13,7 +14,7 @@ public class MoodEventModel {
     private double latitude;
     private double longitude;
 
-    public MoodEventModel(String emotion, String timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
+    public MoodEventModel(String emotion, String description, String timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
         this.emotion = emotion;
         this.timestamp = timestamp;
         this.emoji = emoji;
@@ -22,10 +23,15 @@ public class MoodEventModel {
         this.hasLocation = hasLocation;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.description = description;
     }
 
     public String getEmotion() {
         return emotion;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getTimestamp() {
