@@ -4,7 +4,6 @@ import com.google.firebase.firestore.ServerTimestamp;
 
 public class MoodEventModel {
     private String emotion;
-    @ServerTimestamp
     private String description;
     private String timestamp;
     private String emoji;
@@ -13,6 +12,10 @@ public class MoodEventModel {
     private boolean hasLocation;
     private double latitude;
     private double longitude;
+
+    // No-argument constructor required for Firestore
+    public MoodEventModel() {
+    }
 
     public MoodEventModel(String emotion, String description, String timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
         this.emotion = emotion;
