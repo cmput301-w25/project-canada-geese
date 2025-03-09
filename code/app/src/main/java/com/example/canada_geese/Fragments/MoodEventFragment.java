@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.canada_geese.Adapters.MoodEventAdapter;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
+import com.example.canada_geese.Pages.fragment_map_view_page;
 import com.example.canada_geese.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -37,6 +38,7 @@ public class MoodEventFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
         View addMoodEventButton = view.findViewById(R.id.add_mood_event_button);
+        View filterIcon = view.findViewById(R.id.filter_button);  // Get filter icon
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -107,9 +109,10 @@ public class MoodEventFragment extends Fragment {
 
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false));
-        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false));
-        list.add(new MoodEventModel("Sadness", "2025-02-07 21:16", "😢", R.color.color_sadness, false));
+        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
+
 }

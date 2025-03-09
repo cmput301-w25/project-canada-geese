@@ -89,7 +89,7 @@ public class fragment_user_moods_page extends Fragment {
         return view;
     }
 
-    // 添加新的心情事件并刷新UI
+
     public void addNewMood(MoodEventModel moodEvent) {
         if (adapter != null) {
             adapter.addItem(moodEvent);
@@ -112,9 +112,9 @@ public class fragment_user_moods_page extends Fragment {
     // Sample data method
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false));
-        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false));
-        list.add(new MoodEventModel("Sadness", "2025-02-07 21:16", "😢", R.color.color_sadness, false));
+        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
+        list.add(new MoodEventModel("Fear", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
         return list;
     }
 }

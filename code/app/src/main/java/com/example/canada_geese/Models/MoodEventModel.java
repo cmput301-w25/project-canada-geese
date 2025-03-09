@@ -9,13 +9,19 @@ public class MoodEventModel {
     private String emoji;
     private int color;
     private boolean triggerWarning;
+    private boolean hasLocation;
+    private double latitude;
+    private double longitude;
 
-    public MoodEventModel(String emotion, String timestamp, String emoji, int color, boolean hasTriggerWarning) {
+    public MoodEventModel(String emotion, String timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
         this.emotion = emotion;
         this.timestamp = timestamp;
         this.emoji = emoji;
         this.color = color;
-        this.triggerWarning = triggerWarning;
+        this.triggerWarning = hasTriggerWarning;
+        this.hasLocation = hasLocation;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getEmotion() {
@@ -37,4 +43,7 @@ public class MoodEventModel {
     public boolean hasTriggerWarning() {
         return triggerWarning;
     }
+    public boolean HasLocation(){return hasLocation;}
+    public double getLatitude() { return latitude; }
+    public double getLongitude() { return longitude; }
 }

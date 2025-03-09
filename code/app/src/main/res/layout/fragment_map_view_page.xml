@@ -1,15 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+    <!-- Google Map Fragment (background) -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- Top bar for buttons (on top of the map) -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:layout_gravity="top"
+        android:weightSum="3"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/white"
+        android:alpha="0.9">
+
+    <!-- Memory Button -->
+    <Button
+        android:id="@+id/btnMemory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Memory" />
+
+    <!-- Friends Button -->
+    <Button
+        android:id="@+id/btnFriends"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Friends" />
+
+    <!-- Explore Button -->
+    <Button
+        android:id="@+id/btnExplore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Explore" />
+
+    <!-- Filter Icon -->
+    <ImageButton
+        android:id="@+id/btnFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is Page #4"
-        android:textSize="18sp"/>
+        android:src="@drawable/baseline_filter_alt_24"
+        android:contentDescription="Filter"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"/>
 </LinearLayout>
+
+    </FrameLayout>

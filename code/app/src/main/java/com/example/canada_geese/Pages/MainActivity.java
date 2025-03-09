@@ -5,6 +5,8 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.canada_geese.Fragments.AddMoodEventDialogFragment;
 import com.example.canada_geese.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -37,7 +39,14 @@ public class MainActivity extends AppCompatActivity {
                     fragment = fragment_user_moods_page.newInstance();
                 } else if (itemId == R.id.page3) {
                     // Using fragment_add_mood_page
-                    fragment = fragment_add_mood_page.newInstance();
+                    //fragment = fragment_add_mood_page.newInstance();
+                    fragment_user_moods_page moodsFragment = fragment_user_moods_page.newInstance();
+
+                    AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
+                    dialog.setOnMoodAddedListener(moodsFragment::addNewMood);
+                    dialog.show(getSupportFragmentManager(), "AddMoodEventDialog");
+
+                    fragment = moodsFragment;
                 } else if (itemId == R.id.page4) {
                     fragment = fragment_map_view_page.newInstance();
                 } else if (itemId == R.id.page5) {
