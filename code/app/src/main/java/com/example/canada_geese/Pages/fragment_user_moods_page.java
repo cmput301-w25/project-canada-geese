@@ -1,6 +1,7 @@
 package com.example.canada_geese.Pages;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,19 +51,31 @@ public class fragment_user_moods_page extends Fragment {
         // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
-
-        // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Initialize data and adapter
-        moodEventList = new ArrayList<>(getSampleMoodEvents());
+        // Initialize empty list and adapter
+        moodEventList = new ArrayList<>();
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
-        // 如果有新添加的心情，添加到列表中
+        // Fetch mood events for the logged-in user
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                List<MoodEventModel> newList = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    MoodEventModel moodEvent = document.toObject(MoodEventModel.class);
+                    newList.add(moodEvent);
+                }
+                adapter.updateList(newList); // Refresh adapter with new data
+            } else {
+                Log.e("FetchError", "Error getting documents: ", task.getException());
+            }
+        });
+
+        // Check if there is a new mood to add
         if (newMood != null) {
             adapter.addItem(newMood);
-            newMood = null; // 重置，避免重复添加
+            newMood = null; // Reset to avoid duplicate addition
         }
 
         // Setup search functionality
@@ -78,7 +93,7 @@ public class fragment_user_moods_page extends Fragment {
             }
         });
 
-        // Add close listener to ensure list resets when search is closed
+        // Reset list when search is closed
         searchView.setOnCloseListener(() -> {
             adapter.filter("");
             return false;

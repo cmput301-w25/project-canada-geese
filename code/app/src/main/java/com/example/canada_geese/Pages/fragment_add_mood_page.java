@@ -50,7 +50,7 @@ public class fragment_add_mood_page extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize data and adapter
-        moodEventList = new ArrayList<>(getSampleMoodEvents());
+        moodEventList = new ArrayList<>(getSampleMoodEvents()); //CHANGE THIS MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 

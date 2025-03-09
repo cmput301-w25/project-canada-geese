@@ -86,9 +86,11 @@ public class DatabaseManager {
         if (user != null) {
             String userId = user.getUid();
 
-            // Reference to "moodEvents" subcollection under the user ID
-            db.collection("users").document(userId).collection("moodEvents")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)  // Order by most recent first
+            // Reference to "moodEvents" collection under the user ID
+            CollectionReference moodEventsRef = db.collection("users").document(userId).collection("moodEvents");
+
+            // Fetch all documents in the "moodEvents" collection
+            moodEventsRef.orderBy("timestamp", Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(listener);
         } else {
