@@ -142,7 +142,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                     getCurrentTimestamp(),
                     getEmojiForEmotion(moodName),
                     getColorForEmotion(moodName),
-                    false  // No trigger warning for now
+                    false,
+                    false,
+                    0.0,
+                    0.0// No trigger warning for now
             );
 
             // Add mood event to Firestore using DatabaseManager
