@@ -15,7 +15,7 @@
       android:layout_height="wrap_content"
       android:layout_centerHorizontal="true"
       android:layout_marginTop="90dp"
-      android:text="Sing In"
+      android:text="Sign In"
       android:textColor="#6B4F3F"
       android:textSize="64sp"
       android:textStyle="normal" />
