@@ -21,26 +21,14 @@ import java.util.Map;
 public class DatabaseManager {
     private static final String TAG = "DatabaseManager";
     private static DatabaseManager instance;
-    protected FirebaseFirestore db;  // Changed to protected for test subclass
-    protected FirebaseAuth auth;     // Changed to protected for test subclass
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
 
     // ---- Private Constructor for Singleton ----
     private DatabaseManager() {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         Log.d(TAG, "DatabaseManager initialized.");
-    }
-
-    // ---- Protected Constructor for Test Subclass ----
-    protected DatabaseManager(boolean isTestMode) {
-        if (isTestMode) {
-            db = null;   // Disable Firebase to avoid real interactions
-            auth = null;
-        } else {
-            db = FirebaseFirestore.getInstance();
-            auth = FirebaseAuth.getInstance();
-        }
-        Log.d(TAG, "DatabaseManager initialized (Test Mode: " + isTestMode + ").");
     }
 
     // ---- Get Singleton Instance ----
@@ -53,25 +41,29 @@ public class DatabaseManager {
 
     // ---- Add Mood Event to Firestore (Similar to Saving User Info) ----
     public void addMoodEvent(MoodEventModel moodEvent) {
-        if (auth == null) {
-            Log.e(TAG, "Test mode active: FirebaseAuth is disabled.");
-            return;
-        }
-
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
 
+            // Create a map for mood event data
             Map<String, Object> moodMap = new HashMap<>();
+            moodMap.put("userId", userId);  // Associate with current user
             moodMap.put("emotion", moodEvent.getEmotion());
+            moodMap.put("description", moodEvent.getDescription());
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
             moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
-            moodMap.put("userId", userId);
+            if(moodEvent.HasLocation()){
+                moodMap.put("latitude", moodEvent.getLatitude());
+                moodMap.put("longitude", moodEvent.getLongitude());
+            }
 
+
+            // Reference to "moodEvents" collection under the user ID
             CollectionReference moodEventsRef = db.collection("users").document(userId).collection("moodEvents");
 
+            // Write to Firestore
             moodEventsRef.add(moodMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -87,25 +79,25 @@ public class DatabaseManager {
         }
     }
 
+
     // ---- Fetch Mood Events for Logged-in User ----
     public void fetchMoodEvents(OnCompleteListener<QuerySnapshot> listener) {
-        if (auth == null) {
-            Log.e(TAG, "Test mode active: FirebaseAuth is disabled.");
-            return;
-        }
-
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
 
-            db.collection("users").document(userId).collection("moodEvents")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
+            // Reference to "moodEvents" collection under the user ID
+            CollectionReference moodEventsRef = db.collection("users").document(userId).collection("moodEvents");
+
+            // Fetch all documents in the "moodEvents" collection
+            moodEventsRef.orderBy("timestamp", Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(listener);
         } else {
             Log.e(TAG, "User is not logged in.");
         }
     }
+
 
     // ---- Placeholder for Updating a Mood Event ----
     public void updateMoodEvent() {

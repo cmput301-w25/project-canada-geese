@@ -73,8 +73,13 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
 
     public void updateData(List<MoodEventModel> newData) {
-        this.moodEventListFull = new ArrayList<>(newData);
-        filter(currentQuery);
+        this.moodEventListFull.clear();
+        this.moodEventListFull.addAll(newData);  // 🔄 Update the full list for filtering
+
+        this.moodEventList.clear();
+        this.moodEventList.addAll(newData);       // 🔄 Update the list displayed in RecyclerView
+
+        filter(currentQuery);                     // 🔄 Apply current filter if any
     }
 
 
@@ -93,6 +98,9 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
 
     public void updateList(List<MoodEventModel> newList) {
+        this.moodEventListFull.clear();
+        this.moodEventListFull.addAll(newList);
+
         this.moodEventList.clear();
         this.moodEventList.addAll(newList);
         notifyDataSetChanged();

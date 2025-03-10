@@ -1,6 +1,7 @@
 package com.example.canada_geese.Pages;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,24 +48,36 @@ public class fragment_user_moods_page extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_mood_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_moods_page, container, false);
 
         // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
-
-        // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Initialize data and adapter
+        // Initialize empty list and adapter
         moodEventList = new ArrayList<>();
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
-        // 如果有新添加的心情，添加到列表中
+        // Fetch mood events for the logged-in user
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                List<MoodEventModel> newList = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    MoodEventModel moodEvent = document.toObject(MoodEventModel.class);
+                    newList.add(moodEvent);
+                }
+                adapter.updateList(newList); // Refresh adapter with new data
+            } else {
+                Log.e("FetchError", "Error getting documents: ", task.getException());
+            }
+        });
+
+        // Check if there is a new mood to add
         if (newMood != null) {
             adapter.addItem(newMood);
-            newMood = null; // 重置，避免重复添加
+            newMood = null; // Reset to avoid duplicate addition
         }
 
         // Setup search functionality
@@ -80,7 +95,7 @@ public class fragment_user_moods_page extends Fragment {
             }
         });
 
-        // Add close listener to ensure list resets when search is closed
+        // Reset list when search is closed
         searchView.setOnCloseListener(() -> {
             adapter.filter("");
             return false;
@@ -112,9 +127,9 @@ public class fragment_user_moods_page extends Fragment {
     // Sample data method
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
-        list.add(new MoodEventModel("Fear", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
+        list.add(new MoodEventModel("Happiness","test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
+        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
         return list;
     }
 }
