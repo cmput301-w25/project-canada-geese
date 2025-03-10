@@ -32,7 +32,7 @@ public class DatabaseManager {
      * Private constructor for singleton pattern.
      * Initializes Firebase Firestore and FirebaseAuth instances.
      */
-    private DatabaseManager() {
+    protected DatabaseManager() {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         Log.d(TAG, "DatabaseManager initialized.");

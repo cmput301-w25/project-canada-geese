@@ -15,15 +15,21 @@ import static org.junit.Assert.*;
 public class DatabaseManagerTest {
 
     /**
-     * Custom `TestDatabaseManager` to mock Firebase operations
+     * Custom *`TestDatabaseManager`* to mock Firebase operations
      */
     private static class TestDatabaseManager extends DatabaseManager {
         public boolean addMoodEventCalled = false;
         public MoodEventModel lastAddedMood = null;
 
-        // Constructor to bypass real Firebase initialization
+        // Constructor that doesn't rely on the private constructor
         public TestDatabaseManager() {
-            super(true); // Pass `true` to activate test mode in DatabaseManager
+            // Call the public constructor instead of the private one
+            super();
+        }
+
+        // Another option: initialize in a different way if needed
+        public void initForTesting() {
+            // Put any initialization code needed for testing here
         }
 
         // Override addMoodEvent to avoid real Firebase requests
@@ -40,6 +46,8 @@ public class DatabaseManagerTest {
     public void setUp() {
         // Initialize the test version of DatabaseManager
         testManager = new TestDatabaseManager();
+        // If needed, use the alternate initialization method
+        testManager.initForTesting();
     }
 
     @Test
@@ -47,6 +55,7 @@ public class DatabaseManagerTest {
         // Create a MoodEventModel instance
         MoodEventModel moodEvent = new MoodEventModel(
                 "Happy",                // Emotion
+                "Feeling great today!", // Description
                 "2025-03-09 10:30",     // Timestamp
                 "😊",                   // Emoji
                 R.color.color_happiness,// Color
