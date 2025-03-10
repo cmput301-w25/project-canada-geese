@@ -12,19 +12,18 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#6B4F3F"
+        android:background="@color/banner"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true" />
+        <!-- Search Bar -->
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="275dp"
+            android:layout_height="40dp"
+            android:background="@android:drawable/editbox_background"
+            android:queryHint="Search..."
+            android:iconifiedByDefault="false"
+            android:padding="5dp"/>
 
         <ImageButton
             android:id="@+id/btn_logout"
@@ -39,8 +38,9 @@
             android:clickable="true"
             android:focusable="true"/>
 
+        <!-- Follow Requests Button -->
         <ImageButton
-            android:id="@+id/btnSignOut"
+            android:id="@+id/btn_follow_requests"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
@@ -58,14 +58,13 @@
         android:id="@+id/profile_image"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="55dp"
         android:background="@drawable/circle_border"
-        android:clickable="true"
-        android:focusable="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/circle_border" />
+        android:src="@drawable/circle_border"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <TextView
         android:id="@+id/username_text"
@@ -73,12 +72,13 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_image"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="YourUsername"
-        android:textColor="#6B4F3F"
         android:textSize="22sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="#6B4F3F"/>
 
+    <!-- Followers & Following Section -->
     <LinearLayout
         android:id="@+id/follow_stats_container"
         android:layout_width="wrap_content"
