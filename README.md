@@ -13,13 +13,12 @@
 
 ## Project Description
 
-[Brief description of the project in your own words]
+Mood Event App 
 
 ## Key Features
 
-- [Feature 1]: Brief description
-- [Feature 2]: Brief description
-- [Feature 3]: Brief description
+- Map Feature: Add location to new mood event and see the mood events happening in a certain area around you
+- Follow people as in your friends to see updaes on their mood on your feed
 
 ## Setup Instructions
 
