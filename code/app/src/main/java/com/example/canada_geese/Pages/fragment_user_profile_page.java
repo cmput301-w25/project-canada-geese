@@ -19,27 +19,47 @@ import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Fragment to display and manage the user's profile page.
+ * Includes user information such as username and profile picture,
+ * and provides a sign-out functionality.
+ */
 public class fragment_user_profile_page extends Fragment {
 
     private FirebaseAuth mAuth;
     private TextView usernameText;
-
     private ImageView profileImage;
     private ImageButton signOutButton;
 
+    /**
+     * Required empty public constructor.
+     */
     public fragment_user_profile_page() {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of this fragment.
+     *
+     * @return A new instance of fragment_user_profile_page.
+     */
     public static fragment_user_profile_page newInstance() {
         return new fragment_user_profile_page();
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes Firebase authentication and UI components.
+     *
+     * @param inflater           The LayoutInflater object to inflate views.
+     * @param container          The parent view to attach the fragment's UI.
+     * @param savedInstanceState A previous saved state of the fragment, if available.
+     * @return The root view for this fragment's layout.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user_profile_page, container, false);
 
-        //  Initialize Firebase Auth
+        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         // Find Views
@@ -50,11 +70,15 @@ public class fragment_user_profile_page extends Fragment {
         // Fetch the user details from Firebase
         loadUserProfile();
 
-        // sign out button
+        // Set click listener for the sign-out button
         signOutButton.setOnClickListener(v -> signOutUser());
 
         return rootView;
     }
+
+    /**
+     * Signs out the current user, clears stored login preferences, and redirects to the login screen.
+     */
     private void signOutUser() {
         // 1. Sign out from Firebase
         mAuth.signOut();
@@ -70,10 +94,14 @@ public class fragment_user_profile_page extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
-        // Optionally, finish the current activity so the user can't go back to the profile page
-        requireActivity().finish(); // Close the profile activity
+        // Finish the current activity to prevent the user from returning to the profile page
+        requireActivity().finish();
     }
 
+    /**
+     * Loads the user's profile information including username and profile picture.
+     * Displays default information if user data is not available.
+     */
     private void loadUserProfile() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -84,7 +112,7 @@ public class fragment_user_profile_page extends Fragment {
             if (username != null && !username.isEmpty()) {
                 usernameText.setText(username);
             } else {
-                Log.d("UserProfile", "Username is empty, using email");
+                Log.d("UserProfile", "Username is empty, using email as fallback");
                 usernameText.setText(email);
             }
 
@@ -99,5 +127,4 @@ public class fragment_user_profile_page extends Fragment {
             Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

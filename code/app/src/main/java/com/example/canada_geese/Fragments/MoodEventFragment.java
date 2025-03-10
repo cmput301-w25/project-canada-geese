@@ -22,14 +22,28 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A fragment that displays a list of mood events and allows searching and filtering.
+ */
 public class MoodEventFragment extends Fragment {
     private RecyclerView recyclerView;
     private MoodEventAdapter adapter;
     private SearchView searchView;
     private List<MoodEventModel> moodEventList;
 
+    /**
+     * Default constructor for MoodEventFragment.
+     */
     public MoodEventFragment() {}
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -38,15 +52,14 @@ public class MoodEventFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
         View addMoodEventButton = view.findViewById(R.id.add_mood_event_button);
-        View filterIcon = view.findViewById(R.id.filter_button);  // Get filter icon
+        View filterIcon = view.findViewById(R.id.filter_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        moodEventList = new ArrayList<>();  // Start with an empty list (no sample data)
+        moodEventList = new ArrayList<>();
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
-        // ---- Fetch Mood Events from Firestore ----
         fetchMoodEventsFromFirestore();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -69,23 +82,24 @@ public class MoodEventFragment extends Fragment {
 
         addMoodEventButton.setOnClickListener(v -> {
             AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
-            dialog.setOnMoodAddedListener(moodEvent -> {
-                fetchMoodEventsFromFirestore();  // Refresh the list after adding a mood
-            });
+            dialog.setOnMoodAddedListener(moodEvent -> fetchMoodEventsFromFirestore());
             dialog.show(getParentFragmentManager(), "AddMoodEventDialog");
         });
 
         return view;
     }
 
-    // ---- Fetch Mood Events from Firestore ----
+    /**
+     * Fetches mood events from Firestore and updates the RecyclerView.
+     * Logs the success or failure of the operation.
+     */
     private void fetchMoodEventsFromFirestore() {
         Log.d("MoodEventFragment", "Attempting to fetch mood events from Firestore...");
 
         DatabaseManager.getInstance().fetchMoodEvents(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 Log.d("MoodEventFragment", "Fetched " + task.getResult().size() + " mood events.");
-                moodEventList.clear();  // Clear old data
+                moodEventList.clear();
 
                 for (DocumentSnapshot doc : task.getResult()) {
                     MoodEventModel mood = doc.toObject(MoodEventModel.class);
@@ -97,7 +111,7 @@ public class MoodEventFragment extends Fragment {
                     }
                 }
 
-                adapter.updateList(moodEventList);  // Refresh RecyclerView
+                adapter.updateList(moodEventList);
                 Log.d("MoodEventFragment", "RecyclerView updated with latest mood events.");
             } else {
                 Log.e("MoodEventFragment", "Failed to fetch mood events: ", task.getException());
@@ -105,14 +119,16 @@ public class MoodEventFragment extends Fragment {
         });
     }
 
-
-
+    /**
+     * Provides sample mood events for testing purposes.
+     *
+     * @return A list of sample MoodEventModel objects.
+     */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
-
 }

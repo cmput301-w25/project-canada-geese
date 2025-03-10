@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,6 +21,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment to display the list of mood events for the logged-in user.
+ * Supports searching and adding new mood events dynamically.
+ */
 public class fragment_user_moods_page extends Fragment {
     private RecyclerView recyclerView;
     private MoodEventAdapter adapter;
@@ -29,10 +32,18 @@ public class fragment_user_moods_page extends Fragment {
     private List<MoodEventModel> moodEventList;
     private MoodEventModel newMood;
 
+    /**
+     * Required empty public constructor.
+     */
     public fragment_user_moods_page() {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of this fragment.
+     *
+     * @return A new instance of fragment_user_moods_page.
+     */
     public static fragment_user_moods_page newInstance() {
         fragment_user_moods_page fragment = new fragment_user_moods_page();
         Bundle args = new Bundle();
@@ -40,11 +51,23 @@ public class fragment_user_moods_page extends Fragment {
         return fragment;
     }
 
-    // 设置新的心情，在Fragment创建之前调用
+    /**
+     * Sets a new mood to be added to the list before the fragment is created.
+     *
+     * @param mood The MoodEventModel representing the new mood to add.
+     */
     public void setNewMood(MoodEventModel mood) {
         this.newMood = mood;
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes views.
+     *
+     * @param inflater           The LayoutInflater object to inflate views.
+     * @param container          The parent view to attach the fragment's UI.
+     * @param savedInstanceState A previous saved state of the fragment, if available.
+     * @return The root view for this fragment's layout.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,7 +83,7 @@ public class fragment_user_moods_page extends Fragment {
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
-        // Fetch mood events for the logged-in user
+        // Fetch mood events for the logged-in user from Firestore
         DatabaseManager.getInstance().fetchMoodEvents(task -> {
             if (task.isSuccessful()) {
                 List<MoodEventModel> newList = new ArrayList<>();
@@ -104,32 +127,41 @@ public class fragment_user_moods_page extends Fragment {
         return view;
     }
 
-
+    /**
+     * Adds a new mood to the list and scrolls to the top to display it.
+     *
+     * @param moodEvent The new MoodEventModel to add.
+     */
     public void addNewMood(MoodEventModel moodEvent) {
         if (adapter != null) {
             adapter.addItem(moodEvent);
-            recyclerView.smoothScrollToPosition(0); // 滚动到顶部以显示新添加的条目
+            recyclerView.smoothScrollToPosition(0); // Scroll to top to show the new entry
         } else {
-            // 如果adapter尚未初始化，保存心情以便稍后添加
-            newMood = moodEvent;
+            newMood = moodEvent; // Save mood to add it later if adapter is not ready
         }
     }
 
+    /**
+     * Resets the search filter when the fragment is resumed.
+     */
     @Override
     public void onResume() {
         super.onResume();
-        // 确保在Fragment恢复时重置过滤
         if (adapter != null) {
-            adapter.filter("");
+            adapter.filter(""); // Clear search filter on resume
         }
     }
 
-    // Sample data method
+    /**
+     * Provides a sample list of mood events for testing purposes.
+     *
+     * @return A list of sample MoodEventModel objects.
+     */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness","test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
-        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
+        list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
         return list;
     }
 }

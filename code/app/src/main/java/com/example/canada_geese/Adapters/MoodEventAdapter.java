@@ -15,12 +15,21 @@ import java.util.List;
 import android.os.Handler;
 import android.os.Looper;
 
+/**
+ * Adapter for displaying a list of mood events in a RecyclerView.
+ */
 public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.ViewHolder> {
     private List<MoodEventModel> moodEventList;
     private List<MoodEventModel> moodEventListFull;
     private Context context;
     private String currentQuery = "";
 
+    /**
+     * Constructor for MoodEventAdapter.
+     *
+     * @param moodEventList Initial list of mood events.
+     * @param context       Context for accessing resources.
+     */
     public MoodEventAdapter(List<MoodEventModel> moodEventList, Context context) {
         this.moodEventList = new ArrayList<>(moodEventList);
         this.moodEventListFull = new ArrayList<>(moodEventList);
@@ -43,7 +52,6 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             holder.timestamp.setText(event.getTimestamp());
             holder.moodEmoji.setText(event.getEmoji());
 
-
             int color = event.getColor();
             if (color != 0) {
                 holder.cardView.setCardBackgroundColor(context.getResources().getColor(color));
@@ -58,10 +66,18 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         return moodEventList != null ? moodEventList.size() : 0;
     }
 
+    /**
+     * ViewHolder class for managing individual mood event items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView moodText, timestamp, moodEmoji;
         CardView cardView;
 
+        /**
+         * Constructor for ViewHolder.
+         *
+         * @param itemView The view for a single item.
+         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             moodText = itemView.findViewById(R.id.mood_name);
@@ -71,23 +87,29 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         }
     }
 
-
+    /**
+     * Updates the adapter with a new list of mood events.
+     *
+     * @param newData The new list of mood events.
+     */
     public void updateData(List<MoodEventModel> newData) {
         this.moodEventListFull.clear();
-        this.moodEventListFull.addAll(newData);  // 🔄 Update the full list for filtering
+        this.moodEventListFull.addAll(newData);
 
         this.moodEventList.clear();
-        this.moodEventList.addAll(newData);       // 🔄 Update the list displayed in RecyclerView
+        this.moodEventList.addAll(newData);
 
-        filter(currentQuery);                     // 🔄 Apply current filter if any
+        filter(currentQuery);
     }
 
-
+    /**
+     * Adds a new mood event to the list.
+     *
+     * @param newItem The new mood event to add.
+     */
     public void addItem(MoodEventModel newItem) {
-
         moodEventListFull.add(0, newItem);
         moodEventList.add(0, newItem);
-
 
         new Handler(Looper.getMainLooper()).post(() -> {
             notifyItemInserted(0);
@@ -95,8 +117,11 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
     }
 
-
-
+    /**
+     * Replaces the current list of mood events with a new list.
+     *
+     * @param newList The new list of mood events.
+     */
     public void updateList(List<MoodEventModel> newList) {
         this.moodEventListFull.clear();
         this.moodEventListFull.addAll(newList);
@@ -106,7 +131,11 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         notifyDataSetChanged();
     }
 
-
+    /**
+     * Filters the mood events based on a query string.
+     *
+     * @param query The search query.
+     */
     public void filter(String query) {
         this.currentQuery = query;
         moodEventList.clear();

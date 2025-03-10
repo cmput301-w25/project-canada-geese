@@ -14,15 +14,31 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Adapter for displaying a list of emotional states in a RecyclerView.
+ */
 public class EmotionalStateAdapter extends RecyclerView.Adapter<EmotionalStateAdapter.MoodViewHolder> {
     private final List<EmotionalState> states;
     private final OnEmotionalStateSelectedListener listener;
     private EmotionalState selectedState;
 
+    /**
+     * Listener interface for handling emotional state selection.
+     */
     public interface OnEmotionalStateSelectedListener {
+        /**
+         * Called when an emotional state is selected.
+         *
+         * @param state The selected emotional state.
+         */
         void onEmotionalStateSelected(EmotionalState state);
     }
 
+    /**
+     * Constructor for EmotionalStateAdapter.
+     *
+     * @param listener Listener for handling emotional state selection.
+     */
     public EmotionalStateAdapter(OnEmotionalStateSelectedListener listener) {
         this.states = Arrays.asList(EmotionalState.values());
         this.listener = listener;
@@ -48,11 +64,19 @@ public class EmotionalStateAdapter extends RecyclerView.Adapter<EmotionalStateAd
         return states.size();
     }
 
+    /**
+     * ViewHolder class for managing individual emotional state items.
+     */
     public class MoodViewHolder extends RecyclerView.ViewHolder {
         private final MaterialCardView cardView;
         private final TextView emojiView;
         private final TextView nameView;
 
+        /**
+         * Constructor for MoodViewHolder.
+         *
+         * @param itemView The view for a single item.
+         */
         public MoodViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = (MaterialCardView) itemView;
@@ -69,6 +93,12 @@ public class EmotionalStateAdapter extends RecyclerView.Adapter<EmotionalStateAd
             });
         }
 
+        /**
+         * Binds the data to the view holder.
+         *
+         * @param state      The emotional state to bind.
+         * @param isSelected Whether this state is currently selected.
+         */
         public void bind(EmotionalState state, boolean isSelected) {
             emojiView.setText(state.getEmoji());
             nameView.setText(state.getDisplayName());
@@ -84,6 +114,11 @@ public class EmotionalStateAdapter extends RecyclerView.Adapter<EmotionalStateAd
         }
     }
 
+    /**
+     * Sets the selected emotional state and updates the view.
+     *
+     * @param state The new selected state.
+     */
     public void setSelectedState(EmotionalState state) {
         EmotionalState oldState = this.selectedState;
         this.selectedState = state;

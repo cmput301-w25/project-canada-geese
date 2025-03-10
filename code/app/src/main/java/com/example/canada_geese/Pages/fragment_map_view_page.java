@@ -25,48 +25,65 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
-
 import java.util.ArrayList;
-import java.util.List; // To handle the list of mood events
+import java.util.List;
 
+/**
+ * A fragment that displays a map view with mood event markers.
+ */
 public class fragment_map_view_page extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private Button memoryButton;
+    private List<MoodEventModel> moodEventList;
 
-    private List<MoodEventModel> moodEventList;  // List of mood events (replace with actual data source)
-
+    /**
+     * Required empty public constructor.
+     */
     public fragment_map_view_page() {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of this fragment.
+     *
+     * @return A new instance of fragment_map_view_page.
+     */
     public static fragment_map_view_page newInstance() {
         return new fragment_map_view_page();
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes views.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState A previous saved state of the fragment, if available.
+     * @return The root view for this fragment's layout.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map_view_page, container, false);
 
-        // Initialize the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        // Initialize the location client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-
-        // Initialize and set the "Memory" button functionality
         memoryButton = rootView.findViewById(R.id.btnMemory);
         memoryButton.setOnClickListener(v -> onMemoryButtonClick());
 
         return rootView;
     }
 
+    /**
+     * Called when the map is ready to be used.
+     *
+     * @param googleMap The GoogleMap object.
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -83,7 +100,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
 
         mMap.setMyLocationEnabled(true);
 
-        // Request the most recent location of the user
         fusedLocationClient.getCurrentLocation(com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(requireActivity(), location -> {
                     if (location != null) {
@@ -94,7 +110,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                 });
     }
 
-    // Handle permission result
+    /**
+     * Handles the result of permission requests.
+     *
+     * @param requestCode  The request code passed in requestPermissions().
+     * @param permissions  The requested permissions.
+     * @param grantResults The grant results for the requested permissions.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -105,14 +127,20 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         }
     }
 
-    // This method will be called when the "Memory" button is clicked
+    /**
+     * Handles the "Memory" button click event to add mood event markers.
+     */
     private void onMemoryButtonClick() {
-        // This is just an example list. Replace this with actual data from your Firestore or other source.
-        moodEventList = getSampleMoodEvents();  // Fetch the list of mood events (either from Firestore or your data source)
-
-        // Add the markers to the map
+        moodEventList = getSampleMoodEvents();
         addMoodEventMarkers();
     }
+
+    /**
+     * Gets the emoji representation for a given emotion.
+     *
+     * @param emotion The emotion string.
+     * @return The corresponding emoji.
+     */
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
             case "Happiness": return "😊";
@@ -128,17 +156,16 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         }
     }
 
-    // Add MoodEventModel markers to the map
+    /**
+     * Adds mood event markers to the map.
+     */
     private void addMoodEventMarkers() {
         if (moodEventList != null && !moodEventList.isEmpty()) {
             for (MoodEventModel moodEvent : moodEventList) {
                 if (moodEvent.HasLocation()) {
                     LatLng location = new LatLng(moodEvent.getLatitude(), moodEvent.getLongitude());
-
-                    // Convert emoji to Bitmap
                     Bitmap emojiBitmap = createEmojiBitmap(getEmojiForEmotion(moodEvent.getEmotion()));
 
-                    // Create a marker with the emoji as an icon
                     MarkerOptions markerOptions = new MarkerOptions()
                             .position(location)
                             .title(moodEvent.getEmotion())
@@ -150,9 +177,16 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
             }
         }
     }
+
+    /**
+     * Converts an emoji to a Bitmap to be used as a marker icon.
+     *
+     * @param emoji The emoji character.
+     * @return A Bitmap representation of the emoji.
+     */
     private Bitmap createEmojiBitmap(String emoji) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextSize(100);  // Adjust size as needed
+        paint.setTextSize(100);
         paint.setColor(Color.BLACK);
         paint.setTextAlign(Paint.Align.CENTER);
 
@@ -167,19 +201,16 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         return bitmap;
     }
 
-
-
-    // Example method to simulate fetching mood events (replace with actual data fetching logic)
-    private List<MoodEventModel> getMoodEvents() {
-        // Fetch your data from Firestore, SQLite, etc. and return it
-        // This is just a placeholder.
-        return null;
-    }
+    /**
+     * Retrieves a sample list of mood events for testing.
+     *
+     * @return A list of sample MoodEventModel objects.
+     */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
 }

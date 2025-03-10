@@ -18,6 +18,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Handles user login functionality including "Remember Me" feature.
+ * Authenticates users using Firebase Authentication and retrieves user information from Firestore.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameField, passwordField;
@@ -27,12 +31,20 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private CheckBox rememberMeCheckBox;
 
+    // SharedPreferences keys for storing login information
     private static final String PREF_NAME = "loginPrefs";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_REMEMBER_ME = "rememberMe";
 
+    /**
+     * Called when the activity is first created.
+     * Initializes Firebase authentication and UI components.
+     * Checks if the user is already logged in based on saved preferences.
+     *
+     * @param savedInstanceState Previous state of the activity, if available.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +106,14 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // Login with username and password
+    /**
+     * Logs in a user using their username and password.
+     * Queries Firestore to retrieve the associated email and authenticates using FirebaseAuth.
+     *
+     * @param username    The username entered by the user.
+     * @param password    The password entered by the user.
+     * @param rememberMe  Whether to remember the user's credentials for future logins.
+     */
     public void loginWithUsername(String username, String password, boolean rememberMe) {
         // Query Firestore to find the email associated with the username
         db.collection("users")
@@ -118,19 +137,11 @@ public class LoginActivity extends AppCompatActivity {
 
                                                 // Save the login state if "Remember Me" is checked
                                                 if (rememberMe) {
-                                                    SharedPreferences sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                    editor.putString(KEY_EMAIL, email);
-                                                    editor.putString(KEY_PASSWORD, password);
-                                                    editor.putString(KEY_USERNAME, username);  // Save username too
-                                                    editor.putBoolean(KEY_REMEMBER_ME, true);
-                                                    editor.apply();
+                                                    saveLoginInfo(email, password, username);
                                                 }
 
                                                 // Go to MainActivity after successful login
-                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                startActivity(intent);
-                                                finish();
+                                                navigateToMainActivity();
                                             } else {
                                                 // Login failed
                                                 Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
@@ -149,5 +160,31 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Error retrieving user info.", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    /**
+     * Saves login information to SharedPreferences if "Remember Me" is checked.
+     *
+     * @param email     The email of the logged-in user.
+     * @param password  The password of the logged-in user.
+     * @param username  The username of the logged-in user.
+     */
+    private void saveLoginInfo(String email, String password, String username) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_EMAIL, email);
+        editor.putString(KEY_PASSWORD, password);
+        editor.putString(KEY_USERNAME, username);  // Save username too
+        editor.putBoolean(KEY_REMEMBER_ME, true);
+        editor.apply();
+    }
+
+    /**
+     * Navigates to the main activity of the app.
+     */
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

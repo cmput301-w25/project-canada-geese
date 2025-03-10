@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,16 +20,28 @@ import com.example.canada_geese.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A fragment that manages and displays a list of mood events.
+ * Provides functionality for searching and adding new mood events.
+ */
 public class fragment_add_mood_page extends Fragment {
     private RecyclerView recyclerView;
     private MoodEventAdapter adapter;
     private SearchView searchView;
     private List<MoodEventModel> moodEventList;
 
+    /**
+     * Required empty public constructor.
+     */
     public fragment_add_mood_page() {
         // Required empty public constructor
     }
 
+    /**
+     * Creates a new instance of this fragment.
+     *
+     * @return A new instance of fragment_add_mood_page.
+     */
     public static fragment_add_mood_page newInstance() {
         fragment_add_mood_page fragment = new fragment_add_mood_page();
         Bundle args = new Bundle();
@@ -38,6 +49,14 @@ public class fragment_add_mood_page extends Fragment {
         return fragment;
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState A previous saved state of the fragment, if available.
+     * @return The root view for this fragment's layout.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,7 +85,6 @@ public class fragment_add_mood_page extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // 直接使用filter方法，让适配器内部决定如何处理空查询
                 adapter.filter(newText);
                 return false;
             }
@@ -92,21 +110,27 @@ public class fragment_add_mood_page extends Fragment {
         return view;
     }
 
+    /**
+     * Ensures the filter is reset when the fragment resumes.
+     */
     @Override
     public void onResume() {
         super.onResume();
-        // 确保在Fragment恢复时重置过滤
         if (adapter != null) {
             adapter.filter("");
         }
     }
 
-    // Sample data method
+    /**
+     * Provides sample mood events for testing purposes.
+     *
+     * @return A list of sample MoodEventModel objects.
+     */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger","test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear","test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
-    }
+}
