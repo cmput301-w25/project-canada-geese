@@ -57,10 +57,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     /**
      * Inflates the layout for this fragment and initializes views.
      *
-     * @param inflater           The LayoutInflater object that can be used to inflate views.
-     * @param container          The parent view that this fragment's UI should be attached to.
-     * @param savedInstanceState A previous saved state of the fragment, if available.
-     * @return The root view for this fragment's layout.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

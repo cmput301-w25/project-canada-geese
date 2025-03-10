@@ -41,6 +41,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * A dialog fragment that allows the user to add a new mood event.
+ */
 public class AddMoodEventDialogFragment extends DialogFragment {
     private Spinner moodSpinner;
     private Button addMoodButton;
@@ -50,16 +53,32 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
     private static final int LOCATION_PERMISSION_REQUEST = 100;
 
+    /**
+     * Interface for listening to mood event added events.
+     */
     public interface OnMoodAddedListener {
         void onMoodAdded(MoodEventModel moodEvent);
     }
 
+    /**
+     * Listener for mood event added events.
+     */
     private OnMoodAddedListener moodAddedListener;
 
+    /**
+     * Sets the listener for mood event added events.
+     *
+     * @param listener the listener to set.
+     */
     public void setOnMoodAddedListener(OnMoodAddedListener listener) {
         this.moodAddedListener = listener;
     }
-
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI, or null.
+     */
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
@@ -75,7 +94,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         return dialog;
     }
-
+    /**
+     * Called when the fragment is visible to the user and actively running.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -88,6 +109,18 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -125,7 +158,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             }
         });
 
-
+        // Click listener for the add mood button
         addMoodButton.setOnClickListener(v -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
@@ -170,6 +203,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         return view;
     }
 
+    /**
+     * Requests the location permission from the user.
+     */
     private void requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
@@ -178,6 +214,15 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     *
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -190,6 +235,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Shows the user's current location on the map.
+     */
     private void showUserLocation() {
         View mapContainer = getView().findViewById(R.id.map_container);
         if (mapContainer != null) {
@@ -220,10 +268,21 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     }
 
 
+    /**
+     * Returns the current timestamp in the format "yyyy-MM-dd HH:mm".
+     *
+     * @return the current timestamp.
+     */
     private String getCurrentTimestamp() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
     }
 
+    /**
+     * Returns the emoji corresponding to the given emotion.
+     *
+     * @param emotion the emotion to get the emoji for.
+     * @return the emoji corresponding to the given emotion.
+     */
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
             case "Happiness": return "😊";
@@ -239,6 +298,11 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     *
+     * @param emotion
+     * @return
+     */
     private int getColorForEmotion(String emotion) {
         switch (emotion) {
             case "Happiness": return R.color.color_happiness;

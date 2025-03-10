@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment that displays a list of mood events and allows searching and filtering.
+ * A fragment that displays a list of mood events and allows searching and filtering of mood evnents
  */
 public class MoodEventFragment extends Fragment {
     private RecyclerView recyclerView;

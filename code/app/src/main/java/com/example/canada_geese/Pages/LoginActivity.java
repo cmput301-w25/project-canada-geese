@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Handles user login functionality including "Remember Me" feature.
- * Authenticates users using Firebase Authentication and retrieves user information from Firestore.
+ * Authenticates users using Firebase Authentication and retrieves user information from Firestore
  */
 public class LoginActivity extends AppCompatActivity {
 

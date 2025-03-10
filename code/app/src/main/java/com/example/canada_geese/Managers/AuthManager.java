@@ -1,4 +1,4 @@
-
+// AuthManager Final left for future reference not being used currently
 /*
 package com.example.canada_geese.Managers;
 

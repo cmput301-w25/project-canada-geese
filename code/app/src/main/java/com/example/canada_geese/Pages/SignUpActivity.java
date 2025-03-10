@@ -74,7 +74,21 @@ public class SignUpActivity extends AppCompatActivity {
                     usernameField.setError("Username is required");
                     return;
                 }
-
+                // check email format through regex pattern matching for email
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    emailField.setError("Please enter a valid email address");
+                    return;
+                }
+                // check password length
+                if (password.length() < 5) {
+                    passwordField.setError("Password must be at least 6 characters long");
+                    return;
+                }
+                // check username length
+                if (username.length() < 3 || username.length() > 15) {
+                    usernameField.setError("Username must be between 3 and 15 characters long");
+                    return;
+                }
                 // Initiate sign-up
                 signUp(email, password, username);
             }
@@ -104,6 +118,24 @@ public class SignUpActivity extends AppCompatActivity {
      * @param username The username entered by the user.
      */
     public void signUp(String email, String password, String username) {
+        // check if email is already in use
+        db.collection("users").whereEqualTo("email", email).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // prevent duplicate emails
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        emailField.setError("Email is already in use");
+                        return;
+                    }
+                });
+        // check if username is already in use
+        db.collection("users").whereEqualTo("username", username).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // prevent duplicate usernames
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        usernameField.setError("Username is already in use");
+                        return;
+                    }
+                });
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {

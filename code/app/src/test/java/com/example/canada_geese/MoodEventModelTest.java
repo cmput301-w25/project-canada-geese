@@ -11,7 +11,7 @@ public class MoodEventModelTest {
     @Test
     public void testConstructorAndGetters() {
         MoodEventModel moodEvent = new MoodEventModel(
-                "Happy",
+                "Happy","",
                 "2023-10-01",
                 "😊",
                 R.color.mood_happiness,
@@ -31,7 +31,7 @@ public class MoodEventModelTest {
     @Test
     public void testHasTriggerWarning_True() {
         MoodEventModel moodEvent = new MoodEventModel(
-                "Happy",
+                "Happy","",
                 "2023-10-01",
                 "😊",
                 R.color.mood_happiness,
@@ -47,7 +47,7 @@ public class MoodEventModelTest {
     @Test
     public void testHasTriggerWarning_False() {
         MoodEventModel moodEvent = new MoodEventModel(
-                "Happy",
+                "Happy","",
                 "2023-10-01",
                 "😊",
                 R.color.mood_happiness,
@@ -62,9 +62,9 @@ public class MoodEventModelTest {
 
     @Test
     public void testMultipleInstancesAreIndependent() {
-        MoodEventModel mood1 = new MoodEventModel("Happy", "2023-10-01", "😊",
+        MoodEventModel mood1 = new MoodEventModel("Happy", "", "2023-10-01", "😊",
                 R.color.mood_happiness, false, false, 0.0, 0.0);
-        MoodEventModel mood2 = new MoodEventModel("Angry", "2023-10-02", "😠",
+        MoodEventModel mood2 = new MoodEventModel("Angry","", "2023-10-02", "😠",
                 R.color.mood_anger, true,true, 1.0, 1.0);
 
         assertNotEquals("Emotions should be different", mood1.getEmotion(), mood2.getEmotion());
@@ -77,7 +77,7 @@ public class MoodEventModelTest {
 
     @Test
     public void testMoodEventWithEmptyStringValues() {
-        MoodEventModel mood = new MoodEventModel("", "", "", 0, false,false,0.0,0.0);
+        MoodEventModel mood = new MoodEventModel("", "","", "", 0, false,false,0.0,0.0);
 
         assertEquals("Empty emotion should be empty string", "", mood.getEmotion());
         assertEquals("Empty timestamp should be empty string", "", mood.getTimestamp());
@@ -88,7 +88,7 @@ public class MoodEventModelTest {
 
     @Test
     public void testMoodEventWithNullValues() {
-        MoodEventModel mood = new MoodEventModel(null, null, null, 0, false, false, 0.0, 0.0);
+        MoodEventModel mood = new MoodEventModel(null,"", null, null, 0, false, false, 0.0, 0.0);
 
         assertNull("Emotion should be null", mood.getEmotion());
         assertNull("Timestamp should be null", mood.getTimestamp());
