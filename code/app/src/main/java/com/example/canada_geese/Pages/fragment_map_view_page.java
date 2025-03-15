@@ -6,11 +6,15 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.SearchView;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -26,6 +30,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +46,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private FusedLocationProviderClient fusedLocationClient;
     private Button memoryButton;
     private List<MoodEventModel> moodEventList;
+    private SearchView searchView;
 
     /**
      * Required empty public constructor.
@@ -75,6 +81,8 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         memoryButton = rootView.findViewById(R.id.btnMemory);
         memoryButton.setOnClickListener(v -> onMemoryButtonClick());
+        searchView = rootView.findViewById(R.id.search_view);
+        setupSearchView();
 
         return rootView;
     }
@@ -215,4 +223,40 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
+    private void setupSearchView() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchLocation(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+    private void searchLocation(String location) {
+        if (mMap == null){
+            return;
+        }
+        Geocoder geocoder = new Geocoder(requireContext());
+        List<Address> addressList;
+
+        try {
+            addressList = geocoder.getFromLocationName(location, 1);
+            if (addressList != null && !addressList.isEmpty()) {
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
