@@ -273,8 +273,8 @@ public class AddMoodEventDialogFragment extends DialogFragment {
      *
      * @return the current timestamp.
      */
-    private String getCurrentTimestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+    private Date getCurrentTimestamp() {
+        return new Date();
     }
 
     /**

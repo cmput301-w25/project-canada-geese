@@ -10,8 +10,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import android.os.Handler;
 import android.os.Looper;
 
@@ -23,6 +27,8 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     private List<MoodEventModel> moodEventListFull;
     private Context context;
     private String currentQuery = "";
+    private String selectedEmotion = "All";
+    private boolean filterLast7Days = false;
 
     /**
      * Constructor for MoodEventAdapter.
@@ -48,8 +54,9 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         MoodEventModel event = moodEventList.get(position);
 
         if (event != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             holder.moodText.setText(event.getEmotion());
-            holder.timestamp.setText(event.getTimestamp());
+            holder.timestamp.setText(dateFormat.format(event.getTimestamp()));
             holder.moodEmoji.setText(event.getEmoji());
 
             int color = event.getColor();
@@ -85,6 +92,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             moodEmoji = itemView.findViewById(R.id.mood_emoji);
             cardView = itemView.findViewById(R.id.card_view);
         }
+    }
+
+    public void setFilters(String selectedEmotion, boolean filterLast7Days) {
+        this.selectedEmotion = selectedEmotion;
+        this.filterLast7Days = filterLast7Days;
+        filter(currentQuery);
     }
 
     /**
@@ -140,13 +153,15 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         this.currentQuery = query;
         moodEventList.clear();
 
-        if (query.isEmpty()) {
-            moodEventList.addAll(moodEventListFull);
-        } else {
-            for (MoodEventModel event : moodEventListFull) {
-                if (event.getEmotion().toLowerCase().contains(query.toLowerCase())) {
-                    moodEventList.add(event);
-                }
+        long cutoffTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+
+        for (MoodEventModel event : moodEventListFull) {
+            boolean matchesQuery = query.isEmpty() || event.getEmotion().toLowerCase().contains(query.toLowerCase());
+            boolean matchesEmotion = selectedEmotion == null || selectedEmotion.equals("All") || event.getEmotion().equalsIgnoreCase(selectedEmotion);
+            boolean matchesDate = !filterLast7Days || event.getTimestamp().getTime() >= cutoffTime;
+
+            if (matchesQuery && matchesEmotion && matchesDate) {
+                moodEventList.add(event);
             }
         }
         notifyDataSetChanged();

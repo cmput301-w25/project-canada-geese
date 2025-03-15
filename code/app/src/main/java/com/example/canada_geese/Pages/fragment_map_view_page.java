@@ -25,8 +25,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A fragment that displays a map view with mood event markers.
@@ -161,11 +165,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                 if (moodEvent.HasLocation()) {
                     LatLng location = new LatLng(moodEvent.getLatitude(), moodEvent.getLongitude());
                     Bitmap emojiBitmap = createEmojiBitmap(getEmojiForEmotion(moodEvent.getEmotion()));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                    String formattedTimestamp = dateFormat.format(moodEvent.getTimestamp()); // Convert Date to String
 
                     MarkerOptions markerOptions = new MarkerOptions()
                             .position(location)
                             .title(moodEvent.getEmotion())
-                            .snippet(moodEvent.getTimestamp())
+                            .snippet(formattedTimestamp)
                             .icon(BitmapDescriptorFactory.fromBitmap(emojiBitmap));
 
                     mMap.addMarker(markerOptions);
@@ -204,9 +210,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
 }
