@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -131,8 +135,65 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      * Handles the "Memory" button click event to add mood event markers.
      */
     private void onMemoryButtonClick() {
-        moodEventList = getSampleMoodEvents();
-        addMoodEventMarkers();
+        if (moodEventList == null) {
+            moodEventList = new ArrayList<>();
+        } else {
+            moodEventList.clear(); // Clear existing data to prevent duplicates
+        }
+
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                for (DocumentSnapshot document : task.getResult()) {
+                    // Manually extract fields from Firestore document
+                    String emotion = document.getString("emotion");
+                    String description = document.getString("description");
+                    Date timestamp = document.getDate("timestamp"); // ✅ Get timestamp as Date
+                    String emoji = document.getString("emoji");
+                    Long colorLong = document.getLong("color");
+                    boolean triggerWarning = Boolean.TRUE.equals(document.getBoolean("triggerWarning"));
+                    boolean hasLocation = Boolean.TRUE.equals(document.getBoolean("hasLocation"));
+                    Double latitude = document.getDouble("latitude");
+                    Double longitude = document.getDouble("longitude");
+
+                    // Convert color from Long to int
+                    int color = (colorLong != null) ? colorLong.intValue() : 0;
+
+                    // Ensure latitude & longitude are not null
+                    double lat = (latitude != null) ? latitude : 0.0;
+                    double lon = (longitude != null) ? longitude : 0.0;
+
+                    // Create a new MoodEventModel object with Date timestamp
+                    MoodEventModel moodEvent = new MoodEventModel(
+                            emotion != null ? emotion : "Unknown",
+                            description != null ? description : "No description",
+                            timestamp,  // ✅ Directly passing Date object
+                            emoji != null ? emoji : "😐",
+                            color,
+                            triggerWarning,
+                            hasLocation,
+                            lat,
+                            lon
+                    );
+
+                    // Debug logs
+                    Log.d("MoodEventDebug", "Emotion: " + moodEvent.getEmotion());
+                    Log.d("MoodEventDebug", "Description: " + moodEvent.getDescription());
+                    Log.d("MoodEventDebug", "Timestamp: " + timestamp);
+                    Log.d("MoodEventDebug", "Emoji: " + moodEvent.getEmoji());
+                    Log.d("MoodEventDebug", "Color: " + moodEvent.getColor());
+                    Log.d("MoodEventDebug", "Trigger Warning: " + moodEvent.hasTriggerWarning());
+                    Log.d("MoodEventDebug", "Has Location: " + moodEvent.HasLocation());
+                    Log.d("MoodEventDebug", "Lat: " + moodEvent.getLatitude());
+                    Log.d("MoodEventDebug", "Lon: " + moodEvent.getLongitude());
+
+                    // Add the new object to the list
+                    moodEventList.add(moodEvent);
+                }
+                addMoodEventMarkers();
+            } else {
+                Log.e("FetchError", "Error getting documents: ", task.getException());
+            }
+        });
     }
 
     /**
@@ -162,7 +223,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private void addMoodEventMarkers() {
         if (moodEventList != null && !moodEventList.isEmpty()) {
             for (MoodEventModel moodEvent : moodEventList) {
-                if (moodEvent.HasLocation()) {
+                if (!moodEvent.HasLocation()) {
                     LatLng location = new LatLng(moodEvent.getLatitude(), moodEvent.getLongitude());
                     Bitmap emojiBitmap = createEmojiBitmap(getEmojiForEmotion(moodEvent.getEmotion()));
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());

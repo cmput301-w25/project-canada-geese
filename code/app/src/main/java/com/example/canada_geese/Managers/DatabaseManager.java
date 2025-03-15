@@ -70,6 +70,7 @@ public class DatabaseManager {
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
             moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("hasLocation", moodEvent.HasLocation());
             if (moodEvent.HasLocation()) {
                 moodMap.put("latitude", moodEvent.getLatitude());
                 moodMap.put("longitude", moodEvent.getLongitude());
