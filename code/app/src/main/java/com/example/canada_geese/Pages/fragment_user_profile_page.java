@@ -7,6 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -17,8 +20,13 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.fragment.app.Fragment;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+//import com.example.canada_geese.Adapters.UserSearchAdapter;
 import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,21 +44,20 @@ import java.util.List;
 public class fragment_user_profile_page extends Fragment {
 
     private FirebaseAuth mAuth;
-
     private FirebaseFirestore db;
     private TextView usernameText;
     private TextView followersCountText;
     private TextView followingCountText;
-
+    private ImageButton menuImageButton;
     private ImageView profileImage;
-    private ImageButton signOutButton;
-    private ImageButton RequestsButton;
+    private SearchView searchView;
     private ListView followersListView;
     private LinearLayout followersSection;
     private LinearLayout followingSection;
-
-    private SearchView searchView;
     private ArrayAdapter<String> userAdapter;
+    private RecyclerView searchResultsList;
+    LinearLayout searchResultsContainer;
+    LinearLayout profileContentContainer;
     private List<String> userList; // Declare userList here
 
     /**
@@ -80,35 +87,71 @@ public class fragment_user_profile_page extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user_profile_page, container, false);
-
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Find Views
+
+        // Find Views for the UI components of the profile content container
         usernameText = rootView.findViewById(R.id.username_text);
         profileImage = rootView.findViewById(R.id.profile_image);
-        signOutButton = rootView.findViewById(R.id.btn_logout);
-        RequestsButton = rootView.findViewById(R.id.btn_follow_requests);
-
+        followersSection = rootView.findViewById(R.id.followers_section);
+        followingSection = rootView.findViewById(R.id.following_section);
         followersCountText = rootView.findViewById(R.id.followers_count);
         followingCountText = rootView.findViewById(R.id.following_count);
-
-        // Initialize the ListView and Adapter
         followersListView = rootView.findViewById(R.id.followers_list);
 
+        // Find Views for the search bar and search results container
+        searchView = rootView.findViewById(R.id.searchView);
+        menuImageButton = rootView.findViewById(R.id.menu_button);
+
+        // Find views for the search list view
+        searchResultsList = rootView.findViewById(R.id.search_results_list);
+
+        // Initialize the search results container AND profile content container
+        searchResultsContainer = rootView.findViewById(R.id.search_results_container);
+        profileContentContainer = rootView.findViewById(R.id.profile_content_container);
+
+        // Initialize the ListView and Adapter basic implementation right now with just users name
         userList = new ArrayList<>();
         userAdapter= new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, userList);
         followersListView.setAdapter(userAdapter);
 
-        // Initialize the LinearLayouts
-        followersSection = rootView.findViewById(R.id.followers_section);
-        followingSection = rootView.findViewById(R.id.following_section);
+//        // Initialize the search results listview
+//        List<String> searchResultsContainer = new ArrayList<>();
+//        ArrayAdapter<String> searchResultsAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, searchResultsContainer);
+//        searchResultsContainer.setAdapter(searchResultsAdapter);
+
 
         // Fetch the user details from Firebase
         loadUserProfile();
         // Show the list of followers
         showFollowersList();
+        // Set up the menu button
+        menuImageButton.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(requireContext(), menuImageButton);
+            popup.getMenuInflater().inflate(R.menu.profile_menu, popup.getMenu());
+
+            // Set click listener for menu items
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.action_signout) {
+                    signOutUser();
+                    return true;
+                } else if (id == R.id.action_requests) {
+                    // Navigate to the follow requests page
+                    Toast.makeText(requireContext(), "Follow Requests", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.action_settings) {
+                    // Navigate to the settings page
+                    Toast.makeText(requireContext(), "Settings", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            });
+
+            popup.show();
+        });
 
         // Click listener for the followers section
         followersSection.setOnClickListener(v -> {
@@ -121,19 +164,26 @@ public class fragment_user_profile_page extends Fragment {
             showFollowingList();
         });
 
+        // SearchView listener to show search results
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchResultsContainer.getVisibility() == View.INVISIBLE) {
+                    searchResultsContainer.setVisibility(View.VISIBLE);
+                    profileContentContainer.setVisibility(View.INVISIBLE);
+                }
+                else if (searchResultsContainer.getVisibility() == View.VISIBLE) {
+                    searchResultsContainer.setVisibility(View.INVISIBLE);
+                    profileContentContainer.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
-        // sign out button
-        signOutButton.setOnClickListener(v -> signOutUser());
-
-        // follow requests button opens dialog with requests
-//        RequestsButton.setOnClickListener(v -> {
-//            // Open the requests dialog
-//            RequestsDialogFragment requestsDialog = new RequestsDialogFragment();
-//            requestsDialog.show(getChildFragmentManager(), "RequestsDialog");
-//        });
 
         return rootView;
     }
+
+
 
     /**
      * Signs out the current user, clears stored login preferences, and redirects to the login screen.
@@ -151,7 +201,7 @@ public class fragment_user_profile_page extends Fragment {
         // Navigate back to LoginActivity
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         // Clear the back stack and start the new activity
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
 
         // Finish the current activity so the user can't go back to the profile page
