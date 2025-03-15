@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -83,6 +84,7 @@ public class fragment_user_moods_page extends Fragment {
         moodEventList = new ArrayList<>();
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
+
 
         // Fetch mood events for the logged-in user from Firestore
         DatabaseManager.getInstance().fetchMoodEvents(task -> {
