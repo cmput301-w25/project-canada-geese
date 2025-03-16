@@ -10,62 +10,53 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!-- Top bar with search view and buttons -->
+    <!-- Top bar for buttons (on top of the map) -->
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
         android:layout_gravity="top"
+        android:weightSum="3"
+        android:layout_marginTop="20dp"
         android:background="@android:color/white"
-        android:alpha="0.9"
-        android:padding="8dp"
-        android:elevation="5dp">
+        android:alpha="0.9">
 
-        <!-- SearchView for searching locations -->
-        <SearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:queryHint="Search location"
-            android:iconifiedByDefault="false"
-            android:background="@drawable/bg_search_view"/>
+    <!-- Memory Button -->
+    <Button
+        android:id="@+id/btnMemory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Memory" />
 
-        <!-- Row for buttons -->
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="3"
-            android:paddingTop="8dp">
+    <!-- Friends Button -->
+    <Button
+        android:id="@+id/btnFriends"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Friends" />
 
-            <!-- Memory Button -->
-            <Button
-                android:id="@+id/btnMemory"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Memory" />
+    <!-- Explore Button -->
+    <Button
+        android:id="@+id/btnExplore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Explore" />
 
-            <!-- Friends Button -->
+    <!-- Filter Icon -->
+    <ImageButton
+        android:id="@+id/btnFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_filter_alt_24"
+        android:contentDescription="Filter"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"/>
+</LinearLayout>
 
-            <!-- Filter Icon -->
-            <Button
-                android:id="@+id/btnFriends"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Friends" />
-
-            <ImageButton
-                android:id="@+id/btnFilter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Filter"
-                android:src="@drawable/baseline_filter_alt_24" />
-        </LinearLayout>
-    </LinearLayout>
-
-</FrameLayout>
+    </FrameLayout>

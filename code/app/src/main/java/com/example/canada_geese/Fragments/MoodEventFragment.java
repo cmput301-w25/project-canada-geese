@@ -1,14 +1,11 @@
 package com.example.canada_geese.Fragments;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.SearchView;
-import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +20,6 @@ import com.example.canada_geese.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,7 +52,7 @@ public class MoodEventFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
         View addMoodEventButton = view.findViewById(R.id.add_mood_event_button);
-        View filterButton = view.findViewById(R.id.filter_button);
+        View filterIcon = view.findViewById(R.id.filter_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -84,8 +80,6 @@ public class MoodEventFragment extends Fragment {
             }
         });
 
-        filterButton.setOnClickListener(v -> showFilterDialog());
-
         addMoodEventButton.setOnClickListener(v -> {
             AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
             dialog.setOnMoodAddedListener(moodEvent -> fetchMoodEventsFromFirestore());
@@ -93,22 +87,6 @@ public class MoodEventFragment extends Fragment {
         });
 
         return view;
-    }
-
-    private void showFilterDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_filter, null);
-        Spinner emotionSpinner = view.findViewById(R.id.filter_mood_spinner);
-        CheckBox last7DaysCheckBox = view.findViewById(R.id.filter_last_7_days);
-
-        builder.setView(view)
-                .setPositiveButton("Apply", (dialog, which) -> {
-                    String selectedEmotion = emotionSpinner.getSelectedItem().toString();
-                    boolean filterLast7Days = last7DaysCheckBox.isChecked();
-                    adapter.setFilters(selectedEmotion, filterLast7Days); // Update adapter's filter state
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .show();
     }
 
     /**
@@ -148,9 +126,9 @@ public class MoodEventFragment extends Fragment {
      */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
 }
