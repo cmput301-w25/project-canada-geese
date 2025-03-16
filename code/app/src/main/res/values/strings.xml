@@ -48,7 +48,7 @@
     <string name="social_situation">Social Situation</string>
     <string name="attach_location">Attach location</string>
     <string name="trigger_warning">Trigger warning</string>
-
+    <string name="private_mood">Private mood</string>
     <!-- Social Situation Dropdown -->
     <string-array name="social_situations">
         <item>Alone</item>

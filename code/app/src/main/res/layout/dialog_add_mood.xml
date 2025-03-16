@@ -42,7 +42,7 @@
         android:id="@+id/title_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reason"
+        android:text="@string/description"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/mood_spinner_container"
@@ -54,7 +54,7 @@
         android:id="@+id/description_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Explain why you feel this way...."
+        android:hint="@string/description_hint"
         android:background="@drawable/textarea_background"
         android:padding="8dp"
         android:inputType="text"
@@ -63,28 +63,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:minHeight="80dp"
         android:gravity="top"/>
-
-
-    <ImageButton
-        android:id="@+id/camera_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/baseline_camera_alt_24"
-        app:layout_constraintBottom_toBottomOf="@id/description_input"
-        app:layout_constraintEnd_toEndOf="@id/description_input"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp" />
-
-    <ImageView
-        android:id="@+id/selected_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/description_input"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
 
     <!-- Social Situation Title -->
     <TextView
@@ -118,13 +96,23 @@
             app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Attach Location and Trigger Warning Checkboxes -->
+    <!-- Private Mood Checkbox (renamed from trigger warning) -->
+    <CheckBox
+        android:id="@+id/private_mood_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/private_mood"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_container"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Attach Location Checkbox -->
     <CheckBox
         android:id="@+id/attach_location_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/attach_location"
-        app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox"
+        app:layout_constraintTop_toBottomOf="@id/private_mood_checkbox"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
@@ -139,16 +127,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox"
         app:layout_constraintVertical_bias="0.0" />
-
-    <CheckBox
-        android:id="@+id/trigger_warning_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/trigger_warning"
-        app:layout_constraintTop_toBottomOf="@id/social_situation_container"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
-
 
     <!-- Add Mood Button -->
     <Button

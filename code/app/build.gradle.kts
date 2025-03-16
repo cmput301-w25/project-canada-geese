@@ -8,7 +8,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.canada_geese"
+        applicationId = "com.example.testingnavigation"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -58,10 +58,4 @@ dependencies {
 
     implementation ("com.google.android.gms:play-services-maps:19.1.0")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
-    implementation ("androidx.activity:activity-ktx:1.7.2") // Ensures compatibility with Activity Result API
-    implementation ("androidx.fragment:fragment-ktx:1.6.1")
-    implementation ("androidx.core:core-ktx:1.9.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation ("androidx.exifinterface:exifinterface:1.3.6")
-
 }

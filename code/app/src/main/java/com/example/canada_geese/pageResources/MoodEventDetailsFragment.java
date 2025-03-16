@@ -1,6 +1,7 @@
 package com.example.canada_geese.pageResources;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.canada_geese.R;
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.EmotionalState;
+import com.example.canada_geese.Models.MoodEventModel;
+import com.example.canada_geese.R;
 import com.google.android.material.card.MaterialCardView;
 
 /**
@@ -23,17 +26,22 @@ import com.google.android.material.card.MaterialCardView;
  * including options to edit or delete the mood event.
  */
 public class MoodEventDetailsFragment extends Fragment {
+    private static final String TAG = "MoodEventDetails";
     private MaterialCardView cardMoodDetails;
     private TextView tvEmoji;
     private TextView tvMoodName;
     private TextView tvTimestamp;
+    private TextView tvDescription;
     private CheckBox cbTriggerWarning;
     private EditText etAdditionalInfo;
     private Button btnEdit;
     private Button btnDelete;
+    private View viewDetailsLayout;
+    private View viewEditLayout;
 
     private boolean isEditMode = false;
     private String moodEventId;
+    private MoodEventModel currentMoodEvent;
 
     /**
      * Inflates the layout for this fragment.
@@ -64,6 +72,9 @@ public class MoodEventDetailsFragment extends Fragment {
         initViews(view);
         setupListeners();
 
+        // Initially show details view, not edit view
+        showDetailsView();
+
         // Retrieve mood event ID from arguments and load the event if available.
         if (getArguments() != null) {
             moodEventId = getArguments().getString("mood_event_id");
@@ -79,14 +90,50 @@ public class MoodEventDetailsFragment extends Fragment {
      * @param view The root view for this fragment's layout.
      */
     private void initViews(View view) {
+        // Details view components
         cardMoodDetails = view.findViewById(R.id.card_mood_details);
         tvEmoji = view.findViewById(R.id.tv_emoji);
         tvMoodName = view.findViewById(R.id.tv_mood_name);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
+        tvDescription = view.findViewById(R.id.tv_description);
         cbTriggerWarning = view.findViewById(R.id.cb_trigger_warning);
-        etAdditionalInfo = view.findViewById(R.id.et_additional_info);
         btnEdit = view.findViewById(R.id.btn_edit);
         btnDelete = view.findViewById(R.id.btn_delete);
+
+        // Edit view components
+        etAdditionalInfo = view.findViewById(R.id.et_additional_info);
+        Button btnSave = view.findViewById(R.id.btn_save);
+
+        // Get the layout containers for details view and edit view
+        viewDetailsLayout = view.findViewById(R.id.details_layout);
+        viewEditLayout = view.findViewById(R.id.edit_layout);
+
+        // Set the same listeners for both edit and save buttons
+        if (btnSave != null) {
+            btnSave.setOnClickListener(v -> toggleEditMode());
+        }
+    }
+
+    /**
+     * Shows the details view and hides the edit view.
+     */
+    private void showDetailsView() {
+        if (viewDetailsLayout != null && viewEditLayout != null) {
+            viewDetailsLayout.setVisibility(View.VISIBLE);
+            viewEditLayout.setVisibility(View.GONE);
+        }
+        isEditMode = false;
+    }
+
+    /**
+     * Shows the edit view and hides the details view.
+     */
+    private void showEditView() {
+        if (viewDetailsLayout != null && viewEditLayout != null) {
+            viewDetailsLayout.setVisibility(View.GONE);
+            viewEditLayout.setVisibility(View.VISIBLE);
+        }
+        isEditMode = true;
     }
 
     /**
@@ -99,45 +146,165 @@ public class MoodEventDetailsFragment extends Fragment {
 
     /**
      * Loads the mood event data based on the provided mood event ID.
-     * Currently, this is a placeholder for future implementation.
      */
     private void loadMoodEvent() {
-        // TODO: Load mood event data from the database (need to work with Member 5)
+        Log.d(TAG, "Loading mood event with ID: " + moodEventId);
+
+        // For now, we're using the passed data from the adapter
+        // In a real app, you would query Firebase using the moodEventId
+
+        // TODO: Implement actual loading from Firebase when database integration is complete
+        // For example:
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                for (com.google.firebase.firestore.DocumentSnapshot doc : task.getResult()) {
+                    MoodEventModel mood = doc.toObject(MoodEventModel.class);
+                    if (mood != null) {
+                        String eventId = mood.getEmotion() + "_" + mood.getTimestamp();
+                        if (eventId.equals(moodEventId)) {
+                            currentMoodEvent = mood;
+                            updateUIWithMoodEvent(mood);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Updates the UI with mood event data.
+     *
+     * @param moodEvent The mood event to display.
+     */
+    private void updateUIWithMoodEvent(MoodEventModel moodEvent) {
+        if (moodEvent != null && getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                // Update details view
+                tvEmoji.setText(moodEvent.getEmoji());
+                tvMoodName.setText(moodEvent.getEmotion());
+                tvTimestamp.setText(moodEvent.getTimestamp());
+                cbTriggerWarning.setChecked(moodEvent.hasTriggerWarning());
+
+                // Update description text
+                if (tvDescription != null) {
+                    tvDescription.setText(moodEvent.getDescription());
+                }
+
+                // Update edit view
+                View editView = getView();
+                if (editView != null) {
+                    TextView tvEmojiEdit = editView.findViewById(R.id.tv_emoji_edit);
+                    TextView tvMoodNameEdit = editView.findViewById(R.id.tv_mood_name_edit);
+                    TextView tvTimestampEdit = editView.findViewById(R.id.tv_timestamp_edit);
+                    CheckBox cbTriggerWarningEdit = editView.findViewById(R.id.cb_trigger_warning_edit);
+
+                    if (tvEmojiEdit != null) tvEmojiEdit.setText(moodEvent.getEmoji());
+                    if (tvMoodNameEdit != null) tvMoodNameEdit.setText(moodEvent.getEmotion());
+                    if (tvTimestampEdit != null) tvTimestampEdit.setText(moodEvent.getTimestamp());
+                    if (cbTriggerWarningEdit != null) cbTriggerWarningEdit.setChecked(moodEvent.hasTriggerWarning());
+
+                    if (etAdditionalInfo != null) {
+                        etAdditionalInfo.setText(moodEvent.getDescription());
+                    }
+                }
+
+                // Set the card background color for both views
+                if (moodEvent.getColor() != 0 && getContext() != null) {
+                    int color = getContext().getColor(moodEvent.getColor());
+                    cardMoodDetails.setCardBackgroundColor(color);
+
+                    // Also set the color for the edit card if it exists
+                    View view = getView();
+                    if (view != null) {
+                        MaterialCardView cardMoodEdit = view.findViewById(R.id.card_mood_edit);
+                        if (cardMoodEdit != null) {
+                            cardMoodEdit.setCardBackgroundColor(color);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
      * Toggles the edit mode for mood event details.
-     * Enables or disables editing of trigger warning and additional info fields.
+     * Switches between details view and edit view.
      */
     private void toggleEditMode() {
-        isEditMode = !isEditMode;
-
-        // Updating UI state
-        cbTriggerWarning.setEnabled(isEditMode);
-        etAdditionalInfo.setEnabled(isEditMode);
-
-        if (isEditMode) {
+        if (!isEditMode) {
+            // Switch to edit mode
+            showEditView();
             btnEdit.setText(R.string.save);
         } else {
+            // Switch back to details view and save changes
+            showDetailsView();
             btnEdit.setText(R.string.edit_mood);
             saveMoodEvent();
         }
     }
 
     /**
-     * Saves the edited mood event details.
-     * Currently, this is a placeholder for future implementation.
+     * Saves the edited mood event details to the database.
      */
     private void saveMoodEvent() {
-        if (!isEditMode) return;
+        if (currentMoodEvent == null) return;
 
         // Get the edited data
-        boolean hasTriggerWarning = cbTriggerWarning.isChecked();
-        String additionalInfo = etAdditionalInfo.getText().toString().trim();
+        View view = getView();
+        CheckBox cbTriggerWarningEdit = view != null ? view.findViewById(R.id.cb_trigger_warning_edit) : null;
+        boolean hasTriggerWarning = cbTriggerWarningEdit != null ? cbTriggerWarningEdit.isChecked() : false;
+        String additionalInfo = etAdditionalInfo != null ? etAdditionalInfo.getText().toString().trim() : "";
 
-        // TODO: Save to database (need to work with Member 5)
+        // Create an updated mood event with the new values
+        MoodEventModel updatedMood = new MoodEventModel(
+                currentMoodEvent.getEmotion(),
+                additionalInfo,
+                currentMoodEvent.getTimestamp(),
+                currentMoodEvent.getEmoji(),
+                currentMoodEvent.getColor(),
+                hasTriggerWarning,
+                currentMoodEvent.HasLocation(),
+                currentMoodEvent.getLatitude(),
+                currentMoodEvent.getLongitude()
+        );
 
-        Toast.makeText(getContext(), "Changes saved", Toast.LENGTH_SHORT).show();
+        // Find the document ID for this mood event
+        DatabaseManager.getInstance().findMoodEventDocumentId(
+                currentMoodEvent.getTimestamp(),
+                currentMoodEvent.getEmotion(),
+                task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        // Get the document ID from the document snapshot
+                        String documentId = task.getResult().getId();
+
+                        // Update the document using its ID
+                        DatabaseManager.getInstance().updateMoodEvent(updatedMood, documentId, updateTask -> {
+                            if (updateTask.isSuccessful()) {
+                                // Show success toast
+                                Toast.makeText(getContext(), "Changes saved", Toast.LENGTH_SHORT).show();
+
+                                // Return to the previous screen (home page)
+                                if (getActivity() != null) {
+                                    getActivity().onBackPressed();
+                                }
+                            } else {
+                                // Show error toast
+                                Toast.makeText(getContext(), "Failed to save changes", Toast.LENGTH_SHORT).show();
+                                if (task.getException() != null) {
+                                    Log.e(TAG, "Error updating mood event", updateTask.getException());
+                                }
+                            }
+                        });
+                    } else {
+                        // Show error toast if document not found
+                        Toast.makeText(getContext(), "Could not find mood event to update", Toast.LENGTH_SHORT).show();
+                        if (task.getException() != null) {
+                            Log.e(TAG, "Error finding mood event document ID", task.getException());
+                        }
+                    }
+                }
+        );
     }
 
     /**
@@ -146,14 +313,51 @@ public class MoodEventDetailsFragment extends Fragment {
     private void showDeleteConfirmation() {
         DeleteConfirmationDialog dialog = new DeleteConfirmationDialog(
                 () -> {
-                    // TODO: Delete mood events (need to work with Member 5)
-                    // Return to the previous page after successful deletion
-                    if (getActivity() != null) {
-                        getActivity().onBackPressed();
-                    }
+                    // Delete the mood event
+                    deleteMoodEvent();
                 }
         );
         dialog.show(getChildFragmentManager(), "delete_confirmation");
+    }
+
+    /**
+     * Deletes the current mood event from the database.
+     */
+    private void deleteMoodEvent() {
+        if (currentMoodEvent == null) return;
+
+        // First find the document ID for this mood event
+        DatabaseManager.getInstance().findMoodEventDocumentId(
+                currentMoodEvent.getTimestamp(),
+                currentMoodEvent.getEmotion(),
+                task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        // Get the document ID from the document snapshot
+                        String documentId = task.getResult().getId();
+
+                        // Now delete the document using its ID
+                        DatabaseManager.getInstance().deleteMoodEvent(documentId, deleteTask -> {
+                            if (deleteTask.isSuccessful()) {
+                                // Show success toast
+                                Toast.makeText(getContext(), "Mood event deleted", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Show error toast
+                                Toast.makeText(getContext(), "Failed to delete mood event", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Error deleting mood event", deleteTask.getException());
+                            }
+
+                            // Return to the previous screen
+                            if (getActivity() != null) {
+                                getActivity().onBackPressed();
+                            }
+                        });
+                    } else {
+                        // Show error toast if document not found
+                        Toast.makeText(getContext(), "Could not find mood event to delete", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error finding mood event document ID", task.getException());
+                    }
+                }
+        );
     }
 
     /**
@@ -164,11 +368,13 @@ public class MoodEventDetailsFragment extends Fragment {
      * @param timestamp The timestamp of the mood event.
      */
     public void updateMoodEventDisplay(EmotionalState state, String moodName, String timestamp) {
-        tvEmoji.setText(state.getEmoji());
-        tvMoodName.setText(moodName);
-        tvTimestamp.setText(timestamp);
-        cardMoodDetails.setCardBackgroundColor(
-                requireContext().getColor(state.getColorResId())
-        );
+        if (state != null && getContext() != null) {
+            tvEmoji.setText(state.getEmoji());
+            tvMoodName.setText(moodName);
+            tvTimestamp.setText(timestamp);
+            cardMoodDetails.setCardBackgroundColor(
+                    requireContext().getColor(state.getColorResId())
+            );
+        }
     }
 }
