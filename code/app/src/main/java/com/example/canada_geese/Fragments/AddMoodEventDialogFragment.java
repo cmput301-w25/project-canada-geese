@@ -13,6 +13,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -46,12 +47,18 @@ import java.util.Locale;
  */
 public class AddMoodEventDialogFragment extends DialogFragment {
     private Spinner moodSpinner;
+    private Spinner socialSituationSpinner;
+    private EditText descriptionInput;
     private Button addMoodButton;
+    private CheckBox privateMoodCheckbox;
     private CheckBox addLocationCheckbox;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap googleMap;
+    private double currentLatitude = 0.0;
+    private double currentLongitude = 0.0;
 
     private static final int LOCATION_PERMISSION_REQUEST = 100;
+    private static final String TAG = "AddMoodEventDialog";
 
     /**
      * Interface for listening to mood event added events.
@@ -73,6 +80,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     public void setOnMoodAddedListener(OnMoodAddedListener listener) {
         this.moodAddedListener = listener;
     }
+
     /**
      * Called to have the fragment instantiate its user interface view.
      *
@@ -94,6 +102,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         return dialog;
     }
+
     /**
      * Called when the fragment is visible to the user and actively running.
      */
@@ -126,26 +135,43 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_add_mood, container, false);
 
+        // Initialize views
         moodSpinner = view.findViewById(R.id.emotion_spinner);
+        socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
+        descriptionInput = view.findViewById(R.id.description_input);
         addMoodButton = view.findViewById(R.id.add_mood_button);
+        privateMoodCheckbox = view.findViewById(R.id.private_mood_checkbox);
         addLocationCheckbox = view.findViewById(R.id.attach_location_checkbox);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
+        // Set up the mood spinner
         String[] moodArray = new String[]{
                 "Happiness 😊", "Anger 😠", "Sadness 😢", "Fear 😨",
                 "Calm 😌", "Confusion 😕", "Disgust 🤢", "Shame 😳", "Surprise 😮"
         };
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<String> moodAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_dropdown_item,
                 moodArray
         );
-        moodSpinner.setAdapter(adapter);
+        moodSpinner.setAdapter(moodAdapter);
+
+        // Set up the social situation spinner
+        String[] socialSituationArray = new String[]{
+                "Alone", "With one person", "With two to several people", "With a crowd"
+        };
+
+        ArrayAdapter<String> socialAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                socialSituationArray
+        );
+        socialSituationSpinner.setAdapter(socialAdapter);
 
         addLocationCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            View mapContainer = getView().findViewById(R.id.map_container);
+            View mapContainer = view.findViewById(R.id.map_container);
             if (isChecked) {
                 requestLocationPermission();
                 if (mapContainer != null) {
@@ -160,47 +186,91 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         // Click listener for the add mood button
         addMoodButton.setOnClickListener(v -> {
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (currentUser != null) {
-                String selectedMood = moodSpinner.getSelectedItem().toString();
-                String moodName = selectedMood.split(" ")[0];
-                boolean hasLocation = addLocationCheckbox.isChecked();
-                double latitude = 0.0;
-                double longitude = 0.0;
-                String description = "placeholder";
-
-                if (hasLocation) {
-                    // Get actual location values (Replace this with your location retrieval method)
-                    latitude = 43.6532;
-                    longitude = -79.3832;
-                }
-
-                MoodEventModel newEvent = new MoodEventModel(
-                        moodName,
-                        description,
-                        getCurrentTimestamp(),
-                        getEmojiForEmotion(moodName),
-                        getColorForEmotion(moodName),
-                        false,
-                        //addLocationCheckbox.isChecked(),
-                        hasLocation,
-                        latitude,
-                        longitude
-
-                );
-                DatabaseManager.getInstance().addMoodEvent(newEvent);
-                Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
-
-                if (moodAddedListener != null) {
-                    moodAddedListener.onMoodAdded(newEvent);
-                }
-                dismiss();
-            }else { Log.e("Auth", "User not logged in! Cannot add mood.");
-                Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_SHORT).show();
-            }
+            addMoodEvent();
         });
 
         return view;
+    }
+
+    /**
+     * Adds the mood event to the database.
+     */
+    private void addMoodEvent() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String selectedMood = moodSpinner.getSelectedItem().toString();
+            String moodName = selectedMood.split(" ")[0];
+
+            final boolean hasLocation = addLocationCheckbox.isChecked();
+            final boolean isPrivate = privateMoodCheckbox.isChecked();
+
+            final String description = descriptionInput.getText().toString().trim();
+            Log.d(TAG, "Description entered: " + description);
+
+            final String finalDescription = description.isEmpty() ? "No description provided" : description;
+
+            if (hasLocation) {
+                // If we have permission and location is enabled, use the current location
+                if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                        if (location != null) {
+                            currentLatitude = location.getLatitude();
+                            currentLongitude = location.getLongitude();
+                        }
+                        createAndSaveMoodEvent(moodName, finalDescription, hasLocation, isPrivate);
+                    });
+                } else {
+                    // Default coordinates if permission not granted
+                    createAndSaveMoodEvent(moodName, finalDescription, hasLocation, isPrivate);
+                }
+            } else {
+                createAndSaveMoodEvent(moodName, finalDescription, false, isPrivate);
+            }
+        } else {
+            Log.e("Auth", "User not logged in! Cannot add mood.");
+            Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Creates and saves a mood event with the provided information.
+     *
+     * @param moodName The name of the mood.
+     * @param description The description of the mood event.
+     * @param hasLocation Whether the mood event has location data.
+     * @param isPrivate Whether the mood event is private.
+     */
+    private void createAndSaveMoodEvent(String moodName, String description, boolean hasLocation, boolean isPrivate) {
+        // Create a new mood event with all the required information
+        MoodEventModel newEvent = new MoodEventModel(
+                moodName,                  // emotion
+                description,               // description
+                getCurrentTimestamp(),     // timestamp
+                getEmojiForEmotion(moodName), // emoji
+                getColorForEmotion(moodName), // color
+                isPrivate,                 // isPrivate
+                hasLocation,               // hasLocation
+                currentLatitude,           // latitude
+                currentLongitude           // longitude
+        );
+
+        // Log the mood event details before saving
+        Log.d(TAG, "Creating mood event: " + moodName +
+                ", Description: " + description +
+                ", Private: " + isPrivate +
+                ", HasLocation: " + hasLocation);
+
+        // Save the mood event to the database
+        DatabaseManager.getInstance().addMoodEvent(newEvent);
+        Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
+
+        // Notify the listener if one is set
+        if (moodAddedListener != null) {
+            moodAddedListener.onMoodAdded(newEvent);
+        }
+
+        // Dismiss the dialog
+        dismiss();
     }
 
     /**
@@ -239,7 +309,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
      * Shows the user's current location on the map.
      */
     private void showUserLocation() {
-        View mapContainer = getView().findViewById(R.id.map_container);
+        View mapContainer = getView() != null ? getView().findViewById(R.id.map_container) : null;
         if (mapContainer != null) {
             mapContainer.setVisibility(View.VISIBLE);
         }
@@ -258,7 +328,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                     if (location != null) {
-                        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        currentLatitude = location.getLatitude();
+                        currentLongitude = location.getLongitude();
+
+                        LatLng userLocation = new LatLng(currentLatitude, currentLongitude);
                         googleMap.addMarker(new MarkerOptions().position(userLocation).title("Your Location"));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                     }
@@ -266,7 +339,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             }
         });
     }
-
 
     /**
      * Returns the current timestamp in the format "yyyy-MM-dd HH:mm".
@@ -299,9 +371,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     }
 
     /**
+     * Returns the color resource ID corresponding to the given emotion.
      *
-     * @param emotion
-     * @return
+     * @param emotion the emotion to get the color for.
+     * @return the color resource ID corresponding to the given emotion.
      */
     private int getColorForEmotion(String emotion) {
         switch (emotion) {

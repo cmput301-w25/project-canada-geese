@@ -96,13 +96,23 @@
             app:layout_constraintEnd_toEndOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Attach Location and Trigger Warning Checkboxes -->
+    <!-- Private Mood Checkbox (renamed from trigger warning) -->
+    <CheckBox
+        android:id="@+id/private_mood_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/private_mood"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_container"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Attach Location Checkbox -->
     <CheckBox
         android:id="@+id/attach_location_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/attach_location"
-        app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox"
+        app:layout_constraintTop_toBottomOf="@id/private_mood_checkbox"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>
 
@@ -117,16 +127,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox"
         app:layout_constraintVertical_bias="0.0" />
-
-    <CheckBox
-        android:id="@+id/trigger_warning_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/trigger_warning"
-        app:layout_constraintTop_toBottomOf="@id/social_situation_container"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
-
 
     <!-- Add Mood Button -->
     <Button

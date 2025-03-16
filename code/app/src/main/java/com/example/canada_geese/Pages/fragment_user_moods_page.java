@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
 import com.example.canada_geese.Managers.DatabaseManager;
+import com.example.canada_geese.Models.EmotionalState;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+import com.example.canada_geese.pageResources.DeleteConfirmationDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -23,9 +26,10 @@ import java.util.List;
 
 /**
  * Fragment to display the list of mood events for the logged-in user.
- * Supports searching and adding new mood events dynamically.
+ * Supports searching, adding, editing and deleting mood events.
  */
 public class fragment_user_moods_page extends Fragment {
+    private static final String TAG = "UserMoodsPage";
     private RecyclerView recyclerView;
     private MoodEventAdapter adapter;
     private SearchView searchView;
@@ -83,19 +87,11 @@ public class fragment_user_moods_page extends Fragment {
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
+        // Set up click listeners for mood events
+        setupMoodEventClickListeners();
+
         // Fetch mood events for the logged-in user from Firestore
-        DatabaseManager.getInstance().fetchMoodEvents(task -> {
-            if (task.isSuccessful()) {
-                List<MoodEventModel> newList = new ArrayList<>();
-                for (DocumentSnapshot document : task.getResult()) {
-                    MoodEventModel moodEvent = document.toObject(MoodEventModel.class);
-                    newList.add(moodEvent);
-                }
-                adapter.updateList(newList); // Refresh adapter with new data
-            } else {
-                Log.e("FetchError", "Error getting documents: ", task.getException());
-            }
-        });
+        refreshMoodEventList();
 
         // Check if there is a new mood to add
         if (newMood != null) {
@@ -128,6 +124,117 @@ public class fragment_user_moods_page extends Fragment {
     }
 
     /**
+     * Set up click and long-click listeners for the mood events.
+     */
+    private void setupMoodEventClickListeners() {
+        // Click listener to handle saving edited mood events
+        adapter.setOnMoodEventClickListener(updatedMood -> {
+            // Save the updated mood to the database
+            saveMoodEventChanges(updatedMood);
+        });
+
+        // Edit listener - used to handle UI transitions in the adapter
+        adapter.setOnMoodEventEditListener((moodEvent, position) -> {
+            // No additional action needed here - the adapter handles the UI transition
+        });
+
+        // Long click listener - Show delete confirmation
+        adapter.setOnMoodEventLongClickListener(moodEvent -> {
+            // Show delete confirmation dialog
+            showDeleteConfirmation(moodEvent);
+            return true; // Consume the long click
+        });
+    }
+
+    /**
+     * Save mood event changes to the database
+     *
+     * @param updatedMood The updated mood event
+     */
+    private void saveMoodEventChanges(MoodEventModel updatedMood) {
+        // Find the document ID and save changes
+        DatabaseManager.getInstance().findMoodEventDocumentId(
+                updatedMood.getTimestamp(),
+                updatedMood.getEmotion(),
+                task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String documentId = task.getResult().getId();
+
+                        DatabaseManager.getInstance().updateMoodEvent(updatedMood, documentId, updateTask -> {
+                            if (updateTask.isSuccessful()) {
+                                Toast.makeText(getContext(), "Changes saved", Toast.LENGTH_SHORT).show();
+                                refreshMoodEventList();
+                            } else {
+                                Toast.makeText(getContext(), "Failed to save changes", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Error updating mood event", updateTask.getException());
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Could not find mood event to update", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error finding mood event document ID", task.getException());
+                    }
+                }
+        );
+    }
+
+    /**
+     * Show a confirmation dialog for deleting a mood event.
+     *
+     * @param moodEvent The mood event to delete.
+     */
+    private void showDeleteConfirmation(MoodEventModel moodEvent) {
+        DeleteConfirmationDialog dialog = new DeleteConfirmationDialog(() -> {
+            // Delete the mood event
+            deleteMoodEvent(moodEvent);
+        });
+        dialog.show(getChildFragmentManager(), "delete_confirmation");
+    }
+
+    /**
+     * Delete a mood event from the database and update the UI.
+     *
+     * @param moodEvent The mood event to delete.
+     */
+    private void deleteMoodEvent(MoodEventModel moodEvent) {
+        // First find the document ID for this mood event
+        DatabaseManager.getInstance().findMoodEventDocumentId(
+                moodEvent.getTimestamp(),
+                moodEvent.getEmotion(),
+                task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        // Get the document ID from the document snapshot
+                        String documentId = task.getResult().getId();
+
+                        // Now delete the document using its ID
+                        DatabaseManager.getInstance().deleteMoodEvent(documentId, deleteTask -> {
+                            if (deleteTask.isSuccessful()) {
+                                // Remove from local list
+                                int position = moodEventList.indexOf(moodEvent);
+                                if (position != -1) {
+                                    moodEventList.remove(position);
+                                    adapter.notifyItemRemoved(position);
+                                }
+
+                                // Show success toast
+                                Toast.makeText(getContext(), "Mood event deleted", Toast.LENGTH_SHORT).show();
+                                // Refresh the list to ensure UI is updated
+                                refreshMoodEventList();
+                            } else {
+                                // Show error toast
+                                Toast.makeText(getContext(), "Failed to delete mood event", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Error deleting mood event", deleteTask.getException());
+                            }
+                        });
+                    } else {
+                        // Show error toast if document not found
+                        Toast.makeText(getContext(), "Could not find mood event to delete", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error finding mood event document ID", task.getException());
+                    }
+                }
+        );
+    }
+
+    /**
      * Adds a new mood to the list and scrolls to the top to display it.
      *
      * @param moodEvent The new MoodEventModel to add.
@@ -149,7 +256,37 @@ public class fragment_user_moods_page extends Fragment {
         super.onResume();
         if (adapter != null) {
             adapter.filter(""); // Clear search filter on resume
+            // Refresh the mood events list
+            refreshMoodEventList();
         }
+    }
+
+    /**
+     * Fetches the latest mood events from Firebase and updates the UI.
+     * Call this method whenever the mood list needs to be refreshed.
+     */
+    private void refreshMoodEventList() {
+        // Fetch mood events for the logged-in user from Firestore
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                List<MoodEventModel> newList = new ArrayList<>();
+                for (DocumentSnapshot document : task.getResult()) {
+                    MoodEventModel moodEvent = document.toObject(MoodEventModel.class);
+                    if (moodEvent != null) {
+                        newList.add(moodEvent);
+                    }
+                }
+
+                // Update the adapter with new data
+                adapter.updateList(newList);
+
+                // Update the class field to maintain the latest list
+                moodEventList.clear();
+                moodEventList.addAll(newList);
+            } else {
+                Log.e(TAG, "Error getting documents: ", task.getException());
+            }
+        });
     }
 
     /**
@@ -161,7 +298,7 @@ public class fragment_user_moods_page extends Fragment {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", "2025-02-12 08:15", "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
         list.add(new MoodEventModel("Anger", "test", "2025-02-11 03:42", "😠", R.color.color_anger, false, true, 40.7128, -74.0060));
-        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566f, 2.3522));
+        list.add(new MoodEventModel("Fear", "test", "2025-02-07 21:16", "😢", R.color.color_sadness, false, true, 48.8566, 2.3522));
         return list;
     }
 }
