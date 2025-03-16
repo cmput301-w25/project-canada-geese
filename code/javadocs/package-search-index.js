@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.canada_geese"},{"l":"com.example.canada_geese.Adapters"},{"l":"com.example.canada_geese.Fragments"},{"l":"com.example.canada_geese.Managers"},{"l":"com.example.canada_geese.Models"},{"l":"com.example.canada_geese.pageResources"},{"l":"com.example.canada_geese.Pages"}];updateSearchResults();
