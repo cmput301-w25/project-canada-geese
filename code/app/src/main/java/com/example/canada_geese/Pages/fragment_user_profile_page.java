@@ -140,6 +140,8 @@ public class fragment_user_profile_page extends Fragment {
                     return true;
                 } else if (id == R.id.action_requests) {
                     // Navigate to the follow requests page
+
+
                     Toast.makeText(requireContext(), "Follow Requests", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.action_settings) {
@@ -164,20 +166,22 @@ public class fragment_user_profile_page extends Fragment {
             showFollowingList();
         });
 
-        // SearchView listener to show search results
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (searchResultsContainer.getVisibility() == View.INVISIBLE) {
-                    searchResultsContainer.setVisibility(View.VISIBLE);
-                    profileContentContainer.setVisibility(View.INVISIBLE);
-                }
-                else if (searchResultsContainer.getVisibility() == View.VISIBLE) {
-                    searchResultsContainer.setVisibility(View.INVISIBLE);
-                    profileContentContainer.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+//        // SearchView listener to show search results
+//        searchView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (searchResultsContainer.getVisibility() == View.INVISIBLE) {
+//                    searchResultsContainer.setVisibility(View.VISIBLE);
+//                    profileContentContainer.setVisibility(View.INVISIBLE);
+//                }
+//                else if (searchResultsContainer.getVisibility() == View.VISIBLE) {
+//                    searchResultsContainer.setVisibility(View.INVISIBLE);
+//                    profileContentContainer.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
+
+
 
 
         return rootView;
