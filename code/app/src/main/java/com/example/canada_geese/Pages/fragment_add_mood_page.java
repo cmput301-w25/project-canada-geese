@@ -17,9 +17,12 @@ import com.example.canada_geese.Fragments.AddMoodEventDialogFragment;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A fragment that manages and displays a list of mood events.
@@ -121,7 +124,15 @@ public class fragment_add_mood_page extends Fragment {
             adapter.filter("");
         }
     }
-
+    private Date parseDate(String dateString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            return sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date(); // Return current date if parsing fails
+        }
+    }
     /**
      * Provides sample mood events for testing purposes.
      *
@@ -129,9 +140,10 @@ public class fragment_add_mood_page extends Fragment {
      */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Happiness", "test", parseDate("2025-02-12 08:15"), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "test", parseDate("2025-02-11 03:42"), "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", parseDate("2025-02-07 21:16"), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
+
 }

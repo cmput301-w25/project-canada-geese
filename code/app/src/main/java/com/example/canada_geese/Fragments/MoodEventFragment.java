@@ -1,14 +1,11 @@
 package com.example.canada_geese.Fragments;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.SearchView;
-import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,11 +20,14 @@ import com.example.canada_geese.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 /**
- * A fragment that displays a list of mood events and allows searching and filtering of mood evnents
+ * A fragment that displays a list of mood events and allows searching and filtering of mood events
  */
 public class MoodEventFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -39,6 +39,22 @@ public class MoodEventFragment extends Fragment {
      * Default constructor for MoodEventFragment.
      */
     public MoodEventFragment() {}
+
+    /**
+     * Helper method to parse a date string into a Date object.
+     *
+     * @param dateString The date string in format "yyyy-MM-dd HH:mm".
+     * @return A Date object parsed from the string.
+     */
+    private Date parseDate(String dateString) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            return sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new Date(); // Return current date if parsing fails
+        }
+    }
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -56,7 +72,7 @@ public class MoodEventFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
         View addMoodEventButton = view.findViewById(R.id.add_mood_event_button);
-        View filterButton = view.findViewById(R.id.filter_button);
+        View filterIcon = view.findViewById(R.id.filter_button);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -84,8 +100,6 @@ public class MoodEventFragment extends Fragment {
             }
         });
 
-        filterButton.setOnClickListener(v -> showFilterDialog());
-
         addMoodEventButton.setOnClickListener(v -> {
             AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
             dialog.setOnMoodAddedListener(moodEvent -> fetchMoodEventsFromFirestore());
@@ -93,22 +107,6 @@ public class MoodEventFragment extends Fragment {
         });
 
         return view;
-    }
-
-    private void showFilterDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_filter, null);
-        Spinner emotionSpinner = view.findViewById(R.id.filter_mood_spinner);
-        CheckBox last7DaysCheckBox = view.findViewById(R.id.filter_last_7_days);
-
-        builder.setView(view)
-                .setPositiveButton("Apply", (dialog, which) -> {
-                    String selectedEmotion = emotionSpinner.getSelectedItem().toString();
-                    boolean filterLast7Days = last7DaysCheckBox.isChecked();
-                    adapter.setFilters(selectedEmotion, filterLast7Days); // Update adapter's filter state
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .show();
     }
 
     /**
@@ -126,7 +124,7 @@ public class MoodEventFragment extends Fragment {
                 for (DocumentSnapshot doc : task.getResult()) {
                     MoodEventModel mood = doc.toObject(MoodEventModel.class);
                     if (mood != null) {
-                        Log.d("MoodEventFragment", "Loaded mood: " + mood.getEmotion() + ", " + mood.getTimestamp());
+                        Log.d("MoodEventFragment", "Loaded mood: " + mood.getEmotion() + ", " + mood.getFormattedTimestamp());
                         moodEventList.add(mood);
                     } else {
                         Log.e("MoodEventFragment", "Failed to convert document to MoodEventModel.");
@@ -148,9 +146,9 @@ public class MoodEventFragment extends Fragment {
      */
     private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
-        list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
-        list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
-        list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Happiness", "test", parseDate("2025-02-12 08:15"), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
+        list.add(new MoodEventModel("Anger", "test", parseDate("2025-02-11 03:42"), "😠", R.color.color_anger, false, false, 0.0, 0.0));
+        list.add(new MoodEventModel("Fear", "test", parseDate("2025-02-07 21:16"), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
     }
 }
