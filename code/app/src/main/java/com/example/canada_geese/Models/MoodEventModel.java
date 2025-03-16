@@ -2,13 +2,15 @@ package com.example.canada_geese.Models;
 
 import com.google.firebase.firestore.ServerTimestamp;
 
+import java.util.Date;
+
 /**
  * Represents a mood event with various attributes such as emotion, timestamp, emoji, color, and location data.
  */
 public class MoodEventModel {
     private String emotion;
     private String description;
-    private String timestamp;
+    private Date timestamp;
     private String emoji;
     private int color;
     private boolean triggerWarning;
@@ -27,7 +29,7 @@ public class MoodEventModel {
      *
      * @param emotion           the emotion associated with the event.
      * @param description       a description of the event.
-     * @param timestamp         the timestamp of the event as a String.
+     * @param timestamp         the timestamp of the event as a Date.
      * @param emoji             the emoji representation of the emotion.
      * @param color             the color associated with the emotion.
      * @param hasTriggerWarning whether the event has a trigger warning.
@@ -35,7 +37,7 @@ public class MoodEventModel {
      * @param latitude          the latitude of the event location.
      * @param longitude         the longitude of the event location.
      */
-    public MoodEventModel(String emotion, String description, String timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
+    public MoodEventModel(String emotion, String description, Date timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
         this.emotion = emotion;
         this.timestamp = timestamp;
         this.emoji = emoji;
@@ -68,9 +70,9 @@ public class MoodEventModel {
     /**
      * Gets the timestamp of the event.
      *
-     * @return the timestamp as a String.
+     * @return the timestamp as a Date.
      */
-    public String getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 

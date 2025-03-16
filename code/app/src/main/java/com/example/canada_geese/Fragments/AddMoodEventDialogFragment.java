@@ -1,10 +1,17 @@
 package com.example.canada_geese.Fragments;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -50,6 +58,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private CheckBox addLocationCheckbox;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap googleMap;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_PICK = 2;
+    private ImageButton cameraButton;
+
 
     private static final int LOCATION_PERMISSION_REQUEST = 100;
 
@@ -129,6 +141,8 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         moodSpinner = view.findViewById(R.id.emotion_spinner);
         addMoodButton = view.findViewById(R.id.add_mood_button);
         addLocationCheckbox = view.findViewById(R.id.attach_location_checkbox);
+        cameraButton = view.findViewById(R.id.camera_icon);
+        cameraButton.setOnClickListener(v -> showImagePickerDialog());
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
@@ -273,8 +287,8 @@ public class AddMoodEventDialogFragment extends DialogFragment {
      *
      * @return the current timestamp.
      */
-    private String getCurrentTimestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+    private Date getCurrentTimestamp() {
+        return new Date();
     }
 
     /**
@@ -317,4 +331,45 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             default: return R.color.colorPrimaryDark;
         }
     }
+    private void showImagePickerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Choose an option")
+                .setItems(new String[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
+                    if (which == 0) {
+                        takePhoto();
+                    } else {
+                        pickImageFromGallery();
+                    }
+                })
+                .show();
+    }
+    private void takePhoto() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    private void pickImageFromGallery() {
+        Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickPhotoIntent, REQUEST_IMAGE_PICK);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE && data != null) {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                cameraButton.setImageBitmap(imageBitmap);
+            } else if (requestCode == REQUEST_IMAGE_PICK && data != null) {
+                Uri selectedImageUri = data.getData();
+                cameraButton.setImageURI(selectedImageUri);
+            }
+        }
+    }
+
+
 }
