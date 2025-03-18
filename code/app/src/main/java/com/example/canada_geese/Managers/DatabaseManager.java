@@ -119,6 +119,16 @@ public class DatabaseManager {
         }
     }
 
+    public void fetchAllUsers(OnCompleteListener<QuerySnapshot> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            Log.e(TAG, "User is not logged in.");
+            return;
+        }
+        CollectionReference usersRef = db.collection("users");
+        usersRef.get().addOnCompleteListener(listener);
+    }
+
     /**
      * Placeholder method for updating a mood event.
      * Currently not implemented.

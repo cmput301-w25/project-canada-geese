@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.espresso.intents)
+    implementation(libs.recyclerview)
 
 
     testImplementation(libs.junit)

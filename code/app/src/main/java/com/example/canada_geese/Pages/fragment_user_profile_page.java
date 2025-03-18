@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,9 +25,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 //import com.example.canada_geese.Adapters.UserSearchAdapter;
+import com.example.canada_geese.Adapters.UsersAdapter;
+import com.example.canada_geese.Fragments.RequestsDialogFragment;
+import com.example.canada_geese.Managers.DatabaseManager;
+import com.example.canada_geese.Models.Users;
 import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,6 +56,7 @@ public class fragment_user_profile_page extends Fragment {
     private TextView followingCountText;
     private ImageButton menuImageButton;
     private ImageView profileImage;
+    private ImageButton returnButton;
     private SearchView searchView;
     private ListView followersListView;
     private LinearLayout followersSection;
@@ -59,6 +66,8 @@ public class fragment_user_profile_page extends Fragment {
     LinearLayout searchResultsContainer;
     LinearLayout profileContentContainer;
     private List<String> userList; // Declare userList here
+    private List<Users> AllUsers;
+    private UsersAdapter adapter;
 
     /**
      * Required empty public constructor.
@@ -73,8 +82,12 @@ public class fragment_user_profile_page extends Fragment {
      * @return A new instance of fragment_user_profile_page.
      */
     public static fragment_user_profile_page newInstance() {
-        return new fragment_user_profile_page();
+        fragment_user_profile_page fragment = new fragment_user_profile_page();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
     }
+
 
     /**
      * Inflates the layout for this fragment and initializes Firebase authentication and UI components.
@@ -87,10 +100,10 @@ public class fragment_user_profile_page extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user_profile_page, container, false);
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
 
         // Find Views for the UI components of the profile content container
         usernameText = rootView.findViewById(R.id.username_text);
@@ -101,26 +114,28 @@ public class fragment_user_profile_page extends Fragment {
         followingCountText = rootView.findViewById(R.id.following_count);
         followersListView = rootView.findViewById(R.id.followers_list);
 
-        // Find Views for the search bar and search results container
+        // Find Views for the search bar, menu and return buttons
         searchView = rootView.findViewById(R.id.searchView);
         menuImageButton = rootView.findViewById(R.id.menu_button);
+        returnButton = rootView.findViewById(R.id.back_button);
 
-        // Find views for the search list view
+        // Find views for the search list view recycler view in the search results container
         searchResultsList = rootView.findViewById(R.id.search_results_list);
+        searchResultsList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize the search results container AND profile content container
         searchResultsContainer = rootView.findViewById(R.id.search_results_container);
         profileContentContainer = rootView.findViewById(R.id.profile_content_container);
 
-        // Initialize the ListView and Adapter basic implementation right now with just users name
+        // Initialize the list of users this is for profile container
         userList = new ArrayList<>();
         userAdapter= new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, userList);
         followersListView.setAdapter(userAdapter);
 
-//        // Initialize the search results listview
-//        List<String> searchResultsContainer = new ArrayList<>();
-//        ArrayAdapter<String> searchResultsAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, searchResultsContainer);
-//        searchResultsContainer.setAdapter(searchResultsAdapter);
+        // Initialize the list of users for search results page container
+        AllUsers = new ArrayList<>();
+        adapter = new UsersAdapter(AllUsers, getContext());
+        searchResultsList.setAdapter(adapter);
 
 
         // Fetch the user details from Firebase
@@ -139,9 +154,9 @@ public class fragment_user_profile_page extends Fragment {
                     signOutUser();
                     return true;
                 } else if (id == R.id.action_requests) {
-                    // Navigate to the follow requests page
-
-
+                    // Open the requests dialog fragment
+                    RequestsDialogFragment dialogFragment = new RequestsDialogFragment();
+                    dialogFragment.show(getParentFragmentManager(), "RequestsDialogFragment");
                     Toast.makeText(requireContext(), "Follow Requests", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.action_settings) {
@@ -166,23 +181,56 @@ public class fragment_user_profile_page extends Fragment {
             showFollowingList();
         });
 
-//        // SearchView listener to show search results
-//        searchView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (searchResultsContainer.getVisibility() == View.INVISIBLE) {
-//                    searchResultsContainer.setVisibility(View.VISIBLE);
-//                    profileContentContainer.setVisibility(View.INVISIBLE);
-//                }
-//                else if (searchResultsContainer.getVisibility() == View.VISIBLE) {
-//                    searchResultsContainer.setVisibility(View.INVISIBLE);
-//                    profileContentContainer.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        });
 
 
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                menuImageButton.setVisibility(View.GONE);
+                returnButton.setVisibility(View.VISIBLE);
+                searchResultsContainer.setVisibility(View.VISIBLE);
+                profileContentContainer.setVisibility(View.GONE);
 
+                // Fetch all users from the database
+                DatabaseManager.getInstance().fetchAllUsers(task -> {
+                    if (task.isSuccessful()) {
+                        List<Users> newList = new ArrayList<>();
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Users user = document.toObject(Users.class);
+                            newList.add(user);
+                        }
+                        adapter.updateList(newList);
+                    } else {
+                        Log.e("FetchError", "Error getting documents: ", task.getException());
+                    }
+                });
+            }
+
+        });
+
+        // Searchview to filter through database users
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterUsers(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterUsers(newText);
+                return false;
+            }
+        });
+
+        // Return button click listener
+        returnButton.setOnClickListener(v -> {
+            // remove focus from the search view
+            searchView.clearFocus();
+            menuImageButton.setVisibility(View.VISIBLE);
+            returnButton.setVisibility(View.GONE);
+            searchResultsContainer.setVisibility(View.GONE);
+            profileContentContainer.setVisibility(View.VISIBLE);
+        });
 
         return rootView;
     }
@@ -282,5 +330,70 @@ public class fragment_user_profile_page extends Fragment {
                     });
         }
     }
+    // Then add this method to filter users based on search query
+    private void filterUsers(String searchText) {
+        if (AllUsers == null || AllUsers.isEmpty()) {
+            // If users haven't been loaded yet, fetch them first
+            DatabaseManager.getInstance().fetchAllUsers(task -> {
+                if (task.isSuccessful()) {
+                    List<Users> newList = new ArrayList<>();
+                    for (DocumentSnapshot document : task.getResult()) {
+                        Users user = document.toObject(Users.class);
+                        if (user != null) {
+                            newList.add(user);
+                        }
+                    }
+                    AllUsers = newList;
+                    performFiltering(searchText);
+                } else {
+                    Log.e("FilterError", "Error getting documents: ", task.getException());
+                }
+            });
+        } else {
+            // If users are already loaded, just filter them
+            performFiltering(searchText);
+        }
+    }
+
+    // Add this helper method to perform the actual filtering
+    private void performFiltering(String searchText) {
+        List<Users> filteredList = new ArrayList<>();
+
+        // Get current user ID to exclude from results
+        String currentUserId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "";
+
+        for (Users user : AllUsers) {
+            // Add user to filtered list if username contains search text (case insensitive)
+            if (user.getUsername() != null &&
+                    user.getUsername().toLowerCase().contains(searchText.toLowerCase())) {
+                filteredList.add(user);
+            }
+        }
+
+        // Update adapter with filtered results
+        adapter.updateList(filteredList);
+    }
+
+    private void sendFollowerRequest(Users users){
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            String currentUserId = user.getUid();
+            String targetUserId = user.getUid();
+            // Check id already following
+            db.collection("users").document(currentUserId).collection("Following").document(targetUserId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Already following, show a message
+                            Toast.makeText(requireContext(), "Already following", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Not following, send a follow request
+                            db.collection("users").document(targetUserId).collection("FollowRequests").document(currentUserId).set(users)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(requireContext(), "Follow request sent", Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    });
+
+    }}
 
 }
