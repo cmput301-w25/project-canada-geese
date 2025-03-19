@@ -14,7 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * The main activity of the application that manages the bottom navigation and loads different fragments.
  * Handles user navigation between different pages such as User Moods, Friends' Moods, Map View, and Profile.
  */
-public class MainActivity extends AppCompatActivity {
+public class    MainActivity extends AppCompatActivity {
 
     /**
      * Called when the activity is first created.

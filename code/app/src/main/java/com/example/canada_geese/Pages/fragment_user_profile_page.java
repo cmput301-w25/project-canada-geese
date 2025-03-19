@@ -24,14 +24,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 //import com.example.canada_geese.Adapters.UserSearchAdapter;
+import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Adapters.UsersAdapter;
 import com.example.canada_geese.Fragments.RequestsDialogFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
+
 import com.example.canada_geese.Models.Users;
 import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,13 +44,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fragment to display and manage the user's profile page.
  * Includes user information such as username and profile picture,
  * and provides a sign-out functionality.
  */
-public class fragment_user_profile_page extends Fragment {
+public class fragment_user_profile_page extends Fragment{
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -63,12 +67,14 @@ public class fragment_user_profile_page extends Fragment {
     private LinearLayout followingSection;
     private ArrayAdapter<String> userAdapter;
     private RecyclerView searchResultsList;
+    private RecyclerView followRequestsList;
     LinearLayout searchResultsContainer;
     LinearLayout profileContentContainer;
-    private List<String> userList; // Declare userList here
+    private List<String> userList;
     private List<Users> AllUsers;
-    private UsersAdapter adapter;
-
+//    private List<FollowRequestModel> requestList;
+    private UsersAdapter usersAdapter;
+//    private FollowRequestAdapter followRequestAdapter;
     /**
      * Required empty public constructor.
      */
@@ -127,16 +133,15 @@ public class fragment_user_profile_page extends Fragment {
         searchResultsContainer = rootView.findViewById(R.id.search_results_container);
         profileContentContainer = rootView.findViewById(R.id.profile_content_container);
 
-        // Initialize the list of users this is for profile container
+        // Initialize the list of users this is for profile container (this is the list on user profile page)
         userList = new ArrayList<>();
         userAdapter= new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, userList);
         followersListView.setAdapter(userAdapter);
 
-        // Initialize the list of users for search results page container
+        // Initialize the list of users for search results page container (this is for the list of all users when you click search)
         AllUsers = new ArrayList<>();
-        adapter = new UsersAdapter(AllUsers, getContext());
-        searchResultsList.setAdapter(adapter);
-
+        usersAdapter = new UsersAdapter(AllUsers, getContext());
+        searchResultsList.setAdapter(usersAdapter);
 
         // Fetch the user details from Firebase
         loadUserProfile();
@@ -154,11 +159,12 @@ public class fragment_user_profile_page extends Fragment {
                     signOutUser();
                     return true;
                 } else if (id == R.id.action_requests) {
-                    // Open the requests dialog fragment
-                    RequestsDialogFragment dialogFragment = new RequestsDialogFragment();
-                    dialogFragment.show(getParentFragmentManager(), "RequestsDialogFragment");
-                    Toast.makeText(requireContext(), "Follow Requests", Toast.LENGTH_SHORT).show();
+                    // Open the requests dialog fragment which is handled in the RequestsDialogFragment class, allows user to accept or reject requests
+                    DialogFragment dialog = new RequestsDialogFragment();
+                    dialog.show(getParentFragmentManager(), "RequestsDialogFragment");
+                    Toast.makeText(requireContext(), "Requests", Toast.LENGTH_SHORT).show();
                     return true;
+
                 } else if (id == R.id.action_settings) {
                     // Navigate to the settings page
                     Toast.makeText(requireContext(), "Settings", Toast.LENGTH_SHORT).show();
@@ -198,7 +204,7 @@ public class fragment_user_profile_page extends Fragment {
                             Users user = document.toObject(Users.class);
                             newList.add(user);
                         }
-                        adapter.updateList(newList);
+                        usersAdapter.updateList(newList);
                     } else {
                         Log.e("FetchError", "Error getting documents: ", task.getException());
                     }
@@ -207,7 +213,7 @@ public class fragment_user_profile_page extends Fragment {
 
         });
 
-        // Searchview to filter through database users
+        // Search view to filter through database users
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -222,10 +228,18 @@ public class fragment_user_profile_page extends Fragment {
             }
         });
 
+        // Set click listener for the search results list
+//        followRequestAdapter.setOnItemClickListener(request -> {
+//            // Accept or reject request
+//            // not sure if supposed to implement here
+//        });
+
         // Return button click listener
         returnButton.setOnClickListener(v -> {
             // remove focus from the search view
             searchView.clearFocus();
+            // remove any text from the search view
+            searchView.setQuery("", false);
             menuImageButton.setVisibility(View.VISIBLE);
             returnButton.setVisibility(View.GONE);
             searchResultsContainer.setVisibility(View.GONE);
@@ -308,7 +322,7 @@ public class fragment_user_profile_page extends Fragment {
                         userList.clear();
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String username = document.getString("username");
-                            userList.add(username); // Add only the username to the list
+                             userList.add(username); // Add only the username to the list
                         }
                         userAdapter.notifyDataSetChanged(); // Refresh the ListView
                     });
@@ -371,29 +385,30 @@ public class fragment_user_profile_page extends Fragment {
         }
 
         // Update adapter with filtered results
-        adapter.updateList(filteredList);
+        usersAdapter.updateList(filteredList);
     }
 
-    private void sendFollowerRequest(Users users){
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            String currentUserId = user.getUid();
-            String targetUserId = user.getUid();
-            // Check id already following
-            db.collection("users").document(currentUserId).collection("Following").document(targetUserId).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            // Already following, show a message
-                            Toast.makeText(requireContext(), "Already following", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Not following, send a follow request
-                            db.collection("users").document(targetUserId).collection("FollowRequests").document(currentUserId).set(users)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(requireContext(), "Follow request sent", Toast.LENGTH_SHORT).show();
-                                    });
-                        }
-                    });
-
-    }}
+//    private void sendFollowerRequest(Users users){
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if (user != null) {
+//            String currentUserId = user.getUid();
+//            String targetUserId = user.getUid();
+//            // Check id already following
+//            db.collection("users").document(currentUserId).collection("Following").document(targetUserId).get()
+//                    .addOnSuccessListener(documentSnapshot -> {
+//                        if (documentSnapshot.exists()) {
+//                            // Already following, show a message
+//                            Toast.makeText(requireContext(), "Already following", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            // Not following, send a follow request
+//                            db.collection("users").document(targetUserId).collection("FollowRequests").document(currentUserId).set(users)
+//                                    .addOnSuccessListener(aVoid -> {
+//                                        Toast.makeText(requireContext(), "Follow request sent", Toast.LENGTH_SHORT).show();
+//                                    });
+//                        }
+//                    });
+//
+//        }
+//    }
 
 }

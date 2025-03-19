@@ -6,14 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Models.FollowRequestModel;
 import com.example.canada_geese.R;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -21,12 +19,17 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
 
     private List<FollowRequestModel> requestList;
     private Context context;
-    private FirebaseFirestore db;
+    private OnRequestActionListener listener;
 
-    public FollowRequestAdapter(List<FollowRequestModel> requestList, Context context) {
+    // Interface for handling request actions
+    public interface OnRequestActionListener {
+        void onRequestAction(String username, String action);
+    }
+
+    public FollowRequestAdapter(List<FollowRequestModel> requestList, Context context, OnRequestActionListener listener) {
         this.requestList = requestList;
         this.context = context;
-        this.db = FirebaseFirestore.getInstance();
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,9 +42,21 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FollowRequestModel request = requestList.get(position);
-        holder.usernameText.setText(request.getRequestUsername());
-        holder.acceptButton.setOnClickListener(v -> updateRequestStatus(request, "accepted"));
-        holder.rejectButton.setOnClickListener(v -> updateRequestStatus(request, "rejected"));
+        holder.usernameText.setText(request.getUsername()); // Updated field name
+
+        // Handle Accept Button Click
+        holder.acceptButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRequestAction(request.getUsername(), "accepted");
+            }
+        });
+
+        // Handle Reject Button Click
+        holder.rejectButton.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRequestAction(request.getUsername(), "rejected");
+            }
+        });
     }
 
     @Override
@@ -49,21 +64,10 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
         return requestList.size();
     }
 
-    private void updateRequestStatus(FollowRequestModel request, String status) {
-        db.collection("follow_requests").document(request.getRequestID())
-                .update("status", status)
-                .addOnSuccessListener(aVoid -> {
-                    requestList.remove(request);
-                    notifyDataSetChanged();
-                    Toast.makeText(context, "Request " + status, Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> Toast.makeText(context, "Error updating request", Toast.LENGTH_SHORT).show());
-    }
-
+    // ViewHolder Class
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView usernameText;
-        Button acceptButton;
-        Button rejectButton;
+        Button acceptButton, rejectButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
