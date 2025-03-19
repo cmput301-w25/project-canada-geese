@@ -29,7 +29,12 @@ public class FilterBarFragment extends Fragment {
     /**
      * Constructor to receive MoodEventAdapter.
      */
-    public FilterBarFragment(MoodEventAdapter adapter) {
+    public FilterBarFragment() {}
+
+    /**
+     * Use this method to set the adapter AFTER instantiation.
+     */
+    public void setAdapter(MoodEventAdapter adapter) {
         this.adapter = adapter;
     }
 
@@ -87,12 +92,11 @@ public class FilterBarFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // "Clear All" Button - Reset Filters
         btnClearAll.setOnClickListener(v -> {
             isLast7DaysSelected = false;
             btnLast7Days.setBackgroundColor(Color.WHITE);
-            spinnerMood.setSelection(0); // Reset spinner
-            applyFilters();
+            spinnerMood.setSelection(0); // Reset mood spinner
+            applyFilters(); // Re-apply filter with default values
         });
     }
 
@@ -102,7 +106,9 @@ public class FilterBarFragment extends Fragment {
     private void applyFilters() {
         if (adapter != null) {
             String selectedMood = spinnerMood.getSelectedItem().toString();
-            adapter.filter("", isLast7DaysSelected, selectedMood);
+            boolean resetMoodFilter = selectedMood.equals("Select Mood"); // Reset if "Select Mood" is chosen
+            adapter.filter("", isLast7DaysSelected, resetMoodFilter ? "" : selectedMood);
         }
     }
+
 }

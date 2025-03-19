@@ -2,6 +2,7 @@ package com.example.canada_geese.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -363,9 +364,14 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         long cutoffTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
 
         for (MoodEventModel event : moodEventListFull) {
-            boolean matchesQuery = query.isEmpty() || event.getEmotion().toLowerCase().contains(query.toLowerCase());
+            if (event.getTimestamp() == null) continue;
+
+            long eventTime = event.getTimestamp().getTime(); // 🔥 Ensure it's in milliseconds
+            Log.d("FILTER_DEBUG", "Event time: " + eventTime + ", Cutoff time: " + cutoffTime);
+
+            boolean matchesQuery = query.isEmpty() || event.getDescription().toLowerCase().contains(query.toLowerCase());
             boolean matchesMood = selectedMood.isEmpty() || event.getEmotion().equalsIgnoreCase(selectedMood);
-            boolean matchesDate = !last7Days || event.getTimestamp().getTime() >= cutoffTime;
+            boolean matchesDate = !last7Days || (event.getTimestamp() != null && event.getTimestamp().getTime() >= cutoffTime);
 
             if (matchesQuery && matchesMood && matchesDate) {
                 moodEventList.add(event);
@@ -375,6 +381,8 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         // Reset expanded position when filter changes
         expandedPosition = -1;
         isInEditMode = false;
+
+        Log.d("FILTER_DEBUG", "Filtered events count: " + moodEventList.size());
         notifyDataSetChanged();
     }
 
