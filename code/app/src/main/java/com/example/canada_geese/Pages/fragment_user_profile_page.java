@@ -72,9 +72,8 @@ public class fragment_user_profile_page extends Fragment{
     LinearLayout profileContentContainer;
     private List<String> userList;
     private List<Users> AllUsers;
-//    private List<FollowRequestModel> requestList;
     private UsersAdapter usersAdapter;
-//    private FollowRequestAdapter followRequestAdapter;
+
     /**
      * Required empty public constructor.
      */
@@ -93,7 +92,6 @@ public class fragment_user_profile_page extends Fragment{
         fragment.setArguments(args);
         return fragment;
     }
-
 
     /**
      * Inflates the layout for this fragment and initializes Firebase authentication and UI components.
@@ -227,12 +225,6 @@ public class fragment_user_profile_page extends Fragment{
                 return false;
             }
         });
-
-        // Set click listener for the search results list
-//        followRequestAdapter.setOnItemClickListener(request -> {
-//            // Accept or reject request
-//            // not sure if supposed to implement here
-//        });
 
         // Return button click listener
         returnButton.setOnClickListener(v -> {
@@ -388,27 +380,5 @@ public class fragment_user_profile_page extends Fragment{
         usersAdapter.updateList(filteredList);
     }
 
-//    private void sendFollowerRequest(Users users){
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        if (user != null) {
-//            String currentUserId = user.getUid();
-//            String targetUserId = user.getUid();
-//            // Check id already following
-//            db.collection("users").document(currentUserId).collection("Following").document(targetUserId).get()
-//                    .addOnSuccessListener(documentSnapshot -> {
-//                        if (documentSnapshot.exists()) {
-//                            // Already following, show a message
-//                            Toast.makeText(requireContext(), "Already following", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            // Not following, send a follow request
-//                            db.collection("users").document(targetUserId).collection("FollowRequests").document(currentUserId).set(users)
-//                                    .addOnSuccessListener(aVoid -> {
-//                                        Toast.makeText(requireContext(), "Follow request sent", Toast.LENGTH_SHORT).show();
-//                                    });
-//                        }
-//                    });
-//
-//        }
-//    }
 
 }

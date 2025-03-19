@@ -3,6 +3,7 @@ package com.example.canada_geese.Adapters;
 import static androidx.test.InstrumentationRegistry.getContext;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     private List<Users> filteredusersList;
     private Context context;
     private String currentQuery = "";
+    private onItemClickListener listener;
 
 
 
@@ -33,12 +35,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         this.context = context;
     }
 
-    public interface OnItemClickListener {
+    public interface onItemClickListener {
         void onItemClick(Users users);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.setOnItemClickListener(listener);
+    public void setOnItemClickListener(onItemClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -55,19 +57,18 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         if (users != null) {
             holder.text_username.setText(users.getUsername());
             holder.profile_image.setImageResource(R.drawable.profile);
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // do something
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    Log.d("UsersAdapter", "User clicked: " + users.getUsername());  // Log click event
+                    listener.onItemClick(users);
                 }
             });
         }
-
     }
 
     @Override
     public int getItemCount() {
-        return usersList.size();
+        return filteredusersList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -75,30 +75,52 @@ public class RequestsDialogFragment extends DialogFragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                        String docId = document.getId(); // Get the document ID
+
                         if (action.equals("accepted")) {
-                            // Update request status to "accepted"
-                            db.collection("requests")
-                                    .document(document.getId())
-                                    .update("status", "accepted");
-
-                            // Add to followers collection
+                            // Add the requesting user to the current user's Followers collection
                             Map<String, Object> followerData = new HashMap<>();
-                            followerData.put("follower", username);
-                            followerData.put("following", currentUser);
+                            followerData.put("username", username);
 
-                            db.collection("followers")
-                                    .add(followerData)
-                                    .addOnSuccessListener(docRef -> Log.d("TAG", "Added to followers"))
-                                    .addOnFailureListener(e -> Log.d("TAG", "Error adding to followers", e));
-                        } else {
-                            // Update request status to "rejected"
-                            db.collection("requests")
-                                    .document(document.getId())
-                                    .update("status", "rejected");
+                            db.collection("users").document(currentUser)
+                                    .collection("Followers").document(username)
+                                    .set(followerData)
+                                    .addOnSuccessListener(aVoid -> Log.d("TAG", "Added to current user's Followers collection"))
+                                    .addOnFailureListener(e -> Log.d("TAG", "Error adding to current user's Followers collection", e));
+
+                            // Add the current user to the requesting user's Following collection
+                            Map<String, Object> followingData = new HashMap<>();
+                            followingData.put("username", currentUser);
+
+                            db.collection("users").document(username)
+                                    .collection("Following").document(currentUser)
+                                    .set(followingData)
+                                    .addOnSuccessListener(aVoid -> Log.d("TAG", "Added to requesting user's Following collection"))
+                                    .addOnFailureListener(e -> Log.d("TAG", "Error adding to requesting user's Following collection", e));
                         }
+
+                        // Delete the follow request document after processing
+                        db.collection("users").document(currentUser)
+                                .collection("requests").document(docId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("TAG", "Request removed successfully");
+                                    removeRequestFromList(username);
+                                })
+                                .addOnFailureListener(e -> Log.d("TAG", "Error deleting request", e));
                     }
                 })
-                .addOnFailureListener(e -> Log.d("TAG", "Error updating request status", e));
+                .addOnFailureListener(e -> Log.d("TAG", "Error processing follow request", e));
+    }
+
+    private void removeRequestFromList(String username) {
+        for (FollowRequestModel request : requestList) {
+            if (request.getUsername().equals(username)) {
+                requestList.remove(request);
+                adapter.notifyDataSetChanged();
+                break;
+            }
+        }
     }
 
     private void loadFollowRequests() {
