@@ -90,4 +90,5 @@
     <string name="allow_once">Allow Once</string>
     <string name="dont_allow">Don\'t Allow</string>
     <string name="additional_info">SET THIS VALUE\n</string>
+    <string name="clear_all">Clear All</string>
 </resources>

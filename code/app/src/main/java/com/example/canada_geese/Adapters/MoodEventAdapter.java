@@ -320,24 +320,6 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
     /**
-     * Updates the adapter with a new list of mood events.
-     *
-     * @param newData The new list of mood events.
-     */
-    public void updateData(List<MoodEventModel> newData) {
-        this.moodEventListFull.clear();
-        this.moodEventListFull.addAll(newData);
-
-        this.moodEventList.clear();
-        this.moodEventList.addAll(newData);
-
-        // Reset expanded position when data is updated
-        expandedPosition = -1;
-        isInEditMode = false;
-        filter(currentQuery);
-    }
-
-    /**
      * Adds a new mood event to the list.
      *
      * @param newItem The new mood event to add.
@@ -375,17 +357,18 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
      *
      * @param query The search query.
      */
-    public void filter(String query) {
+    public void filter(String query, boolean last7Days, String selectedMood) {
         this.currentQuery = query;
         moodEventList.clear();
+        long cutoffTime = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
 
-        if (query.isEmpty()) {
-            moodEventList.addAll(moodEventListFull);
-        } else {
-            for (MoodEventModel event : moodEventListFull) {
-                if (event.getEmotion().toLowerCase().contains(query.toLowerCase())) {
-                    moodEventList.add(event);
-                }
+        for (MoodEventModel event : moodEventListFull) {
+            boolean matchesQuery = query.isEmpty() || event.getEmotion().toLowerCase().contains(query.toLowerCase());
+            boolean matchesMood = selectedMood.isEmpty() || event.getEmotion().equalsIgnoreCase(selectedMood);
+            boolean matchesDate = !last7Days || event.getTimestamp().getTime() >= cutoffTime;
+
+            if (matchesQuery && matchesMood && matchesDate) {
+                moodEventList.add(event);
             }
         }
 

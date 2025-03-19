@@ -83,20 +83,20 @@ public class fragment_add_mood_page extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query);
+                adapter.filter(query, false, "");
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText);
+                adapter.filter(newText, false, "");
                 return false;
             }
         });
 
         // Add close listener to ensure list resets when search is closed
         searchView.setOnCloseListener(() -> {
-            adapter.filter("");
+            adapter.filter("", false, "");
             return false;
         });
 
@@ -121,7 +121,7 @@ public class fragment_add_mood_page extends Fragment {
     public void onResume() {
         super.onResume();
         if (adapter != null) {
-            adapter.filter("");
+            adapter.filter("", false, "");
         }
     }
     private Date parseDate(String dateString) {

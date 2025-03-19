@@ -10,10 +10,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Fragments.FilterBarFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.EmotionalState;
 import com.example.canada_geese.Models.MoodEventModel;
@@ -39,6 +41,9 @@ public class fragment_user_moods_page extends Fragment {
     private SearchView searchView;
     private List<MoodEventModel> moodEventList;
     private MoodEventModel newMood;
+    private boolean isLast7DaysSelected = false;
+    private String selectedMood = "";
+    private String searchQuery = "";
 
     /**
      * Required empty public constructor.
@@ -91,6 +96,11 @@ public class fragment_user_moods_page extends Fragment {
         adapter = new MoodEventAdapter(moodEventList, getContext());
         recyclerView.setAdapter(adapter);
 
+        // Attach existing FilterBarFragment (which already modifies the adapter)
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.filter_bar_fragment_container, new FilterBarFragment(adapter))
+                .commit();
+
         // Set up click listeners for mood events
         setupMoodEventClickListeners();
 
@@ -107,20 +117,20 @@ public class fragment_user_moods_page extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query);
+                adapter.filter(query, false, "");
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText);
+                adapter.filter(newText, false, "");
                 return false;
             }
         });
 
         // Reset list when search is closed
         searchView.setOnCloseListener(() -> {
-            adapter.filter("");
+            adapter.filter("", false, "");
             return false;
         });
 
@@ -259,7 +269,7 @@ public class fragment_user_moods_page extends Fragment {
     public void onResume() {
         super.onResume();
         if (adapter != null) {
-            adapter.filter(""); // Clear search filter on resume
+            adapter.filter("", false, ""); // Clear search filter on resume
             // Refresh the mood events list
             refreshMoodEventList();
         }
