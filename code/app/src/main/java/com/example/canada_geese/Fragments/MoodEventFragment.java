@@ -146,11 +146,11 @@ public class MoodEventFragment extends Fragment {
      *
      * @return A list of sample MoodEventModel objects.
      */
-    private List<MoodEventModel> getSampleMoodEvents() {
+   /* private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
         list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
         list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
-    }
+    }*/
 }

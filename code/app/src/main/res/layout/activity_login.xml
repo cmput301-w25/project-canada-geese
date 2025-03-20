@@ -5,7 +5,7 @@
     android:id="@+id/sign_up"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F1ED"
+    android:background="#5A544C"
     tools:context=".Pages.SignUpActivity">
 
   <!-- Sign Up -->
@@ -16,9 +16,10 @@
       android:layout_centerHorizontal="true"
       android:layout_marginTop="90dp"
       android:text="Sign In"
-      android:textColor="#6B4F3F"
+      android:textColor="#000000"
       android:textSize="64sp"
-      android:textStyle="normal" />
+      android:textStyle="normal"
+      android:fontFamily="@font/fredoka_variable"/>
 
   <!-- Input Field -->
   <LinearLayout
@@ -38,28 +39,29 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Username"
-        android:textColor="#6B4F3F"
-        android:textSize="14sp"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="-6dp"
         android:paddingStart="15dp"
-        android:layout_marginTop="15dp"/>
+        android:text="Username"
+        android:textColor="#000000"
+        android:textSize="14sp" />
+
+    <!-- Password -->
 
     <EditText
         android:id="@+id/username_input"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:hint="Enter a unique username"
         android:background="@drawable/edittext_border"
+        android:hint="Enter a unique username"
         android:padding="10dp"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 
-    <!-- Password -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Password"
-        android:textColor="#6B4F3F"
+        android:textColor="#000000"
         android:textSize="14sp"
         android:layout_marginBottom="-6dp"
         android:paddingStart="15dp"
@@ -82,7 +84,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Remember me"
-      android:textColor="#6B4F3F"
+      android:textColor="#000000"
       android:layout_below="@id/input_container"
       android:layout_marginTop="15dp"
       android:layout_marginStart="34dp"/>
@@ -95,9 +97,10 @@
       android:layout_below="@id/remember_me"
       android:layout_centerHorizontal="true"
       android:layout_marginTop="20dp"
-      android:backgroundTint="#A67C52"
+
       android:text="Login"
       android:textColor="#FFFFFF"
+      android:backgroundTint="@color/black"
       android:textSize="18sp" />
 
   <!-- Sign In Link -->
@@ -109,6 +112,6 @@
       android:layout_centerHorizontal="true"
       android:layout_marginTop="20dp"
       android:text="Don't have an account? Sign Up!"
-      android:textColor="#6B4F3F"
+      android:textColor="#000000"
       android:textSize="14sp" />
 </RelativeLayout>

@@ -1,168 +1,235 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
-    android:padding="16dp">
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <!-- Title: Mood Name -->
-    <TextView
-        android:id="@+id/title_mood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mood_name"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Mood Selection Spinner with Background -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mood_spinner_container"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="@drawable/spinner_background"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/title_mood"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_background"
+        android:padding="16dp">
 
-        <Spinner
-            android:id="@+id/emotion_spinner"
+        <!-- Title: Mood Name -->
+        <TextView
+            android:id="@+id/title_mood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mood_name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <!-- Mood Selection Spinner with Background -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mood_spinner_container"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="8dp"
+            app:layout_constraintTop_toBottomOf="@id/title_mood"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp">
 
-    <!-- Description Title -->
-    <TextView
-        android:id="@+id/title_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reason"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/mood_spinner_container"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"/>
+            <Spinner
+                android:id="@+id/emotion_spinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Description Input -->
-    <EditText
-        android:id="@+id/description_input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Explain why you feel this way...."
-        android:background="@drawable/textarea_background"
-        android:padding="8dp"
-        android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@id/title_description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:minHeight="80dp"
-        android:gravity="top"/>
+        <!-- Note Icon -->
+        <ImageView
+            android:id="@+id/icon_reason"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/baseline_edit_note_24"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/title_description"
+            android:layout_marginEnd="18dp"/>
+
+        <!-- Description Title -->
 
 
-    <ImageButton
-        android:id="@+id/camera_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/baseline_camera_alt_24"
-        app:layout_constraintBottom_toBottomOf="@id/description_input"
-        app:layout_constraintEnd_toEndOf="@id/description_input"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:id="@+id/title_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp"
+            android:text="Add a Note"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mood_spinner_container" />
+        <!-- Description Input -->
 
-    <ImageView
-        android:id="@+id/selected_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/description_input"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
-
-    <!-- Social Situation Title -->
-    <TextView
-        android:id="@+id/title_social_situation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/social_situation"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/description_input"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"/>
-
-    <!-- Social Situation Spinner with Background -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/social_situation_container"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="@drawable/spinner_background"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/title_social_situation"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp">
-
-        <Spinner
-            android:id="@+id/social_situation_spinner"
+        <EditText
+            android:id="@+id/description_input"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textarea_background"
+            android:gravity="top"
+            android:hint="Explain why you feel this way...."
+            android:inputType="text"
+            android:minHeight="80dp"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/title_description" />
+
+        <ImageView
+            android:id="@+id/icon_camera"
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:src="@drawable/baseline_camera_alt_24"
+            app:layout_constraintBottom_toBottomOf="@id/camera_text"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/camera_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp"
+            android:text="Add a Picture"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/description_input"/>
+
+
+        <Button
+            android:id="@+id/camera_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tap to Select Photo..."
+            android:textColor="@android:color/black"
+            android:backgroundTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_view" />
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/camera_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Social Situation Title -->
+
+
+
+
+        <!-- Container for Map (will be dynamically loaded when location is enabled) -->
+
+        <!-- Social Situation Spinner with Background -->
+        <ImageView
+            android:id="@+id/icon_group"
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:src="@drawable/baseline_groups_24"
+            app:layout_constraintBottom_toBottomOf="@id/title_social_situation"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Attach Location and Trigger Warning Checkboxes -->
+
+        <TextView
+            android:id="@+id/title_social_situation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/social_situation"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/camera_button" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/social_situation_container"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/spinner_background"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_social_situation">
+
+            <Spinner
+                android:id="@+id/social_situation_spinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <CheckBox
+            android:id="@+id/attach_location_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/attach_location"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox" />
+
+        <!-- Container for Map (will be dynamically loaded when location is enabled) -->
+
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="381dp"
+            android:layout_height="219dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/add_mood_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+        <CheckBox
+            android:id="@+id/trigger_warning_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/trigger_warning"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/social_situation_container" />
+
+        <!-- Add Mood Button -->
+
+        <Button
+            android:id="@+id/add_mood_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/black"
+            android:paddingBottom="10dp"
+            android:text="@string/add_mood"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/map_container" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Attach Location and Trigger Warning Checkboxes -->
-    <CheckBox
-        android:id="@+id/attach_location_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/attach_location"
-        app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
-
-    <!-- Container for Map (will be dynamically loaded when location is enabled) -->
-    <FrameLayout
-        android:id="@+id/map_container"
-        android:layout_width="381dp"
-        android:layout_height="219dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/add_mood_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <CheckBox
-        android:id="@+id/trigger_warning_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/trigger_warning"
-        app:layout_constraintTop_toBottomOf="@id/social_situation_container"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp"/>
-
-
-    <!-- Add Mood Button -->
-    <Button
-        android:id="@+id/add_mood_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/black"
-        android:paddingBottom="10dp"
-        android:text="@string/add_mood"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/map_container" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

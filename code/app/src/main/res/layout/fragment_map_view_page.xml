@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:background="@android:color/white"
         android:alpha="0.9"
         android:padding="8dp"
         android:elevation="5dp">
@@ -44,9 +43,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Memory" />
+                android:text="Memory"/>
 
-            <!-- Friends Button -->
 
             <!-- Filter Icon -->
             <Button

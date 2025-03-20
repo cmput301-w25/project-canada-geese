@@ -9,15 +9,19 @@ import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+
+import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +33,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -139,8 +145,31 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      * Handles the "Memory" button click event to add mood event markers.
      */
     private void onMemoryButtonClick() {
-        moodEventList = getSampleMoodEvents();
-        addMoodEventMarkers();
+        // Use the existing fetchMoodEvents method from your DatabaseManager
+        DatabaseManager.getInstance().fetchMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null) {
+                    List<MoodEventModel> events = new ArrayList<>();
+
+                    // Convert the query documents to MoodEventModel objects
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        MoodEventModel event = document.toObject(MoodEventModel.class);
+                        events.add(event);
+                    }
+
+                    // Update your list and add markers
+                    moodEventList = events;
+                    addMoodEventMarkers();
+                }
+            } else {
+                Exception e = task.getException();
+                Toast.makeText(requireContext(),
+                        "Error loading mood events: " + (e != null ? e.getMessage() : "Unknown error"),
+                        Toast.LENGTH_SHORT).show();
+                Log.e("MoodMap", "Error loading mood events", e);
+            }
+        });
     }
 
     /**
@@ -170,7 +199,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private void addMoodEventMarkers() {
         if (moodEventList != null && !moodEventList.isEmpty()) {
             for (MoodEventModel moodEvent : moodEventList) {
-                if (moodEvent.HasLocation()) {
+                if (moodEvent.HasLocation()
+                )Log.d("MoodMap", "Checking mood event: " + moodEvent.getEmotion() + " | Has Location: " + moodEvent.HasLocation());
+                {
                     LatLng location = new LatLng(moodEvent.getLatitude(), moodEvent.getLongitude());
                     Bitmap emojiBitmap = createEmojiBitmap(getEmojiForEmotion(moodEvent.getEmotion()));
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -187,6 +218,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
             }
         }
     }
+
 
     /**
      * Converts an emoji to a Bitmap to be used as a marker icon.
@@ -216,13 +248,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      *
      * @return A list of sample MoodEventModel objects.
      */
-    private List<MoodEventModel> getSampleMoodEvents() {
+    /*private List<MoodEventModel> getSampleMoodEvents() {
         List<MoodEventModel> list = new ArrayList<>();
         list.add(new MoodEventModel("Happiness", "test", new Date(), "😊", R.color.color_happiness, false, true, 51.0447, -114.0719));
         list.add(new MoodEventModel("Anger", "test", new Date(), "😠", R.color.color_anger, false, false, 0.0, 0.0));
         list.add(new MoodEventModel("Fear", "test", new Date(), "😢", R.color.color_sadness, false, false, 0.0, 0.0));
         return list;
-    }
+    }*/
     private void setupSearchView() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
