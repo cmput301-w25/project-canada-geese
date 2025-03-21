@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@android:color/transparent">
+
+    <!-- "Last 7 Days" Button -->
+    <Button
+        android:id="@+id/btn_last_7_days"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/filter_button_background"
+        android:text="@string/last_7_days"
+        android:textColor="#000000"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@id/spinner_mood"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.3" />
+
+    <!-- Mood Selection Spinner -->
+    <Spinner
+        android:id="@+id/spinner_mood"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:spinnerMode="dropdown"
+        android:background="@drawable/filter_button_background"
+        android:popupBackground="@color/white"
+        app:layout_constraintStart_toEndOf="@id/btn_last_7_days"
+        app:layout_constraintEnd_toStartOf="@id/btn_clear_all"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.3"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- "Clear All" Button -->
+    <Button
+        android:id="@+id/btn_clear_all"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@drawable/filter_button_background"
+        android:text="@string/clear_all"
+        android:textColor="#000000"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/spinner_mood"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.3" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
