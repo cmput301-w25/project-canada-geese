@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Fragments.CommentsFragment;
 import com.example.canada_geese.Fragments.FilterBarFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.EmotionalState;
@@ -136,6 +137,14 @@ public class fragment_user_moods_page extends Fragment {
         searchView.setOnCloseListener(() -> {
             adapter.filter("", false, "");
             return false;
+        });
+        adapter.setOnCommentClickListener(new MoodEventAdapter.OnCommentClickListener() {
+            @Override
+            public void onCommentClick(MoodEventModel moodEvent) {
+                // Pass the mood event's document ID to the CommentsFragment
+                CommentsFragment commentsSheet = CommentsFragment.newInstance(moodEvent.getDocumentId());
+                commentsSheet.show(getChildFragmentManager(), commentsSheet.getTag());
+            }
         });
 
         return view;
@@ -291,6 +300,8 @@ public class fragment_user_moods_page extends Fragment {
                 for (DocumentSnapshot document : task.getResult()) {
                     MoodEventModel moodEvent = document.toObject(MoodEventModel.class);
                     if (moodEvent != null) {
+                        // Set the document ID from Firestore
+                        moodEvent.setDocumentId(document.getId());
                         newList.add(moodEvent);
                     }
                 }

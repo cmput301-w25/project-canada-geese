@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -54,6 +55,17 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
      */
     public interface OnMoodEventEditListener {
         void onMoodEventEdit(MoodEventModel moodEvent, int position);
+    }
+
+    // New interface for comment clicks
+    public interface OnCommentClickListener {
+        void onCommentClick(MoodEventModel moodEvent);
+    }
+
+    private OnCommentClickListener commentClickListener;
+
+    public void setOnCommentClickListener(OnCommentClickListener listener) {
+        this.commentClickListener = listener;
     }
 
     /**
@@ -170,6 +182,17 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
                     return longClickListener.onMoodEventLongClick(event);
                 }
                 return false;
+            });
+            // Comment button click listener
+            holder.commentButton.setOnClickListener(v -> {
+                if (commentClickListener != null) {
+                    commentClickListener.onCommentClick(event);
+                }
+            });
+            holder.commentButton.setOnClickListener(v -> {
+                if (commentClickListener != null) {
+                    commentClickListener.onCommentClick(event);
+                }
             });
         }
     }
@@ -291,6 +314,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         View detailsContainer, editContainer;
         CheckBox privateMoodCheck, privateMoodEdit;
         Button editButton, deleteButton, saveButton, cancelButton;
+        ImageButton commentButton; // Comment button
 
         /**
          * Constructor for ViewHolder.
@@ -303,6 +327,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             timestamp = itemView.findViewById(R.id.timestamp);
             moodEmoji = itemView.findViewById(R.id.mood_emoji);
             cardView = itemView.findViewById(R.id.card_view);
+            commentButton = itemView.findViewById(R.id.comment_button);
 
             // Details section views
             detailsContainer = itemView.findViewById(R.id.details_container);

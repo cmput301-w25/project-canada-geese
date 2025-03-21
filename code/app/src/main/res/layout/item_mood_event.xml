@@ -51,58 +51,68 @@
             android:id="@+id/details_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="8dp"
+            android:orientation="vertical"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/mood_emoji"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/mood_emoji">
 
             <CheckBox
                 android:id="@+id/cb_private_mood"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/private_mood"
-                android:enabled="false"/>
+                android:enabled="false"
+                android:text="@string/private_mood" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Description"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:layout_marginTop="4dp"/>
+                android:layout_marginTop="4dp"
+                android:minHeight="40dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btn_edit"
-                    android:layout_width="0dp"
+                    android:layout_width="66dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:text="Edit Mood"
                     android:backgroundTint="#673AB7"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginEnd="8dp"/>
+                    android:text="Edit Mood"
+                    android:textColor="#FFFFFF" />
 
                 <Button
                     android:id="@+id/btn_delete"
-                    android:layout_width="0dp"
+                    android:layout_width="58dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="DELETE"
                     android:backgroundTint="#EAEAEA"
-                    android:textColor="#666666"/>
+                    android:text="DELETE"
+                    android:textColor="#666666" />
+
+                <ImageButton
+                    android:id="@+id/comment_button"
+                    android:layout_width="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="Add a comment"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/comment_icon" />
             </LinearLayout>
         </LinearLayout>
 
@@ -169,14 +179,6 @@
                     android:textColor="#666666"
                     android:layout_marginEnd="8dp"/>
 
-                <ImageButton
-                    android:id="@+id/comment_icon"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/comment_icon"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="Add a comment"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,7 @@ public class MoodEventModel {
     private double latitude;
     private double longitude;
     private String userId;
+    private String documentId; // New field to store Firestore document ID
 
     /**
      * No-argument constructor required for Firestore.
@@ -155,5 +156,14 @@ public class MoodEventModel {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    // New getter and setter for documentId
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 }

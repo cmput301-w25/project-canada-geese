@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.canada_geese.Models.CommentModel;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -236,4 +237,38 @@ public class DatabaseManager {
             }
         }
     }
+
+    public void addComment(String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && moodEventId != null && !moodEventId.isEmpty()) {
+            String userId = user.getUid();
+            // Locate the mood event document, then add a comment to its "comments" subcollection
+            DocumentReference moodEventDocRef = db.collection("users").document(userId)
+                    .collection("moodEvents").document(moodEventId);
+            moodEventDocRef.collection("comments")
+                    .add(comment)
+                    .addOnCompleteListener(listener);
+        } else {
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId missing")));
+            }
+        }
+    }
+
+    public void deleteComment(String moodEventId, String commentId, OnCompleteListener<Void> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && moodEventId != null && commentId != null) {
+            String userId = user.getUid();
+            db.collection("users").document(userId)
+                    .collection("moodEvents").document(moodEventId)
+                    .collection("comments").document(commentId)
+                    .delete()
+                    .addOnCompleteListener(listener);
+        } else {
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId/commentId missing")));
+            }
+        }
+    }
+
 }

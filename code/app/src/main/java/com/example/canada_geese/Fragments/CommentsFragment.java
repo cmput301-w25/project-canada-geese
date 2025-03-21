@@ -1,0 +1,199 @@
+package com.example.canada_geese.Fragments;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.canada_geese.Adapters.CommentAdapter;
+import com.example.canada_geese.Managers.DatabaseManager;
+import com.example.canada_geese.Models.CommentModel;
+import com.example.canada_geese.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class CommentsFragment extends BottomSheetDialogFragment {
+
+    private String moodEventId; // Passed in from the calling fragment/activity
+    private RecyclerView rvComments;
+    private CommentAdapter commentAdapter;
+    private List<CommentModel> commentList = new ArrayList<>();
+    private TextView tvNoComments; // For empty state
+
+    public CommentsFragment() {
+        // Required empty public constructor
+    }
+
+    // Pass the mood event ID when creating the fragment
+    public static CommentsFragment newInstance(String moodEventId) {
+        CommentsFragment fragment = new CommentsFragment();
+        Bundle args = new Bundle();
+        args.putString("moodEventId", moodEventId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        // Adjust when the keyboard appears
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        return dialog;
+    }
+
+    @Override
+    public View onCreateView(@NonNull android.view.LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_comments_bottom_sheet, container, false);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        if (dialog != null) {
+            FrameLayout bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                int screenHeight = getResources().getDisplayMetrics().heightPixels;
+                int desiredHeight = (int) (screenHeight * 0.8);
+                bottomSheet.getLayoutParams().height = desiredHeight;
+                bottomSheet.setLayoutParams(bottomSheet.getLayoutParams());
+                BottomSheetBehavior<?> behavior = BottomSheetBehavior.from(bottomSheet);
+                behavior.setPeekHeight(desiredHeight);
+            }
+        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Retrieve the mood event ID passed as argument
+        if (getArguments() != null) {
+            moodEventId = getArguments().getString("moodEventId");
+        }
+
+        final EditText etComment = view.findViewById(R.id.et_comment);
+        final Button btnPost = view.findViewById(R.id.btn_post_comment);
+        rvComments = view.findViewById(R.id.rv_comments);
+        tvNoComments = view.findViewById(R.id.tv_no_comments);
+
+        rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
+        commentAdapter = new CommentAdapter(commentList, getContext(), moodEventId);
+        rvComments.setAdapter(commentAdapter);
+
+        // Request focus and show keyboard for EditText
+        if (etComment != null) {
+            etComment.requestFocus();
+            new Handler().postDelayed(() -> {
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.showSoftInput(etComment, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 100);
+        }
+
+        // Post comment button click
+        btnPost.setOnClickListener(v -> {
+            String commentText = etComment.getText().toString().trim();
+            if (commentText.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter a comment", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (firebaseUser == null) {
+                Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String uid = firebaseUser.getUid();
+            FirebaseFirestore.getInstance().collection("users")
+                    .document(uid)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                            String username = task.getResult().getString("username");
+                            if (username == null || username.isEmpty()) {
+                                username = firebaseUser.getEmail();
+                            }
+                            CommentModel comment = new CommentModel(commentText, username, new Date());
+                            // Set the userId so we know who posted it
+                            comment.setUserId(uid);
+                            DatabaseManager.getInstance().addComment(moodEventId, comment, new OnCompleteListener<DocumentReference>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentReference> postTask) {
+                                    if (postTask.isSuccessful()) {
+                                        Toast.makeText(getContext(), "Comment posted", Toast.LENGTH_SHORT).show();
+                                        etComment.setText("");
+                                    } else {
+                                        String errorMsg = postTask.getException() != null ? postTask.getException().getMessage() : "Unknown error";
+                                        Toast.makeText(getContext(), "Failed to post comment: " + errorMsg, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+                        } else {
+                            Toast.makeText(getContext(), "Failed to retrieve username", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        });
+
+        // Listen for changes in the comments collection and update the UI.
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null && moodEventId != null) {
+            FirebaseFirestore.getInstance().collection("users")
+                    .document(currentUser.getUid())
+                    .collection("moodEvents")
+                    .document(moodEventId)
+                    .collection("comments")
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .addSnapshotListener((snapshots, error) -> {
+                        if (error != null) {
+                            return;
+                        }
+                        if (snapshots != null) {
+                            commentList.clear();
+                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                                CommentModel comment = doc.toObject(CommentModel.class);
+                                if (comment != null) {
+                                    // Set the documentId on the comment
+                                    comment.setDocumentId(doc.getId());
+                                    commentList.add(comment);
+                                }
+                            }
+                            if (commentList.isEmpty()) {
+                                tvNoComments.setVisibility(View.VISIBLE);
+                                rvComments.setVisibility(View.GONE);
+                            } else {
+                                tvNoComments.setVisibility(View.GONE);
+                                rvComments.setVisibility(View.VISIBLE);
+                            }
+                            commentAdapter.updateComments(commentList);
+                        }
+                    });
+        }
+    }
+}
