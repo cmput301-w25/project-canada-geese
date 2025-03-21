@@ -173,6 +173,7 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp" />
+            android:dividerHeight="1dp"
+            android:focusable="true" />
     </LinearLayout>
 </RelativeLayout>

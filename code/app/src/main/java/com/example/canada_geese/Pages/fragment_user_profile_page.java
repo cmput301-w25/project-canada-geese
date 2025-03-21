@@ -138,7 +138,27 @@ public class fragment_user_profile_page extends Fragment{
 
         // Initialize the list of users for search results page container (this is for the list of all users when you click search)
         AllUsers = new ArrayList<>();
-        usersAdapter = new UsersAdapter(AllUsers, getContext());
+        usersAdapter = new UsersAdapter(AllUsers, getContext(), mAuth.getCurrentUser().getUid());
+        // Make the list clickable and show user details
+        usersAdapter.setOnItemClickListener(new UsersAdapter.onItemClickListener() {
+            @Override
+            public void onItemClick(Users users) {
+                // Show user details dialog
+                Toast.makeText(getContext(), "Clicked on " + users.getUsername(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFollowRequest(Users users) {
+                // Show follow request dialog
+                Toast.makeText(getContext(), "Follow Request Sent to " + users.getUsername(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSendMessage(Users users) {
+                // Show send message dialog
+                Toast.makeText(getContext(), "Send Message to " + users.getUsername(), Toast.LENGTH_SHORT).show();
+            }
+        });
         searchResultsList.setAdapter(usersAdapter);
 
         // Fetch the user details from Firebase
@@ -292,13 +312,13 @@ public class fragment_user_profile_page extends Fragment{
 //            profileImage.setImageResource(R.drawable.profile);
 
             // Load Followers to the user profile
-            db.collection("users").document(user.getUid()).collection("Followers").get()
+            db.collection("users").document(user.getUid()).collection("followers").get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         int followersCount = queryDocumentSnapshots.size();
                         followersCountText.setText(String.valueOf(followersCount));
                     });
             // Load Following to the user profile
-            db.collection("users").document(user.getUid()).collection("Following").get()
+            db.collection("users").document(user.getUid()).collection("following").get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         int followingCount = queryDocumentSnapshots.size();
                         followingCountText.setText(String.valueOf(followingCount));
@@ -309,12 +329,12 @@ public class fragment_user_profile_page extends Fragment{
     private void showFollowersList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            db.collection("users").document(user.getUid()).collection("Followers").get()
+            db.collection("users").document(user.getUid()).collection("followers").get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         userList.clear();
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String username = document.getString("username");
-                             userList.add(username); // Add only the username to the list
+                            userList.add(username); // Add only the username to the list
                         }
                         userAdapter.notifyDataSetChanged(); // Refresh the ListView
                     });
@@ -325,7 +345,7 @@ public class fragment_user_profile_page extends Fragment{
     private void showFollowingList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            db.collection("users").document(user.getUid()).collection("Following").get()
+            db.collection("users").document(user.getUid()).collection("following").get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         userList.clear();
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
@@ -364,10 +384,6 @@ public class fragment_user_profile_page extends Fragment{
     // Add this helper method to perform the actual filtering
     private void performFiltering(String searchText) {
         List<Users> filteredList = new ArrayList<>();
-
-        // Get current user ID to exclude from results
-        String currentUserId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "";
-
         for (Users user : AllUsers) {
             // Add user to filtered list if username contains search text (case insensitive)
             if (user.getUsername() != null &&

@@ -1,42 +1,53 @@
 package com.example.canada_geese.Adapters;
 
-import static androidx.test.InstrumentationRegistry.getContext;
-
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.canada_geese.Models.Users;
 import com.example.canada_geese.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
     private List<Users> usersList;
-    private List<Users> filteredusersList;
+    private List<Users> filteredUsersList;
     private Context context;
     private String currentQuery = "";
+    private String currentUsername;
     private onItemClickListener listener;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-
-
-    // constructor
-    public UsersAdapter(List<Users> usersList, Context context) {
+    // Constructor
+    public UsersAdapter(List<Users> usersList, Context context, String currentUsername) {
         this.usersList = new ArrayList<>(usersList);
-        this.filteredusersList = new ArrayList<>(usersList);
+        this.filteredUsersList = new ArrayList<>(usersList);
         this.context = context;
+        this.currentUsername = currentUsername;
+        this.db = FirebaseFirestore.getInstance();  // Initialize Firestore
     }
 
+    // Interface for click events
     public interface onItemClickListener {
         void onItemClick(Users users);
+        void onFollowRequest(Users users);
+        void onSendMessage(Users users);
     }
 
     public void setOnItemClickListener(onItemClickListener listener) {
@@ -50,17 +61,16 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Users users = filteredusersList.get(position);
+        Users users = filteredUsersList.get(position);
         if (users != null) {
-            holder.text_username.setText(users.getUsername());
-            holder.profile_image.setImageResource(R.drawable.profile);
+            holder.textUsername.setText(users.getUsername());
+            holder.profileImage.setImageResource(R.drawable.profile);
             holder.itemView.setOnClickListener(v -> {
                 if (listener != null) {
-                    Log.d("UsersAdapter", "User clicked: " + users.getUsername());  // Log click event
                     listener.onItemClick(users);
+                    showUserDetailsDialog(users);
                 }
             });
         }
@@ -68,36 +78,102 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return filteredusersList.size();
+        return filteredUsersList.size();
+    }
+
+    private void showUserDetailsDialog(Users user) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.dialog_send_request, null);
+        builder.setView(dialogView);
+
+        // Initialize views
+        ImageView profileImage = dialogView.findViewById(R.id.dialog_profile_image);
+        TextView username = dialogView.findViewById(R.id.dialog_username);
+        TextView about = dialogView.findViewById(R.id.dialog_about);
+        Button actionButton = dialogView.findViewById(R.id.dialog_action_button);
+
+        profileImage.setImageResource(R.drawable.profile);
+        username.setText(user.getUsername());
+        about.setText(user.getAbout() != null ? user.getAbout() : "No description available");
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Check if user is following
+        checkIfFollowing(user.getUserId(), isFollowing -> {
+            if (isFollowing) {
+                actionButton.setText("Send Message");
+                actionButton.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onSendMessage(user);
+                    }
+                    dialog.dismiss();
+                });
+            } else {
+                actionButton.setText("Send Follow Request");
+                actionButton.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onFollowRequest(user);
+                    }
+                    dialog.dismiss();
+                });
+            }
+        });
+    }
+
+    // Asynchronous check if current user is following this user
+    private void checkIfFollowing(String userId, OnFollowCheckListener callback) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            db.collection("users")
+                    .document(user.getUid())
+                    .collection("following")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            boolean isFollowing = !task.getResult().isEmpty();
+                            callback.onResult(isFollowing);
+                        } else {
+                            callback.onResult(false);
+                        }
+                    });
+        } else {
+            callback.onResult(false);
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView text_username;
-        ImageView profile_image;
+        TextView textUsername;
+        ImageView profileImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            text_username = itemView.findViewById(R.id.text_username);
-            profile_image = itemView.findViewById(R.id.profile_image);
+            textUsername = itemView.findViewById(R.id.text_username);
+            profileImage = itemView.findViewById(R.id.profile_image);
         }
     }
 
     public void updateList(List<Users> newData) {
         this.usersList.clear();
         this.usersList.addAll(newData);
-
         filter(currentQuery);
     }
 
     public void filter(String query) {
         this.currentQuery = query;
-        filteredusersList.clear();
+        filteredUsersList.clear();
 
         for (Users user : usersList) {
             if (user.getUsername().toLowerCase().contains(query.toLowerCase())) {
-                filteredusersList.add(user);
+                filteredUsersList.add(user);
             }
         }
         notifyDataSetChanged();
+    }
+
+    // Callback interface for asynchronous follow check
+    private interface OnFollowCheckListener {
+        void onResult(boolean isFollowing);
     }
 }
