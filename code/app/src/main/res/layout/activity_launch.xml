@@ -30,7 +30,7 @@
             android:layout_marginStart="110dp"
             android:layout_marginTop="160dp"
             android:layout_marginEnd="110.46dp"
-            android:layout_marginBottom="360dp"
+            android:layout_marginBottom="330dp"
             android:background="@drawable/goose" />
     </RelativeLayout>
 
