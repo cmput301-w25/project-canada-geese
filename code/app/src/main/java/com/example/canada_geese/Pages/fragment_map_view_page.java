@@ -231,7 +231,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private void addMoodEventMarkers() {
         if (moodEventList != null && !moodEventList.isEmpty()) {
             for (MoodEventModel moodEvent : moodEventList) {
-                if (!moodEvent.HasLocation()) {
+                if (moodEvent.HasLocation()) {
                     LatLng location = new LatLng(moodEvent.getLatitude(), moodEvent.getLongitude());
                     Bitmap emojiBitmap = createEmojiBitmap(getEmojiForEmotion(moodEvent.getEmotion()));
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
