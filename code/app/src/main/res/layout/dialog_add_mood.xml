@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -5,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,6 +21,7 @@
             android:text="@string/mood_name"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
@@ -50,14 +51,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/baseline_edit_note_24"
-
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/title_description"
-            android:layout_marginEnd="18dp"/>
+            app:layout_constraintBottom_toBottomOf="@id/title_description"/>
 
         <!-- Description Title -->
-
-
         <TextView
             android:id="@+id/title_description"
             android:layout_width="wrap_content"
@@ -67,10 +64,11 @@
             android:text="Add a Note"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mood_spinner_container" />
-        <!-- Description Input -->
 
+        <!-- Description Input -->
         <EditText
             android:id="@+id/description_input"
             android:layout_width="0dp"
@@ -93,7 +91,6 @@
             app:layout_constraintBottom_toBottomOf="@id/camera_text"
             app:layout_constraintStart_toStartOf="parent" />
 
-
         <TextView
             android:id="@+id/camera_text"
             android:layout_width="wrap_content"
@@ -101,44 +98,46 @@
             android:layout_marginStart="36dp"
             android:layout_marginTop="12dp"
             android:text="Add a Picture"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/description_input"/>
 
+        <!-- Images Container -->
+        <HorizontalScrollView
+            android:id="@+id/images_scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/camera_text">
+
+            <LinearLayout
+                android:id="@+id/images_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"/>
+
+        </HorizontalScrollView>
 
         <Button
             android:id="@+id/camera_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:backgroundTint="@color/white"
             android:text="Tap to Select Photo..."
             android:textColor="@android:color/black"
-            android:backgroundTint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/image_view" />
+            app:layout_constraintTop_toBottomOf="@id/images_scroll_view" />
 
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/camera_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"/>
-
-        <!-- Social Situation Title -->
-
-
-
-
-        <!-- Container for Map (will be dynamically loaded when location is enabled) -->
-
-        <!-- Social Situation Spinner with Background -->
+        <!-- Social Situation -->
         <ImageView
             android:id="@+id/icon_group"
             android:layout_width="22dp"
@@ -147,8 +146,6 @@
             app:layout_constraintBottom_toBottomOf="@id/title_social_situation"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Attach Location and Trigger Warning Checkboxes -->
-
         <TextView
             android:id="@+id/title_social_situation"
             android:layout_width="wrap_content"
@@ -156,6 +153,7 @@
             android:layout_marginStart="36dp"
             android:layout_marginTop="16dp"
             android:text="@string/social_situation"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -169,7 +167,6 @@
             android:background="@drawable/spinner_background"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_social_situation">
 
@@ -181,54 +178,52 @@
                 app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <CheckBox
-            android:id="@+id/attach_location_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="24dp"
-            android:text="@string/attach_location"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox" />
-
-        <!-- Container for Map (will be dynamically loaded when location is enabled) -->
-
-        <FrameLayout
-            android:id="@+id/map_container"
-            android:layout_width="381dp"
-            android:layout_height="219dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/add_mood_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox"
-            app:layout_constraintVertical_bias="0.0" />
-
-
+        <!-- Checkboxes -->
         <CheckBox
             android:id="@+id/trigger_warning_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="@string/trigger_warning"
+            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/social_situation_container" />
 
-        <!-- Add Mood Button -->
+        <CheckBox
+            android:id="@+id/attach_location_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/attach_location"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox" />
 
+        <!-- Map Container -->
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attach_location_checkbox" />
+
+        <!-- Add Mood Button -->
         <Button
             android:id="@+id/add_mood_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/black"
-            android:paddingBottom="10dp"
             android:text="@string/add_mood"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/map_container" />
     </androidx.constraintlayout.widget.ConstraintLayout>

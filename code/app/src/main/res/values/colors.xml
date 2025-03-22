@@ -49,6 +49,8 @@
     <color name="offline_indicator">#FF9800</color>
     <color name = "banner">#91B4A4</color>
     <color name="primary" />
+    <color name="new_banner">#808080</color>
+    <color name="new_background">#5A544C</color>
 
 
 </resources>

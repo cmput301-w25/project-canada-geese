@@ -193,6 +193,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         }
     }
 
+
     /**
      * Adds mood event markers to the map.
      */

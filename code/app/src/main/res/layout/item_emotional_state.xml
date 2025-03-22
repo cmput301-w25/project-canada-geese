@@ -22,23 +22,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
-            android:layout_marginEnd="12dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="😊"/>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="9dp" />
+
 
         <TextView
             android:id="@+id/name_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
             android:layout_marginStart="12dp"
-            app:layout_constraintStart_toEndOf="@id/emoji_view"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="Happiness"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/emoji_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:text="Happiness" />
 
         <TextView
             android:id="@+id/tv_timestamp"
