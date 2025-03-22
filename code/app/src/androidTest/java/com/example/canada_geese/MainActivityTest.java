@@ -15,6 +15,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.isSelected;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -33,6 +38,14 @@ public class MainActivityTest {
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
+    private SimpleDateFormat dateFormat;
+
+    @Before
+    public void setUp() {
+        // Initialize date format for parsing timestamps
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    }
+
     // ✅ Test 1: Ensure that BottomNavigationView initializes successfully and selects the correct page
     @Test
     public void testBottomNavigationInitialization() {
@@ -43,14 +56,17 @@ public class MainActivityTest {
 
     // ✅ Test 2: Test whether `addNewMood()` correctly adds the Mood Event to `fragment_user_moods_page`
     @Test
-    public void testAddNewMoodSuccessfullyAddsMoodEvent() {
+    public void testAddNewMoodSuccessfullyAddsMoodEvent() throws ParseException {
+        // Parse the timestamp string into a Date object
+        Date timestamp = dateFormat.parse("2025-03-09 12:00");
+
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
                 fragment_user_moods_page moodsFragment = fragment_user_moods_page.newInstance();
 
-                // Create a new MoodEvent
+                // Create a new MoodEvent with Date object
                 MoodEventModel newMood = new MoodEventModel(
-                        "Excited", "Feeling great today!", "2025-03-09 12:00", "🤩",
+                        "Excited", "Feeling great today!", timestamp, "🤩",
                         R.color.color_happiness, false, true, 34.0522, -118.2437
                 );
 
@@ -65,15 +81,18 @@ public class MainActivityTest {
 
     // ✅ Test 3: Test whether `AddMoodEventDialogFragment` triggers `addNewMood()` callback correctly
     @Test
-    public void testAddMoodEventDialogTriggersAddNewMood() {
+    public void testAddMoodEventDialogTriggersAddNewMood() throws ParseException {
+        // Parse the timestamp string into a Date object
+        Date timestamp = dateFormat.parse("2025-03-09 15:00");
+
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {
                 fragment_user_moods_page moodsFragment = fragment_user_moods_page.newInstance();
                 AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
 
-                // Use `setNewMood` to test adding a new Mood Event
+                // Use `setNewMood` to test adding a new Mood Event with Date object
                 MoodEventModel newMood = new MoodEventModel(
-                        "Joy", "Having a wonderful day!", "2025-03-09 15:00", "😃",
+                        "Joy", "Having a wonderful day!", timestamp, "😃",
                         R.color.color_happiness, false, true, 51.0447, -114.0719
                 );
 
