@@ -71,6 +71,7 @@ import java.util.Locale;
 
 public class AddMoodEventDialogFragment extends DialogFragment {
     private Spinner moodSpinner;
+    private Spinner socialSituationSpinner;
     private Button addMoodButton;
     private Button selectImageButton;
     private CheckBox addLocationCheckbox;
@@ -188,6 +189,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         moodSpinner = view.findViewById(R.id.emotion_spinner);
         addMoodButton = view.findViewById(R.id.add_mood_button);
         selectImageButton = view.findViewById(R.id.camera_button);
+        socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
         //imageView = view.findViewById(R.id.images_container);
         imagesScrollView = view.findViewById(R.id.images_scroll_view);
         imagesContainer = view.findViewById(R.id.images_container);
@@ -205,6 +207,17 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                 moodArray
         );
         moodSpinner.setAdapter(adapter);
+
+        String[] socialSituationArray = new String[]{
+                "Alone", "With one person", "With two to several people", "With a crowd"
+        };
+
+        ArrayAdapter<String> socialAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                socialSituationArray
+        );
+        socialSituationSpinner.setAdapter(socialAdapter);
 
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
