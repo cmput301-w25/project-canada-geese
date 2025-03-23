@@ -41,27 +41,6 @@
         </LinearLayout>
 
         <!-- Greeting Texts -->
-        <TextView
-            android:id="@+id/user_greeting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hi, User! :)"
-            android:textSize="38sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:fontFamily="@font/fredoka_variable"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center_horizontal"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="How are you doing today?"
-            android:textSize="18sp"
-            android:textColor="#000000"
-            android:fontFamily="@font/fredoka_variable"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
