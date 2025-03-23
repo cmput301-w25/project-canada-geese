@@ -48,7 +48,7 @@
     <string name="social_situation">Social Situation</string>
     <string name="attach_location">Attach location</string>
     <string name="trigger_warning">Trigger warning</string>
-
+    <string name="private_mood">Private mood</string>
     <!-- Social Situation Dropdown -->
     <string-array name="social_situations">
         <item>Alone</item>
@@ -90,4 +90,11 @@
     <string name="allow_once">Allow Once</string>
     <string name="dont_allow">Don\'t Allow</string>
     <string name="additional_info">SET THIS VALUE\n</string>
+    <string name="clear_all">Clear All</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
+    <string name="yourusername">YourUsername</string>
+    <string name="follow_requests">Follow Requests</string>
+    <string name="requests">Requests</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

@@ -4,17 +4,21 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.canada_geese.Models.CommentModel;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +54,7 @@ public class DatabaseManager {
         return instance;
     }
 
+
     /**
      * Adds a mood event to the Firestore database under the logged-in user's collection.
      * If the user is not logged in, logs an error.
@@ -66,12 +71,12 @@ public class DatabaseManager {
             moodMap.put("userId", userId);  // Associate with current user
             moodMap.put("emotion", moodEvent.getEmotion());
             moodMap.put("description", moodEvent.getDescription());
-            moodMap.put("timestamp", moodEvent.getTimestamp());
+            moodMap.put("timestamp", moodEvent.getTimestamp());  // Now storing Date object
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
             moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
-            moodMap.put("hasLocation", moodEvent.HasLocation());
             if (moodEvent.HasLocation()) {
+                moodMap.put("hasLocation", moodEvent.HasLocation());
                 moodMap.put("latitude", moodEvent.getLatitude());
                 moodMap.put("longitude", moodEvent.getLongitude());
             }
@@ -94,7 +99,6 @@ public class DatabaseManager {
             Log.e(TAG, "User is not logged in.");
         }
     }
-
     /**
      * Fetches all mood events for the logged-in user from Firestore.
      * Orders the results by timestamp in descending order.
@@ -120,18 +124,161 @@ public class DatabaseManager {
     }
 
     /**
-     * Placeholder method for updating a mood event.
-     * Currently not implemented.
+     * Updates an existing mood event in the database.
+     *
+     * @param moodEvent The updated mood event
+     * @param documentId The Firestore document ID of the mood event to update
+     * @param listener Optional listener to handle completion events
      */
-    public void updateMoodEvent() {
-        Log.d(TAG, "updateMoodEvent() called but not implemented yet.");
+    public void updateMoodEvent(MoodEventModel moodEvent, String documentId, OnCompleteListener<Void> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && documentId != null && !documentId.isEmpty()) {
+            String userId = user.getUid();
+
+            // Create a map for mood event data
+            Map<String, Object> moodMap = new HashMap<>();
+            moodMap.put("emotion", moodEvent.getEmotion());
+            moodMap.put("description", moodEvent.getDescription());
+            moodMap.put("timestamp", moodEvent.getTimestamp());
+            moodMap.put("emoji", moodEvent.getEmoji());
+            moodMap.put("color", moodEvent.getColor());
+            moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("hasLocation", moodEvent.HasLocation());
+            if (moodEvent.HasLocation()) {
+                moodMap.put("latitude", moodEvent.getLatitude());
+                moodMap.put("longitude", moodEvent.getLongitude());
+            }
+
+            // Update the document
+            db.collection("users").document(userId)
+                    .collection("moodEvents").document(documentId)
+                    .update(moodMap)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Mood event updated successfully");
+                        } else {
+                            Log.e(TAG, "Failed to update mood event", task.getException());
+                        }
+
+                        if (listener != null) {
+                            listener.onComplete(task);
+                        }
+                    });
+        } else {
+            Log.e(TAG, "Cannot update mood: User not logged in or document ID not provided");
+        }
     }
 
     /**
-     * Placeholder method for deleting a mood event.
-     * Currently not implemented.
+     * Deletes a mood event from the database.
+     *
+     * @param documentId The Firestore document ID of the mood event to delete
+     * @param listener Optional listener to handle completion events
      */
-    public void deleteMoodEvent() {
-        Log.d(TAG, "deleteMoodEvent() called but not implemented yet.");
+    public void deleteMoodEvent(String documentId, OnCompleteListener<Void> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && documentId != null && !documentId.isEmpty()) {
+            String userId = user.getUid();
+
+            // Delete the document
+            db.collection("users").document(userId)
+                    .collection("moodEvents").document(documentId)
+                    .delete()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Mood event deleted successfully");
+                        } else {
+                            Log.e(TAG, "Failed to delete mood event", task.getException());
+                        }
+
+                        if (listener != null) {
+                            listener.onComplete(task);
+                        }
+                    });
+        } else {
+            Log.e(TAG, "Cannot delete mood: User not logged in or document ID not provided");
+        }
     }
+
+    /**
+     * Finds the document ID for a mood event based on its timestamp and emotion.
+     * This is useful when you don't store the document ID directly.
+     *
+     * @param timestamp The timestamp of the mood event (Date)
+     * @param emotion The emotion of the mood event
+     * @param listener Listener that receives the document ID or null if not found
+     */
+    public void findMoodEventDocumentId(Date timestamp, String emotion, OnCompleteListener<DocumentSnapshot> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+
+            db.collection("users").document(userId).collection("moodEvents")
+                    .whereEqualTo("timestamp", timestamp)
+                    .whereEqualTo("emotion", emotion)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            if (listener != null) {
+                                listener.onComplete(Tasks.forResult(document));
+                            }
+                        } else {
+                            if (listener != null) {
+                                listener.onComplete(Tasks.forException(
+                                        new Exception("Document not found or query failed")));
+                            }
+                        }
+                    });
+        } else {
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(
+                        new Exception("User not logged in")));
+            }
+        }
+    }
+
+    public void fetchAllUsers(OnCompleteListener<QuerySnapshot> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            Log.e(TAG, "User is not logged in.");
+            return;
+        }
+        CollectionReference usersRef = db.collection("users");
+        usersRef.get().addOnCompleteListener(listener);
+    }
+
+    public void addComment(String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && moodEventId != null && !moodEventId.isEmpty()) {
+            String userId = user.getUid();
+            // Locate the mood event document, then add a comment to its "comments" subcollection
+            DocumentReference moodEventDocRef = db.collection("users").document(userId)
+                    .collection("moodEvents").document(moodEventId);
+            moodEventDocRef.collection("comments")
+                    .add(comment)
+                    .addOnCompleteListener(listener);
+        } else {
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId missing")));
+            }
+        }
+    }
+
+    public void deleteComment(String moodEventId, String commentId, OnCompleteListener<Void> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null && moodEventId != null && commentId != null) {
+            String userId = user.getUid();
+            db.collection("users").document(userId)
+                    .collection("moodEvents").document(moodEventId)
+                    .collection("comments").document(commentId)
+                    .delete()
+                    .addOnCompleteListener(listener);
+        } else {
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId/commentId missing")));
+            }
+        }
+    }
+
 }

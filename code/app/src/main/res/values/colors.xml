@@ -14,6 +14,7 @@
     <color name="light_green">#DFF0D8</color>
     <color name="dark_green">#91B4A4</color>
     <color name="circle_green">#36FF0F</color>
+    <color name="green">#4CAF50</color>
 
     <!-- Emotional State Colors -->
     <color name="color_happiness">#F4D06F</color>

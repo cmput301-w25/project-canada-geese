@@ -1,7 +1,6 @@
 package com.example.canada_geese.Models;
 
 import com.google.firebase.firestore.ServerTimestamp;
-
 import java.util.Date;
 
 /**
@@ -13,10 +12,12 @@ public class MoodEventModel {
     private Date timestamp;
     private String emoji;
     private int color;
-    private boolean triggerWarning;
+    private boolean isPrivate;
     private boolean hasLocation;
     private double latitude;
     private double longitude;
+    private String userId;
+    private String documentId; // New field to store Firestore document ID
 
     /**
      * No-argument constructor required for Firestore.
@@ -32,101 +33,137 @@ public class MoodEventModel {
      * @param timestamp         the timestamp of the event as a Date.
      * @param emoji             the emoji representation of the emotion.
      * @param color             the color associated with the emotion.
-     * @param hasTriggerWarning whether the event has a trigger warning.
+     * @param isPrivate         whether the mood event is private (true) or public (false).
      * @param hasLocation       whether the event includes location data.
      * @param latitude          the latitude of the event location.
      * @param longitude         the longitude of the event location.
      */
-    public MoodEventModel(String emotion, String description, Date timestamp, String emoji, int color, boolean hasTriggerWarning, boolean hasLocation, double latitude, double longitude) {
+    public MoodEventModel(String emotion, String description, Date timestamp, String emoji, int color, boolean isPrivate, boolean hasLocation, double latitude, double longitude) {
         this.emotion = emotion;
+        this.description = description;
         this.timestamp = timestamp;
         this.emoji = emoji;
         this.color = color;
-        this.triggerWarning = hasTriggerWarning;
+        this.isPrivate = isPrivate;
         this.hasLocation = hasLocation;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.description = description;
     }
 
-    /**
-     * Gets the emotion associated with the event.
-     *
-     * @return the emotion as a String.
-     */
+    // Getters and setters
     public String getEmotion() {
         return emotion;
     }
 
-    /**
-     * Gets the description of the event.
-     *
-     * @return the description as a String.
-     */
+    public void setEmotion(String emotion) {
+        this.emotion = emotion;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Gets the timestamp of the event.
-     *
-     * @return the timestamp as a Date.
-     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Date getTimestamp() {
         return timestamp;
     }
 
-    /**
-     * Gets the emoji representation of the emotion.
-     *
-     * @return the emoji as a String.
-     */
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    // Helper method to get formatted timestamp string for display
+    public String getFormattedTimestamp() {
+        if (timestamp == null) return "";
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+        return sdf.format(timestamp);
+    }
+
     public String getEmoji() {
         return emoji;
     }
 
-    /**
-     * Gets the color associated with the emotion.
-     *
-     * @return the color as an integer resource ID.
-     */
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
+    }
+
     public int getColor() {
         return color;
     }
 
-    /**
-     * Checks if the event has a trigger warning.
-     *
-     * @return true if the event has a trigger warning, false otherwise.
-     */
-    public boolean hasTriggerWarning() {
-        return triggerWarning;
+    public void setColor(int color) {
+        this.color = color;
     }
 
-    /**
-     * Checks if the event has location data.
-     *
-     * @return true if the event has location data, false otherwise.
-     */
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setIsPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
+
+    public boolean getIsPrivate() {
+        return isPrivate;
+    }
+
+    public boolean hasTriggerWarning() {
+        return isPrivate;
+    }
+
+    public void setTriggerWarning(boolean triggerWarning) {
+        this.isPrivate = triggerWarning;
+    }
+
+    public boolean getTriggerWarning() {
+        return isPrivate;
+    }
+
     public boolean HasLocation() {
         return hasLocation;
     }
 
-    /**
-     * Gets the latitude of the event location.
-     *
-     * @return the latitude as a double.
-     */
+    public boolean getHasLocation() {
+        return hasLocation;
+    }
+
+    public void setHasLocation(boolean hasLocation) {
+        this.hasLocation = hasLocation;
+    }
+
     public double getLatitude() {
         return latitude;
     }
 
-    /**
-     * Gets the longitude of the event location.
-     *
-     * @return the longitude as a double.
-     */
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
     public double getLongitude() {
         return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    // New getter and setter for documentId
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 }
