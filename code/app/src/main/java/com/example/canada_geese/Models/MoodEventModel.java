@@ -1,6 +1,8 @@
 package com.example.canada_geese.Models;
 
 import com.google.firebase.firestore.ServerTimestamp;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -18,6 +20,8 @@ public class MoodEventModel {
     private double longitude;
     private String userId;
     private String documentId; // New field to store Firestore document ID
+    private String socialSituation;
+    private ArrayList<String> imageUrls; // URLs to uploaded images
 
     /**
      * No-argument constructor required for Firestore.
@@ -165,5 +169,21 @@ public class MoodEventModel {
 
     public void setDocumentId(String documentId) {
         this.documentId = documentId;
+    }
+
+    public String getSocialSituation() {
+        return socialSituation;
+    }
+
+    public void setSocialSituation(String socialSituation) {
+        this.socialSituation = socialSituation;
+    }
+
+    public ArrayList<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }
