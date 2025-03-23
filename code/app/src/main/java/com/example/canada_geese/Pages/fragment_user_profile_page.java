@@ -40,6 +40,7 @@ import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -408,41 +409,62 @@ public class fragment_user_profile_page extends Fragment{
         String senderId = currentUser.getUid();  // Current user ID
         String recipientUsername = user.getUsername();  // Clicked user's username
 
-        // Step 1: Get sender's username
-        db.collection("users").document(senderId).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                String senderName = documentSnapshot.getString("username");
+        // First, get sender's username
+        db.collection("users").document(senderId).get()
+                .addOnSuccessListener(senderDoc -> {
+                    if (senderDoc.exists()) {
+                        String senderName = senderDoc.getString("username");
 
-                // Step 2: Get recipient's document ID
-                db.collection("users")
-                        .whereEqualTo("username", recipientUsername)
-                        .get()
-                        .addOnSuccessListener(querySnapshot -> {
-                            if (!querySnapshot.isEmpty()) {
-                                DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
-                                String recipientId = recipientSnapshot.getId();
+                        // Now find the recipient's document ID by querying for their username
+                        db.collection("users")
+                                .whereEqualTo("username", recipientUsername)
+                                .limit(1)  // We only need one result
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    if (!querySnapshot.isEmpty()) {
+                                        // Get the recipient's document ID
+                                        DocumentSnapshot recipientDoc = querySnapshot.getDocuments().get(0);
+                                        String recipientId = recipientDoc.getId();
 
-                                // Step 3: Store follow request
-                                Map<String, Object> request = new HashMap<>();
-                                request.put("username", senderName);
-                                request.put("status", "pending");
+                                        Log.d("Firestore", "Found recipient ID: " + recipientId);
 
-                                db.collection("users")
-                                        .document(recipientId)
-                                        .collection("requests")
-                                        .document(senderId)
-                                        .set(request)
-                                        .addOnSuccessListener(aVoid -> Log.d("Firestore", "Follow request sent successfully"))
-                                        .addOnFailureListener(e -> Log.e("Firestore", "Failed to send follow request", e));
-                            } else {
-                                Log.e("Firestore", "Recipient user not found.");
-                            }
-                        })
-                        .addOnFailureListener(e -> Log.e("Firestore", "Failed to find recipient user", e));
-            } else {
-                Log.e("Firestore", "Sender document does not exist.");
-            }
-        }).addOnFailureListener(e -> Log.e("Firestore", "Failed to get sender username", e));
+                                        // Create the request data
+                                        Map<String, Object> requestData = new HashMap<>();
+                                        requestData.put("username", senderName);
+                                        requestData.put("status", "pending");
+
+                                        // The key part: use document path to specify the subcollection
+                                        db.collection("users")
+                                                .document(recipientId)
+                                                .collection("requests")  // This creates a subcollection
+                                                .document(senderId)  // Use sender ID as document ID
+                                                .set(requestData)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("Firestore", "Follow request sent successfully to: " + recipientId);
+                                                    // Add UI feedback here
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("Firestore", "Failed to send follow request", e);
+                                                    // Add UI error feedback here
+                                                });
+                                    } else {
+                                        Log.e("Firestore", "Recipient with username '" + recipientUsername + "' not found");
+                                        // Add UI error feedback here
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firestore", "Failed to query for recipient", e);
+                                    // Add UI error feedback here
+                                });
+                    } else {
+                        Log.e("Firestore", "Current user document does not exist");
+                        // Add UI error feedback here
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Failed to get sender info", e);
+                    // Add UI error feedback here
+                });
     }
 
 
