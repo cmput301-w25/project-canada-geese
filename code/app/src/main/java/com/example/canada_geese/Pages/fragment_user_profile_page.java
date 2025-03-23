@@ -398,32 +398,53 @@ public class fragment_user_profile_page extends Fragment{
     }
 
     private void sendFollowRequest(Users user) {
-
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            String senderId = currentUser.getUid();
-
-            // binary search the database to find the user with username that corresponds to the user that was clicked
-            // extract the username as a string
-            String senderUsername = currentUser.getDisplayName();
-            String recipientId = user.getUserId();
-            Map<String, Object> request = new HashMap<>();
-            request.put("username", senderUsername);
-            request.put("status", "pending");
-
-            db.collection("users").document("ga9dfYzVmHTbmPhkriDa1qDJTWH2")
-                    .collection("requests")
-                    .document(senderId)
-                    .set(request)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(requireContext(), "Follow Request Sent to " + user.getUsername(), Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(requireContext(), "Failed to send follow request: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+        if (currentUser == null) {
+            Log.e("Firestore", "User is not logged in.");
+            return;
         }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String senderId = currentUser.getUid();  // Current user ID
+        String recipientUsername = user.getUsername();  // Clicked user's username
+
+        // Step 1: Get sender's username
+        db.collection("users").document(senderId).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String senderName = documentSnapshot.getString("username");
+
+                // Step 2: Get recipient's document ID
+                db.collection("users")
+                        .whereEqualTo("username", recipientUsername)
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            if (!querySnapshot.isEmpty()) {
+                                DocumentSnapshot recipientSnapshot = querySnapshot.getDocuments().get(0);
+                                String recipientId = recipientSnapshot.getId();
+
+                                // Step 3: Store follow request
+                                Map<String, Object> request = new HashMap<>();
+                                request.put("username", senderName);
+                                request.put("status", "pending");
+
+                                db.collection("users")
+                                        .document(recipientId)
+                                        .collection("requests")
+                                        .document(senderId)
+                                        .set(request)
+                                        .addOnSuccessListener(aVoid -> Log.d("Firestore", "Follow request sent successfully"))
+                                        .addOnFailureListener(e -> Log.e("Firestore", "Failed to send follow request", e));
+                            } else {
+                                Log.e("Firestore", "Recipient user not found.");
+                            }
+                        })
+                        .addOnFailureListener(e -> Log.e("Firestore", "Failed to find recipient user", e));
+            } else {
+                Log.e("Firestore", "Sender document does not exist.");
+            }
+        }).addOnFailureListener(e -> Log.e("Firestore", "Failed to get sender username", e));
     }
+
 
 
 }
