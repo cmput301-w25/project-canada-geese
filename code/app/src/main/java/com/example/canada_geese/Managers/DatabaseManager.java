@@ -238,6 +238,16 @@ public class DatabaseManager {
         }
     }
 
+    public void fetchAllUsers(OnCompleteListener<QuerySnapshot> listener) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            Log.e(TAG, "User is not logged in.");
+            return;
+        }
+        CollectionReference usersRef = db.collection("users");
+        usersRef.get().addOnCompleteListener(listener);
+    }
+
     public void addComment(String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null && moodEventId != null && !moodEventId.isEmpty()) {

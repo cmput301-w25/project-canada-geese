@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_requests"
+        android:title="Follow Requests"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_signout"
+        android:title="Sign Out"
+        android:showAsAction="never" />
+</menu>
