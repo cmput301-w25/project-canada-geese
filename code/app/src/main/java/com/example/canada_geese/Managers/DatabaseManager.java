@@ -68,17 +68,23 @@ public class DatabaseManager {
 
             // Create a map for mood event data
             Map<String, Object> moodMap = new HashMap<>();
-            moodMap.put("userId", userId);  // Associate with current user
+            moodMap.put("userId", userId);
             moodMap.put("emotion", moodEvent.getEmotion());
             moodMap.put("description", moodEvent.getDescription());
-            moodMap.put("timestamp", moodEvent.getTimestamp());  // Now storing Date object
+            moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
             moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("socialSituation", moodEvent.getSocialSituation());
+
             if (moodEvent.HasLocation()) {
-                moodMap.put("hasLocation", moodEvent.HasLocation());
+                moodMap.put("hasLocation", true);
                 moodMap.put("latitude", moodEvent.getLatitude());
                 moodMap.put("longitude", moodEvent.getLongitude());
+            }
+
+            if (moodEvent.getImageUrls() != null && !moodEvent.getImageUrls().isEmpty()) {
+                moodMap.put("imageUrls", moodEvent.getImageUrls());
             }
 
             // Reference to "moodEvents" collection under the user ID

@@ -25,6 +25,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
@@ -55,8 +56,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import android.graphics.Bitmap;
 import android.net.Uri;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -309,10 +316,19 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             if (currentUser != null) {
                 String selectedMood = moodSpinner.getSelectedItem().toString();
                 String moodName = selectedMood.split(" ")[0];
+                CheckBox triggerWarningCheckbox = getView().findViewById(R.id.trigger_warning_checkbox);
+                boolean triggerWarning = triggerWarningCheckbox.isChecked();
+
+                String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+
+                EditText descriptionInput = getView().findViewById(R.id.description_input);
+                String description = descriptionInput.getText().toString();
+
+
+
                 boolean hasLocation = addLocationCheckbox.isChecked();
                 double latitude = 0.0;
                 double longitude = 0.0;
-                String description = "placeholder";
 
                 if (hasLocation) {
                     // Use the stored location values instead of hardcoded ones
@@ -321,34 +337,34 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                         longitude = currentLongitude;
 
                         // Create and save the mood event with the retrieved location
-                        saveMoodEventWithLocationAndImage(moodName, description, latitude, longitude, selectedImages);
+                        saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, latitude, longitude, selectedImages);
                     } else {
                         // If location wasn't retrieved yet, try to get it now
                         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                                 if (location != null) {
                                     // Create and save the mood event with the retrieved location
-                                    saveMoodEventWithLocationAndImage(moodName, description, location.getLatitude(), location.getLongitude(), selectedImages);
+                                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, location.getLatitude(), location.getLongitude(), selectedImages);
                                 } else {
                                     // Create and save the mood event without location
-                                    saveMoodEventWithLocationAndImage(moodName, description, 0.0, 0.0, selectedImages);
+                                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                                     Toast.makeText(requireContext(), "Could not get location", Toast.LENGTH_SHORT).show();
                                 }
                             }).addOnFailureListener(e -> {
                                 // Handle location retrieval failure
                                 Toast.makeText(requireContext(), "Failed to get location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                saveMoodEventWithLocationAndImage(moodName, description, 0.0, 0.0, selectedImages);
+                                saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                             });
                             return;
                         } else {
                             // No location permission, save without location
-                            saveMoodEventWithLocationAndImage(moodName, description, 0.0, 0.0, selectedImages);
+                            saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                             Toast.makeText(requireContext(), "Location permission not granted", Toast.LENGTH_SHORT).show();
                         }
                     }
                 } else {
                     // No location requested, save without location
-                    saveMoodEventWithLocationAndImage(moodName, description, 0.0, 0.0, selectedImages);
+                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                 }
             } else {
                 Log.e("Auth", "User not logged in! Cannot add mood.");
@@ -513,6 +529,7 @@ private void askgalleryPermission() {
     }
 
     private void saveMoodEventWithLocationAndImage(String moodName, String description,
+                                                   boolean triggerWarning, String socialSituation,
                                                    double latitude, double longitude,
                                                    ArrayList<Bitmap> images) {
         boolean hasImages = images != null && !images.isEmpty();
@@ -523,26 +540,73 @@ private void askgalleryPermission() {
                 getCurrentTimestamp(),
                 getEmojiForEmotion(moodName),
                 getColorForEmotion(moodName),
-                hasImages, // hasImage flag
-                latitude != 0.0 || longitude != 0.0, // hasLocation flag
+                triggerWarning,
+                latitude != 0.0 || longitude != 0.0,
                 latitude,
                 longitude
         );
 
-        // Just Database tingz
-        DatabaseManager.getInstance().addMoodEvent(newEvent);
+        newEvent.setSocialSituation(socialSituation);
 
-        // To store more than one image in the database:
         if (hasImages) {
-            for (Bitmap image : images) {
-                //TODO: Ask Camden
-            }
+            uploadImagesAndThenSave(images, newEvent); // ⬅ this handles everything
+        } else {
+            DatabaseManager.getInstance().addMoodEvent(newEvent);
+            finishAddMood(newEvent);
+        }
+    }
+
+    private void uploadImagesAndThenSave(ArrayList<Bitmap> images, MoodEventModel moodEvent) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
+        String userId = user.getUid();
+        ArrayList<String> uploadedUrls = new ArrayList<>();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
+        for (int i = 0; i < images.size(); i++) {
+            Bitmap bitmap = images.get(i);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            byte[] data = baos.toByteArray();
+
+            String filename = "mood_images/" + userId + "/" + System.currentTimeMillis() + "_img" + i + ".jpg";
+            StorageReference imgRef = storageRef.child(filename);
+
+            UploadTask uploadTask = imgRef.putBytes(data);
+            int finalI = i;
+
+            uploadTask
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Now safe to request download URL
+                        imgRef.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    uploadedUrls.add(uri.toString());
+
+                                    if (uploadedUrls.size() == images.size()) {
+                                        moodEvent.setImageUrls(uploadedUrls);
+                                        DatabaseManager.getInstance().addMoodEvent(moodEvent);
+                                        finishAddMood(moodEvent);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Failed to get download URL for image " + finalI, e);
+                                    Toast.makeText(requireContext(), "Failed to get image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Upload failed for image " + finalI, e);
+                        Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+    private void finishAddMood(MoodEventModel moodEvent) {
+        Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
         if (moodAddedListener != null) {
-            moodAddedListener.onMoodAdded(newEvent);
+            moodAddedListener.onMoodAdded(moodEvent);
         }
         dismiss();
     }
