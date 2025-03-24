@@ -18,6 +18,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -193,24 +195,51 @@ public class DatabaseManager {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null && documentId != null && !documentId.isEmpty()) {
             String userId = user.getUid();
+            DocumentReference moodRef = db.collection("users").document(userId)
+                    .collection("moodEvents").document(documentId);
 
-            // Delete the document
-            db.collection("users").document(userId)
-                    .collection("moodEvents").document(documentId)
-                    .delete()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Mood event deleted successfully");
-                        } else {
-                            Log.e(TAG, "Failed to delete mood event", task.getException());
-                        }
+            // Step 1: Fetch the mood document to get image URLs
+            moodRef.get().addOnSuccessListener(snapshot -> {
+                if (snapshot.exists()) {
+                    List<String> imageUrls = (List<String>) snapshot.get("imageUrls");
 
-                        if (listener != null) {
-                            listener.onComplete(task);
+                    if (imageUrls != null && !imageUrls.isEmpty()) {
+                        for (String url : imageUrls) {
+                            // Convert download URL to storage path
+                            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(url);
+                            ref.delete().addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Image deleted: " + url);
+                            }).addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to delete image: " + url, e);
+                            });
                         }
-                    });
+                    }
+                }
+
+                // Step 2: Delete the mood document from Firestore
+                moodRef.delete().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Mood event deleted successfully");
+                    } else {
+                        Log.e(TAG, "Failed to delete mood event", task.getException());
+                    }
+
+                    if (listener != null) {
+                        listener.onComplete(task);
+                    }
+                });
+
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "Failed to fetch mood document for deletion", e);
+                if (listener != null) {
+                    listener.onComplete(Tasks.forException(e));
+                }
+            });
         } else {
             Log.e(TAG, "Cannot delete mood: User not logged in or document ID not provided");
+            if (listener != null) {
+                listener.onComplete(Tasks.forException(new Exception("Invalid delete request")));
+            }
         }
     }
 
