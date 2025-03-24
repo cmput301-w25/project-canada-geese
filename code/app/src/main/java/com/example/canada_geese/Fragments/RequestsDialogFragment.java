@@ -82,21 +82,59 @@ public class RequestsDialogFragment extends DialogFragment {
                             Map<String, Object> followerData = new HashMap<>();
                             followerData.put("username", username);
 
+                            // Use .add() to generate auto ID instead of .document(username).set()
                             db.collection("users").document(currentUser)
-                                    .collection("followers").document(username)
-                                    .set(followerData)
-                                    .addOnSuccessListener(aVoid -> Log.d("TAG", "Added to current user's Followers collection"))
-                                    .addOnFailureListener(e -> Log.d("TAG", "Error adding to current user's Followers collection", e));
+                                    .collection("followers")
+                                    .add(followerData)  // This generates an auto ID
+                                    .addOnSuccessListener(documentReference ->
+                                            Log.d("TAG", "Added to current user's Followers collection with ID: " +
+                                                    documentReference.getId()))
+                                    .addOnFailureListener(e ->
+                                            Log.d("TAG", "Error adding to current user's Followers collection", e));
 
-                            // Add the current user to the requesting user's Following collection
-                            Map<String, Object> followingData = new HashMap<>();
-                            followingData.put("username", currentUser);
+                            // Get the current user's username
+                            db.collection("users").document(currentUser)
+                                    .get()
+                                    .addOnSuccessListener(currentUserDoc -> {
+                                        if (currentUserDoc.exists()) {
+                                            String currentUsername = currentUserDoc.getString("username");
 
-                            db.collection("users").document(username)
-                                    .collection("following").document(currentUser)
-                                    .set(followingData)
-                                    .addOnSuccessListener(aVoid -> Log.d("TAG", "Added to requesting user's Following collection"))
-                                    .addOnFailureListener(e -> Log.d("TAG", "Error adding to requesting user's Following collection", e));
+                                            // Find the requesting user's document ID by their username
+                                            db.collection("users")
+                                                    .whereEqualTo("username", username)
+                                                    .limit(1)
+                                                    .get()
+                                                    .addOnSuccessListener(requestorQuerySnapshot -> {
+                                                        if (!requestorQuerySnapshot.isEmpty()) {
+                                                            // Get the requesting user's document ID
+                                                            DocumentSnapshot requestorDoc = requestorQuerySnapshot.getDocuments().get(0);
+                                                            String requestorId = requestorDoc.getId();
+
+                                                            // Add the current user to the requesting user's Following collection
+                                                            Map<String, Object> followingData = new HashMap<>();
+                                                            followingData.put("username", currentUsername);
+
+                                                            // Use .add() to generate auto ID instead of .document(currentUsername).set()
+                                                            db.collection("users").document(requestorId)
+                                                                    .collection("following")
+                                                                    .add(followingData)  // This generates an auto ID
+                                                                    .addOnSuccessListener(documentReference ->
+                                                                            Log.d("TAG", "Added to requesting user's Following collection with ID: " +
+                                                                                    documentReference.getId()))
+                                                                    .addOnFailureListener(e ->
+                                                                            Log.d("TAG", "Error adding to requesting user's Following collection", e));
+                                                        } else {
+                                                            Log.d("TAG", "Requesting user not found");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(e ->
+                                                            Log.d("TAG", "Error finding requesting user", e));
+                                        } else {
+                                            Log.d("TAG", "Current user document not found");
+                                        }
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Log.d("TAG", "Error getting current user info", e));
                         }
 
                         // Delete the follow request document after processing

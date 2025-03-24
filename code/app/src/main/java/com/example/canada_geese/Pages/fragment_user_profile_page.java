@@ -470,4 +470,3 @@ public class fragment_user_profile_page extends Fragment{
 
 
 }
-
