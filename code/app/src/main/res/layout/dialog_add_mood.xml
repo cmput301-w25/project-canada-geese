@@ -179,29 +179,31 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Checkboxes -->
-        <CheckBox
+
+        <!-- Map Container -->
+
+        <Switch
             android:id="@+id/trigger_warning_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/trigger_warning"
+            android:layout_marginTop="36dp"
+            android:text="Make Mood Public"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/social_situation_container" />
 
-        <CheckBox
+        <Switch
             android:id="@+id/attach_location_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/attach_location"
+            android:layout_marginTop="24dp"
+            android:text="Attach Your Location"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/trigger_warning_checkbox" />
 
-        <!-- Map Container -->
         <FrameLayout
             android:id="@+id/map_container"
             android:layout_width="0dp"
@@ -220,7 +222,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="@color/black"
-            android:text="@string/add_mood"
+            android:text="Post"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

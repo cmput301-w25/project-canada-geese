@@ -32,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 import android.graphics.Bitmap;
 import androidx.activity.result.ActivityResultLauncher;
@@ -81,7 +82,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private Spinner socialSituationSpinner;
     private Button addMoodButton;
     private Button selectImageButton;
-    private CheckBox addLocationCheckbox;
+    private Switch addLocationCheckbox;
     private FusedLocationProviderClient fusedLocationClient;
     private GoogleMap googleMap;
     private static final int CAMERA_PERMISSION_CODE = 100;
@@ -316,7 +317,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             if (currentUser != null) {
                 String selectedMood = moodSpinner.getSelectedItem().toString();
                 String moodName = selectedMood.split(" ")[0];
-                CheckBox triggerWarningCheckbox = getView().findViewById(R.id.trigger_warning_checkbox);
+                Switch triggerWarningCheckbox = getView().findViewById(R.id.trigger_warning_checkbox);
                 boolean triggerWarning = triggerWarningCheckbox.isChecked();
 
                 String socialSituation = socialSituationSpinner.getSelectedItem().toString();
@@ -647,7 +648,7 @@ private void askgalleryPermission() {
      */
 
     private void showUserLocation() {
-        CheckBox locationCheckbox = getView().findViewById(R.id.attach_location_checkbox);
+        Switch locationCheckbox = getView().findViewById(R.id.attach_location_checkbox);
         if (locationCheckbox != null && locationCheckbox.isChecked()) { // ✅ Only show map if checked
             View mapContainer = getView().findViewById(R.id.map_container);
             if (mapContainer != null) {

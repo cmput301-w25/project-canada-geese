@@ -6,47 +6,142 @@
     android:padding="10dp"
     android:background="@android:color/transparent">
 
-    <!-- "Last 7 Days" Button -->
-    <Button
-        android:id="@+id/btn_last_7_days"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/filter_button_background"
-        android:text="@string/last_7_days"
-        android:textColor="#000000"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toStartOf="@id/spinner_mood"
+    <!-- HorizontalScrollView containing all elements -->
+    <HorizontalScrollView
+        android:id="@+id/filter_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.3" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Mood Selection Spinner -->
-    <Spinner
-        android:id="@+id/spinner_mood"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:spinnerMode="dropdown"
-        android:background="@drawable/filter_button_background"
-        android:popupBackground="@color/white"
-        app:layout_constraintStart_toEndOf="@id/btn_last_7_days"
-        app:layout_constraintEnd_toStartOf="@id/btn_clear_all"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.3"
-        android:layout_marginEnd="8dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <!-- "Clear All" Button -->
-    <Button
-        android:id="@+id/btn_clear_all"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="@drawable/filter_button_background"
-        android:text="@string/clear_all"
-        android:textColor="#000000"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/spinner_mood"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.3" />
+            <!-- "Last 7 Days" Button -->
+            <Button
+                android:id="@+id/btn_last_7_days"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="@string/last_7_days"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Mood Selection Spinner -->
+            <Spinner
+                android:id="@+id/spinner_mood"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="100dp"
+                android:spinnerMode="dropdown"
+                android:background="@drawable/filter_button_background"
+                android:popupBackground="@color/white"
+                android:layout_marginEnd="8dp" />
+
+            <!-- "Clear All" Button -->
+            <Button
+                android:id="@+id/btn_clear_all"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="@string/clear_all"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Anger Button -->
+            <Button
+                android:id="@+id/btn_mood_anger"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Anger"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Confusion Button -->
+            <Button
+                android:id="@+id/btn_mood_confusion"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Confusion"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Disgust Button -->
+            <Button
+                android:id="@+id/btn_mood_disgust"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Disgust"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Fear Button -->
+            <Button
+                android:id="@+id/btn_mood_fear"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Fear"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Happiness Button -->
+            <Button
+                android:id="@+id/btn_mood_happiness"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Happiness"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Sadness Button -->
+            <Button
+                android:id="@+id/btn_mood_sadness"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Sadness"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Shame Button -->
+            <Button
+                android:id="@+id/btn_mood_shame"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Shame"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+            <!-- Surprise Button -->
+            <Button
+                android:id="@+id/btn_mood_surprise"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@drawable/filter_button_background"
+                android:text="Surprise"
+                android:textColor="#000000"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
