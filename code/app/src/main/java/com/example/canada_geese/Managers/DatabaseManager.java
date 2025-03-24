@@ -73,7 +73,12 @@ public class DatabaseManager {
             Map<String, Object> moodMap = new HashMap<>();
             moodMap.put("userId", userId);
             moodMap.put("emotion", moodEvent.getEmotion());
-            moodMap.put("description", moodEvent.getDescription());
+            if(moodEvent.getDescription().isEmpty()){
+                moodMap.put("description", "None provided");
+            }else{
+                moodMap.put("description", moodEvent.getDescription());
+            }
+
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
@@ -347,8 +352,9 @@ public class DatabaseManager {
                     Task<QuerySnapshot> moodTask = db.collection("users")
                             .document(followedId)
                             .collection("moodEvents")
+                            .whereEqualTo("isPublic", true) // 👈 ONLY public moods
                             .orderBy("timestamp", Query.Direction.DESCENDING)
-                            .limit(3) // 👈 only grab their last 3 moods
+                            .limit(3)
                             .get();
                     moodTasks.add(moodTask);
                 }

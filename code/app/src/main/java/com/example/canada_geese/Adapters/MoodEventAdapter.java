@@ -9,11 +9,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -134,12 +139,43 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
     private void populateDetails(ViewHolder holder, MoodEventModel event) {
-        holder.privateMoodCheck.setChecked(event.isPrivate());
+
         holder.description.setText(event.getDescription());
         holder.socialSituation.setText(event.getSocialSituation() != null ? event.getSocialSituation() : "Not specified");
 
+        holder.imageContainer.removeAllViews();
+        List<String> urls = event.getImageUrls();
+
+        if (urls != null && !urls.isEmpty()) {
+            holder.imageContainer.setVisibility(View.VISIBLE);
+
+            for (String url : urls) {
+                ImageView img = new ImageView(context);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(0, 16, 0, 16);
+
+                img.setLayoutParams(params);
+                img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                img.setAdjustViewBounds(true); // 🔥 key for portrait pics
+
+                Glide.with(context)
+                        .load(url)
+                        .into(img);
+
+                holder.imageContainer.addView(img);
+            }
+        } else {
+            holder.imageContainer.setVisibility(View.GONE);
+        }
+
         if (event.HasLocation()) {
             holder.mapView.setVisibility(View.VISIBLE);
+            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.VISIBLE); // 👈 Show label
+
             holder.mapView.onCreate(null);
             holder.mapView.getMapAsync(googleMap -> {
                 LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
@@ -148,6 +184,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             });
         } else {
             holder.mapView.setVisibility(View.GONE);
+            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.GONE); // 👈 Hide label
         }
 
         holder.editButton.setOnClickListener(v -> {
@@ -211,6 +248,9 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         ImageButton commentButton;
         MapView mapView;
         TextView usernameView;
+        LinearLayout imageContainer;
+        TextView locationLabel;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -221,7 +261,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             commentButton = itemView.findViewById(R.id.comment_button2); //HERE
             detailsContainer = itemView.findViewById(R.id.details_container);
             description = itemView.findViewById(R.id.tv_description);
-            privateMoodCheck = itemView.findViewById(R.id.cb_private_mood);
+
             editButton = itemView.findViewById(R.id.btn_edit);
             deleteButton = itemView.findViewById(R.id.btn_delete);
             editContainer = itemView.findViewById(R.id.edit_container);
@@ -232,6 +272,9 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             socialSituation = itemView.findViewById(R.id.tv_social_situation);
             mapView = itemView.findViewById(R.id.map_view);
             usernameView = itemView.findViewById(R.id.tv_username);
+            imageContainer = itemView.findViewById(R.id.image_container);
+            locationLabel = itemView.findViewById(R.id.tv_location_label);
+
         }
     }
 
