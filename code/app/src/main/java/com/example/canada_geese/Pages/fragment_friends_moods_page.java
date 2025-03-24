@@ -18,6 +18,7 @@ import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,6 +68,10 @@ public class fragment_friends_moods_page extends Fragment {
         DatabaseManager.getInstance().fetchFollowedUsersMoodEvents(task -> {
             if (task.isSuccessful()) {
                 List<MoodEventModel> friendsMoods = task.getResult();
+                Collections.sort(friendsMoods, (a, b) -> {
+                    if (a.getTimestamp() == null || b.getTimestamp() == null) return 0;
+                    return b.getTimestamp().compareTo(a.getTimestamp());
+                });
 
                 // Fetch UID → username map and then update adapter
                 DatabaseManager.getInstance().fetchAllUsernames(userMap -> {
