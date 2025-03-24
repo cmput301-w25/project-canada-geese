@@ -98,7 +98,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         dialog.show();
 
         // Check if user is following
-        checkIfFollowing(user.getUserId(), isFollowing -> {
+        checkIfFollowing(user.getUsername(), isFollowing -> {
             if (isFollowing) {
                 actionButton.setText("Send Message");
                 actionButton.setOnClickListener(v -> {
@@ -120,12 +120,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     }
 
     // Asynchronous check if current user is following this user shows follow or send message button
-    private void checkIfFollowing(String userId, OnFollowCheckListener callback) {
+    private void checkIfFollowing(String clickedUsername, OnFollowCheckListener callback) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             db.collection("users")
                     .document(user.getUid())
                     .collection("following")
+                    .whereEqualTo("username", clickedUsername)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && task.getResult() != null) {
@@ -139,7 +140,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             callback.onResult(false);
         }
     }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textUsername;
         ImageView profileImage;
