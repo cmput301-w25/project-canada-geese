@@ -94,7 +94,7 @@ public class fragment_user_moods_page extends Fragment {
 
         // Initialize empty list and adapter
         moodEventList = new ArrayList<>();
-        adapter = new MoodEventAdapter(moodEventList, getContext());
+        adapter = new MoodEventAdapter(moodEventList, getContext(), false);
         recyclerView.setAdapter(adapter);
 
         // Create filter bar fragment and set adapter

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.canada_geese.Models.CommentModel;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,7 +77,7 @@ public class DatabaseManager {
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
-            moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("isPublic", moodEvent.hasTriggerWarning());
             moodMap.put("socialSituation", moodEvent.getSocialSituation());
 
             if (moodEvent.HasLocation()) {
@@ -347,6 +348,7 @@ public class DatabaseManager {
                             .document(followedId)
                             .collection("moodEvents")
                             .orderBy("timestamp", Query.Direction.DESCENDING)
+                            .limit(3) // 👈 only grab their last 3 moods
                             .get();
                     moodTasks.add(moodTask);
                 }
@@ -368,6 +370,20 @@ public class DatabaseManager {
                     finalListener.onComplete(Tasks.forResult(combinedMoods));
                 });
             });
+        });
+    }
+
+    public void fetchAllUsernames(OnSuccessListener<Map<String, String>> listener) {
+        db.collection("users").get().addOnSuccessListener(querySnapshot -> {
+            Map<String, String> result = new HashMap<>();
+            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                String uid = doc.getId();
+                String username = doc.getString("username");
+                if (username != null) {
+                    result.put(uid, username);
+                }
+            }
+            listener.onSuccess(result);
         });
     }
 

@@ -76,7 +76,7 @@ public class fragment_add_mood_page extends Fragment {
 
         // Initialize data and adapter
         moodEventList = new ArrayList<>(getSampleMoodEvents());
-        adapter = new MoodEventAdapter(moodEventList, getContext());
+        adapter = new MoodEventAdapter(moodEventList, getContext(),false);
         recyclerView.setAdapter(adapter);
 
         // Setup search functionality

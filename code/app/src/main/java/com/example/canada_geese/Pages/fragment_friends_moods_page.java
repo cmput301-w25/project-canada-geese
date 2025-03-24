@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Fragments.CommentsFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
@@ -60,15 +61,30 @@ public class fragment_friends_moods_page extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         List<MoodEventModel> moodEventList = new ArrayList<>();
-        MoodEventAdapter adapter = new MoodEventAdapter(moodEventList, getContext());
+        MoodEventAdapter adapter = new MoodEventAdapter(moodEventList, getContext(), true);
         recyclerView.setAdapter(adapter);
 
         DatabaseManager.getInstance().fetchFollowedUsersMoodEvents(task -> {
             if (task.isSuccessful()) {
                 List<MoodEventModel> friendsMoods = task.getResult();
-                adapter.updateList(friendsMoods);
+
+                // Fetch UID → username map and then update adapter
+                DatabaseManager.getInstance().fetchAllUsernames(userMap -> {
+                    adapter.setUidToUsernameMap(userMap);
+                    adapter.updateList(friendsMoods);
+                });
+
             } else {
                 Log.e("FriendsMoodsPage", "Error fetching friends' moods", task.getException());
+            }
+        });
+
+        adapter.setOnCommentClickListener(new MoodEventAdapter.OnCommentClickListener() {
+            @Override
+            public void onCommentClick(MoodEventModel moodEvent) {
+                // Pass the mood event's document ID to the CommentsFragment
+                CommentsFragment commentsSheet = CommentsFragment.newInstance(moodEvent.getDocumentId());
+                commentsSheet.show(getChildFragmentManager(), commentsSheet.getTag());
             }
         });
 
