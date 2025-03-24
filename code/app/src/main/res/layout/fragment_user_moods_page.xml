@@ -55,56 +55,33 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/filter_bar_fragment_container"
         android:name="com.example.canada_geese.Fragments.FilterBarFragment"
-        android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/top_banner"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/user_greeting"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_banner"
         tools:layout="@layout/fragment_filter_bar" />
 
     <!-- Greeting Texts -->
-    <TextView
-        android:id="@+id/user_greeting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hi, User! :)"
-        android:textColor="#6B4F3F"
-        android:textSize="38sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_bar_fragment_container"
-        app:layout_constraintBottom_toTopOf="@id/textView3"
-        tools:layout_editor_absoluteY="88dp" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="How are you doing today?"
-        android:textColor="#6B4F3F"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_greeting"
-        app:layout_constraintBottom_toTopOf="@id/recyclerView"/>
 
     <!-- RecyclerView -->
+
+    <!-- Bottom Banner -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="378dp"
-        android:layout_height="442dp"
+        android:layout_width="374dp"
+        android:layout_height="484dp"
         android:padding="10dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/bottom_banner"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.89" />
 
-    <!-- Bottom Banner -->
     <LinearLayout
         android:id="@+id/bottom_banner"
         android:layout_width="match_parent"
