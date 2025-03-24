@@ -1,14 +1,23 @@
 package com.example.canada_geese.Pages;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Managers.DatabaseManager;
+import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment that displays the moods of friends.
@@ -44,12 +53,24 @@ public class fragment_friends_moods_page extends Fragment {
      * @return The root view for this fragment's layout.
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_friends_moods_page, container, false);
 
-        // Initialize and set up views
-        TextView textView = rootView.findViewById(R.id.textView);
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        List<MoodEventModel> moodEventList = new ArrayList<>();
+        MoodEventAdapter adapter = new MoodEventAdapter(moodEventList, getContext());
+        recyclerView.setAdapter(adapter);
+
+        DatabaseManager.getInstance().fetchFollowedUsersMoodEvents(task -> {
+            if (task.isSuccessful()) {
+                List<MoodEventModel> friendsMoods = task.getResult();
+                adapter.updateList(friendsMoods);
+            } else {
+                Log.e("FriendsMoodsPage", "Error fetching friends' moods", task.getException());
+            }
+        });
 
         return rootView;
     }

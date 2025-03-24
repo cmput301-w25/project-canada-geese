@@ -18,8 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -285,6 +287,88 @@ public class DatabaseManager {
                 listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId/commentId missing")));
             }
         }
+    }
+
+    public void fetchFollowedUsersMoodEvents(OnCompleteListener<List<MoodEventModel>> finalListener) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            finalListener.onComplete(Tasks.forException(new Exception("User not logged in")));
+            return;
+        }
+
+        String userId = currentUser.getUid();
+        CollectionReference followingRef = db.collection("users").document(userId).collection("following");
+
+        followingRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                finalListener.onComplete(Tasks.forException(task.getException()));
+                return;
+            }
+
+            List<String> followedUsernames = new ArrayList<>();
+            for (DocumentSnapshot doc : task.getResult()) {
+                String username = doc.getString("username");
+                if (username != null && !username.isEmpty()) {
+                    followedUsernames.add(username);
+                    Log.d(TAG, "Following username: " + username);
+                }
+            }
+
+            if (followedUsernames.isEmpty()) {
+                finalListener.onComplete(Tasks.forResult(new ArrayList<>()));
+                return;
+            }
+
+            // Step 2: Get user IDs from usernames
+            db.collection("users").get().addOnCompleteListener(usersTask -> {
+                if (!usersTask.isSuccessful() || usersTask.getResult() == null) {
+                    finalListener.onComplete(Tasks.forException(usersTask.getException()));
+                    return;
+                }
+
+                List<String> followedUserIds = new ArrayList<>();
+                for (DocumentSnapshot userDoc : usersTask.getResult()) {
+                    String username = userDoc.getString("username");
+                    if (username != null && followedUsernames.contains(username)) {
+                        followedUserIds.add(userDoc.getId());
+                        Log.d(TAG, "Matched username: " + username + " -> UID: " + userDoc.getId());
+                    }
+                }
+
+                if (followedUserIds.isEmpty()) {
+                    finalListener.onComplete(Tasks.forResult(new ArrayList<>()));
+                    return;
+                }
+
+                // Step 3: Fetch mood events from each followed user
+                List<Task<QuerySnapshot>> moodTasks = new ArrayList<>();
+                for (String followedId : followedUserIds) {
+                    Task<QuerySnapshot> moodTask = db.collection("users")
+                            .document(followedId)
+                            .collection("moodEvents")
+                            .orderBy("timestamp", Query.Direction.DESCENDING)
+                            .get();
+                    moodTasks.add(moodTask);
+                }
+
+                Tasks.whenAllSuccess(moodTasks).addOnCompleteListener(moodEventsTask -> {
+                    List<MoodEventModel> combinedMoods = new ArrayList<>();
+                    for (Object result : moodEventsTask.getResult()) {
+                        List<DocumentSnapshot> docs = ((QuerySnapshot) result).getDocuments();
+                        for (DocumentSnapshot moodDoc : docs) {
+                            MoodEventModel mood = moodDoc.toObject(MoodEventModel.class);
+                            if (mood != null) {
+                                mood.setDocumentId(moodDoc.getId());
+                                combinedMoods.add(mood);
+                            }
+                        }
+                    }
+
+                    Log.d(TAG, "Fetched " + combinedMoods.size() + " mood events from followed users");
+                    finalListener.onComplete(Tasks.forResult(combinedMoods));
+                });
+            });
+        });
     }
 
 }
