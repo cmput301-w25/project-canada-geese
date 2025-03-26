@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.canada_geese">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-feature android:name="android.hardware.camera"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-
-
 
     <application
         android:name=".MyApplication"
@@ -29,17 +23,22 @@
             android:value="AIzaSyASp9wWzJucjZynpa59jMIsnyeI0cVQs2w"/>
 
 
-        <activity
-            android:name=".Pages.SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Pages.LoginActivity"
+        <activity android:name=".Pages.LaunchActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".Pages.SignUpActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Pages.LoginActivity"
+            android:exported="true" />
+
         <activity
             android:name=".Pages.MainActivity"
             android:exported="true"
@@ -47,16 +46,6 @@
         <activity
             android:name=".Pages.EditProfileActivity"
             android:exported="true" />
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.canada_geese.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
-        </provider>
-
     </application>
 
 </manifest>
