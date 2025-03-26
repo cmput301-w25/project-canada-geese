@@ -291,19 +291,20 @@ public class DatabaseManager {
         usersRef.get().addOnCompleteListener(listener);
     }
 
-    public void addComment(String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null && moodEventId != null && !moodEventId.isEmpty()) {
-            String userId = user.getUid();
-            // Locate the mood event document, then add a comment to its "comments" subcollection
-            DocumentReference moodEventDocRef = db.collection("users").document(userId)
-                    .collection("moodEvents").document(moodEventId);
-            moodEventDocRef.collection("comments")
+    public void addComment(String ownerUserId, String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && ownerUserId != null && moodEventId != null) {
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(ownerUserId)
+                    .collection("moodEvents")
+                    .document(moodEventId)
+                    .collection("comments")
                     .add(comment)
                     .addOnCompleteListener(listener);
         } else {
             if (listener != null) {
-                listener.onComplete(Tasks.forException(new Exception("User not logged in or moodEventId missing")));
+                listener.onComplete(Tasks.forException(new Exception("User not logged in or invalid mood reference")));
             }
         }
     }

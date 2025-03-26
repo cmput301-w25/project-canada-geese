@@ -13,17 +13,21 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.canada_geese.Adapters.CommentAdapter;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.CommentModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,30 +35,27 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class CommentsFragment extends BottomSheetDialogFragment {
 
-    private String moodEventId; // Passed in from the calling fragment/activity
+    private String moodEventId;
+    private String moodOwnerId;
     private RecyclerView rvComments;
     private CommentAdapter commentAdapter;
     private List<CommentModel> commentList = new ArrayList<>();
-    private TextView tvNoComments; // For empty state
+    private TextView tvNoComments;
 
-    public CommentsFragment() {
-        // Required empty public constructor
-    }
+    public CommentsFragment() {}
 
-    // Pass the mood event ID when creating the fragment
-    public static CommentsFragment newInstance(String moodEventId) {
+    public static CommentsFragment newInstance(String moodEventId, String moodOwnerId) {
         CommentsFragment fragment = new CommentsFragment();
         Bundle args = new Bundle();
         args.putString("moodEventId", moodEventId);
+        args.putString("moodOwnerId", moodOwnerId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,7 +63,6 @@ public class CommentsFragment extends BottomSheetDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        // Adjust when the keyboard appears
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         return dialog;
     }
@@ -93,9 +93,10 @@ public class CommentsFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Retrieve the mood event ID passed as argument
+
         if (getArguments() != null) {
             moodEventId = getArguments().getString("moodEventId");
+            moodOwnerId = getArguments().getString("moodOwnerId");
         }
 
         final EditText etComment = view.findViewById(R.id.et_comment);
@@ -107,7 +108,6 @@ public class CommentsFragment extends BottomSheetDialogFragment {
         commentAdapter = new CommentAdapter(commentList, getContext(), moodEventId);
         rvComments.setAdapter(commentAdapter);
 
-        // Request focus and show keyboard for EditText
         if (etComment != null) {
             etComment.requestFocus();
             new Handler().postDelayed(() -> {
@@ -118,7 +118,6 @@ public class CommentsFragment extends BottomSheetDialogFragment {
             }, 100);
         }
 
-        // Post comment button click
         btnPost.setOnClickListener(v -> {
             String commentText = etComment.getText().toString().trim();
             if (commentText.isEmpty()) {
@@ -141,9 +140,9 @@ public class CommentsFragment extends BottomSheetDialogFragment {
                                 username = firebaseUser.getEmail();
                             }
                             CommentModel comment = new CommentModel(commentText, username, new Date());
-                            // Set the userId so we know who posted it
                             comment.setUserId(uid);
-                            DatabaseManager.getInstance().addComment(moodEventId, comment, new OnCompleteListener<DocumentReference>() {
+
+                            DatabaseManager.getInstance().addComment(moodOwnerId, moodEventId, comment, new OnCompleteListener<DocumentReference>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentReference> postTask) {
                                     if (postTask.isSuccessful()) {
@@ -161,38 +160,35 @@ public class CommentsFragment extends BottomSheetDialogFragment {
                     });
         });
 
-        // Listen for changes in the comments collection and update the UI.
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null && moodEventId != null) {
+        // ✅ Now listen on the actual mood owner's doc
+        if (moodOwnerId != null && moodEventId != null) {
             FirebaseFirestore.getInstance().collection("users")
-                    .document(currentUser.getUid())
+                    .document(moodOwnerId)
                     .collection("moodEvents")
                     .document(moodEventId)
                     .collection("comments")
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .addSnapshotListener((snapshots, error) -> {
-                        if (error != null) {
-                            return;
-                        }
-                        if (snapshots != null) {
-                            commentList.clear();
-                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                                CommentModel comment = doc.toObject(CommentModel.class);
-                                if (comment != null) {
-                                    // Set the documentId on the comment
-                                    comment.setDocumentId(doc.getId());
-                                    commentList.add(comment);
-                                }
+                        if (error != null) return;
+
+                        commentList.clear();
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            CommentModel comment = doc.toObject(CommentModel.class);
+                            if (comment != null) {
+                                comment.setDocumentId(doc.getId());
+                                commentList.add(comment);
                             }
-                            if (commentList.isEmpty()) {
-                                tvNoComments.setVisibility(View.VISIBLE);
-                                rvComments.setVisibility(View.GONE);
-                            } else {
-                                tvNoComments.setVisibility(View.GONE);
-                                rvComments.setVisibility(View.VISIBLE);
-                            }
-                            commentAdapter.updateComments(commentList);
                         }
+
+                        if (commentList.isEmpty()) {
+                            tvNoComments.setVisibility(View.VISIBLE);
+                            rvComments.setVisibility(View.GONE);
+                        } else {
+                            tvNoComments.setVisibility(View.GONE);
+                            rvComments.setVisibility(View.VISIBLE);
+                        }
+
+                        commentAdapter.updateComments(commentList);
                     });
         }
     }

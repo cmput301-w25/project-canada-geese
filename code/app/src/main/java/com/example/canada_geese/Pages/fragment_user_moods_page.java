@@ -141,8 +141,10 @@ public class fragment_user_moods_page extends Fragment {
         adapter.setOnCommentClickListener(new MoodEventAdapter.OnCommentClickListener() {
             @Override
             public void onCommentClick(MoodEventModel moodEvent) {
-                // Pass the mood event's document ID to the CommentsFragment
-                CommentsFragment commentsSheet = CommentsFragment.newInstance(moodEvent.getDocumentId());
+                String moodEventId = moodEvent.getDocumentId();
+                String moodOwnerId = moodEvent.getUserId(); // 👈 This was missing before
+
+                CommentsFragment commentsSheet = CommentsFragment.newInstance(moodEventId, moodOwnerId);
                 commentsSheet.show(getChildFragmentManager(), commentsSheet.getTag());
             }
         });
