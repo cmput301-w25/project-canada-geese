@@ -21,7 +21,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyASp9wWzJucjZynpa59jMIsnyeI0cVQs2w"/>
 
-
         <activity android:name=".Pages.LaunchActivity"
             android:exported="true">
             <intent-filter>

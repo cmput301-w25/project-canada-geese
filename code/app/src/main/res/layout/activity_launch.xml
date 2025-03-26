@@ -35,5 +35,4 @@
             android:background="@drawable/goose"
             android:scaleType="fitCenter" />
     </RelativeLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
