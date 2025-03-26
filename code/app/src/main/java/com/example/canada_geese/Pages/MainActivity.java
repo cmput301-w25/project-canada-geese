@@ -55,14 +55,12 @@ public class MainActivity extends AppCompatActivity {
                 } else if (itemId == R.id.page2) {
                     fragment = fragment_friends_moods_page.newInstance();  // Friends' Moods page
                 } else if (itemId == R.id.page3) {
-                    // Open the Add Mood dialog and update User Moods page
-                    fragment_user_moods_page moodsFragment = fragment_user_moods_page.newInstance();
-
                     AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
-                    dialog.setOnMoodAddedListener(moodsFragment::addNewMood);
+                    dialog.setOnDismissListener(() -> {
+                        bottomNavigationView.setSelectedItemId(R.id.page1); // Select User Moods Page
+                    });
                     dialog.show(getSupportFragmentManager(), "AddMoodEventDialog");
-
-                    fragment = moodsFragment;
+                    return false;
                 } else if (itemId == R.id.page4) {
                     fragment = fragment_map_view_page.newInstance();  // Map View page
                 } else if (itemId == R.id.page5) {

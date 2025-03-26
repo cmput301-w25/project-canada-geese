@@ -63,91 +63,18 @@
         app:layout_constraintTop_toBottomOf="@id/top_banner"
         tools:layout="@layout/fragment_filter_bar" />
 
-    <!-- Greeting Texts -->
-
-    <!-- RecyclerView -->
-
-    <!-- Bottom Banner -->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="374dp"
         android:layout_height="484dp"
         android:padding="10dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.89" />
 
-    <LinearLayout
-        android:id="@+id/bottom_banner"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#91B4A4"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:weightSum="5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <!-- Home icon -->
-        <ImageButton
-            android:id="@+id/home_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_cottage_24" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1.25" />
-
-        <!-- Bird icon -->
-        <ImageButton
-            android:id="@+id/bird_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/raven_24dp_2d2d2d_fill0_wght400_grad0_opsz24__1_" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1.25" />
-
-        <!-- Add Button -->
-        <ImageButton
-            android:id="@+id/add_mood_event_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_add_circle_outline_24" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1.25" />
-
-        <!-- Image icon -->
-        <ImageButton
-            android:id="@+id/image_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_image_24" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1.25" />
-
-        <!-- Profile Icon -->
-        <ImageButton
-            android:id="@+id/profile_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_account_circle_24" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

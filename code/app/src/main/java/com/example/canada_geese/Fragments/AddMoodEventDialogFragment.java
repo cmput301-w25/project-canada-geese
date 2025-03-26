@@ -109,7 +109,22 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private ActivityResultLauncher<PickVisualMediaRequest> photoPickerLauncher;
     private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
 
+    public interface OnDismissListener {
+        void onDismiss();
+    }
+    private OnDismissListener dismissListener;
+    public void setOnDismissListener(OnDismissListener listener) {
+        this.dismissListener = listener;
+    }
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
 
+        // Call the listener when the dialog is dismissed
+        if (dismissListener != null) {
+            dismissListener.onDismiss();
+        }
+    }
     /**
      * Interface for listening to mood event added events.
      */
