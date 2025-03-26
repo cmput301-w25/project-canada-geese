@@ -4,21 +4,21 @@
         android:id="@+id/page1"
         android:title="HOME"
         android:color="#FFF78C"
-        android:icon="@drawable/cottage"/>
+        android:icon="@drawable/ic_home_selector"/>
     <item
         android:id="@+id/page2"
         android:title="FRIENDS"
-        android:icon="@drawable/raven"/>
+        android:icon="@drawable/ic_friends_selector"/>
     <item
         android:id="@+id/page3"
         android:title="ADDMOOD"
-        android:icon="@drawable/add_circle"/>
+        android:icon="@drawable/ic_add_selector"/>
     <item
         android:id="@+id/page4"
         android:title="MAP"
-        android:icon="@drawable/satellite"/>
+        android:icon="@drawable/ic_map_selector"/>
     <item
         android:id="@+id/page5"
         android:title="PROFILE"
-        android:icon="@drawable/account_circle"/>
+        android:icon="@drawable/ic_profile_selector"/>
 </menu>

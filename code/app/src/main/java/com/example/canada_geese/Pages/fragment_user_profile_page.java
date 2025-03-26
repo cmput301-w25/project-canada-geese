@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView;
 //import com.example.canada_geese.Adapters.UserSearchAdapter;
 import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Adapters.UsersAdapter;
-import com.example.canada_geese.Fragments.EditProfileFragment;
 import com.example.canada_geese.Fragments.RequestsDialogFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
 
