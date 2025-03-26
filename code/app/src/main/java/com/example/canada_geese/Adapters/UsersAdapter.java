@@ -44,7 +44,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public interface onItemClickListener {
         void onItemClick(Users users);
         void onFollowRequest(Users users);
-        void onSendMessage(Users users);
+        void onUnfollowRequest(Users users);
     }
 
     public void setOnItemClickListener(onItemClickListener listener) {
@@ -100,10 +100,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         // Check if user is following
         checkIfFollowing(user.getUsername(), isFollowing -> {
             if (isFollowing) {
-                actionButton.setText("Send Message");
+                actionButton.setText("Unfollow");
                 actionButton.setOnClickListener(v -> {
                     if (listener != null) {
-                        listener.onSendMessage(user);
+                        listener.onUnfollowRequest(user);
                     }
                     dialog.dismiss();
                 });

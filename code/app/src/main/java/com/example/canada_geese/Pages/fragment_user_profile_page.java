@@ -26,12 +26,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 //import com.example.canada_geese.Adapters.UserSearchAdapter;
 import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Adapters.UsersAdapter;
+import com.example.canada_geese.Fragments.EditProfileFragment;
 import com.example.canada_geese.Fragments.RequestsDialogFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
 
@@ -42,6 +44,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +80,7 @@ public class fragment_user_profile_page extends Fragment{
     private List<String> userList;
     private List<Users> AllUsers;
     private UsersAdapter usersAdapter;
+
 
     /**
      * Required empty public constructor.
@@ -157,9 +162,7 @@ public class fragment_user_profile_page extends Fragment{
             }
 
             @Override
-            public void onSendMessage(Users users) {
-                // sendMessage(users);
-            }
+            public void onUnfollowRequest(Users users) { unFollowRequest(users);}
         });
         searchResultsList.setAdapter(usersAdapter);
 
@@ -182,12 +185,12 @@ public class fragment_user_profile_page extends Fragment{
                     // Open the requests dialog fragment which is handled in the RequestsDialogFragment class, allows user to accept or reject requests
                     DialogFragment dialog = new RequestsDialogFragment();
                     dialog.show(getParentFragmentManager(), "RequestsDialogFragment");
-                    Toast.makeText(requireContext(), "Requests", Toast.LENGTH_SHORT).show();
                     return true;
 
                 } else if (id == R.id.action_settings) {
-                    // Navigate to the settings page
-                    Toast.makeText(requireContext(), "Settings", Toast.LENGTH_SHORT).show();
+                    // Navigate to the settings page managed by EditProfileFragment
+                    Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+                    startActivity(intent);
                     return true;
                 }
                 return false;
@@ -198,11 +201,15 @@ public class fragment_user_profile_page extends Fragment{
 
         // Click listener for the followers section
         followersSection.setOnClickListener(v -> {
+            // make the list visible
+            followersListView.setVisibility(View.VISIBLE);
             // Show the list of followers
             showFollowersList();
         });
         // Click listener for the following section
         followingSection.setOnClickListener(v -> {
+            // make the list visible
+            followersListView.setVisibility(View.VISIBLE);
             // Show the list of following
             showFollowingList();
         });
@@ -467,6 +474,98 @@ public class fragment_user_profile_page extends Fragment{
                 });
     }
 
+    private void unFollowRequest(Users user) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Log.e("Firestore", "User is not logged in.");
+            return;
+        }
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String senderId = currentUser.getUid();  // Current user ID
+        String recipientUsername = user.getUsername();  // Clicked user's username
 
+//        Log.d("UnfollowRequest", "Sender ID: " + senderId);
+//        Log.d("UnfollowRequest", "Recipient Username: " + recipientUsername);
+
+        // First, get sender's username
+        db.collection("users").document(senderId).get()
+                .addOnSuccessListener(senderDoc -> {
+                    if (senderDoc.exists()) {
+                        String senderName = senderDoc.getString("username");
+//                        Log.d("UnfollowRequest", "Sender Username: " + senderName);
+
+                        // Now find the recipient's document ID by querying for their username
+                        db.collection("users")
+                                .whereEqualTo("username", recipientUsername)
+                                .limit(1)  // We only need one result
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    if (!querySnapshot.isEmpty()) {
+                                        // Get the recipient's document ID
+                                        DocumentSnapshot recipientDoc = querySnapshot.getDocuments().get(0);
+                                        String recipientId = recipientDoc.getId();
+
+//                                        Log.d("UnfollowRequest", "Found recipient ID: " + recipientId);
+
+                                        // Batch write to remove from following and followers collections
+                                        WriteBatch batch = db.batch();
+
+                                        // Reference to the document to remove from current user's following
+                                        Query followingQuery = db.collection("users")
+                                                .document(senderId)
+                                                .collection("following")
+                                                .whereEqualTo("username", recipientUsername);
+
+                                        // Reference to the document to remove from recipient's followers
+                                        Query followersQuery = db.collection("users")
+                                                .document(recipientId)
+                                                .collection("followers")
+                                                .whereEqualTo("username", senderName);
+
+                                        // Remove from current user's following collection
+                                        followingQuery.get().addOnSuccessListener(followingSnapshot -> {
+                                                    for (DocumentSnapshot doc : followingSnapshot.getDocuments()) {
+                                                        batch.delete(doc.getReference());
+                                                    }
+
+                                                    // Remove from recipient's followers collection
+                                                    followersQuery.get().addOnSuccessListener(followersSnapshot -> {
+                                                                for (DocumentSnapshot doc : followersSnapshot.getDocuments()) {
+                                                                    batch.delete(doc.getReference());
+                                                                }
+
+                                                                // Commit the batch
+                                                                batch.commit()
+                                                                        .addOnSuccessListener(aVoid -> {
+                                                                            Log.d("UnfollowRequest", "Successfully unfollowed user");
+                                                                            // Optionally update UI or show toast
+                                                                        })
+                                                                        .addOnFailureListener(e -> {
+                                                                            Log.e("UnfollowRequest", "Failed to unfollow user", e);
+                                                                            // Optionally show error to user
+                                                                        });
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                Log.e("UnfollowRequest", "Failed to find followers document", e);
+                                                            });
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("UnfollowRequest", "Failed to find following document", e);
+                                                });
+                                    } else {
+                                        Log.e("UnfollowRequest", "Recipient user not found");
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("UnfollowRequest", "Failed to find recipient user", e);
+                                });
+                    } else {
+                        Log.e("UnfollowRequest", "Sender document does not exist");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UnfollowRequest", "Failed to get sender username", e);
+                });
+    }
 }

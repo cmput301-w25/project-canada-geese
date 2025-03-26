@@ -3,21 +3,22 @@
     <item
         android:id="@+id/page1"
         android:title="HOME"
-        android:icon="@drawable/ic_home_selector"/>
+        android:color="#FFF78C"
+        android:icon="@drawable/cottage"/>
     <item
         android:id="@+id/page2"
         android:title="FRIENDS"
-        android:icon="@drawable/ic_friends_selector"/>
+        android:icon="@drawable/raven"/>
     <item
         android:id="@+id/page3"
         android:title="ADDMOOD"
-        android:icon="@drawable/ic_add_selector"/>
+        android:icon="@drawable/add_circle"/>
     <item
         android:id="@+id/page4"
         android:title="MAP"
-        android:icon="@drawable/ic_map_selector"/>
+        android:icon="@drawable/satellite"/>
     <item
         android:id="@+id/page5"
         android:title="PROFILE"
-        android:icon="@drawable/ic_profile_selector"/>
+        android:icon="@drawable/account_circle"/>
 </menu>
