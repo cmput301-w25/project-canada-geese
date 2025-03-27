@@ -22,7 +22,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/profile" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/edit_profile_image"
             android:layout_width="30dp"
             android:layout_height="30dp"

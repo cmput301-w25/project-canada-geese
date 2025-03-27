@@ -409,35 +409,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         builder.show();
     }
 
-    /*private void addImageToGallery(Bitmap bitmap) {
-        // Add to the collection
-        selectedImages.add(bitmap);
-
-        // ImageView to display this bitmap
-        ImageView imageView = new ImageView(requireContext());
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                dpToPx(100),
-                dpToPx(100)));
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageBitmap(bitmap);
-        imageView.setPadding(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4));
-
-        // Image is deleted as soon as its clicked: TODO: fix it!!!
-        imageView.setOnClickListener(v -> {
-            imagesContainer.removeView(imageView);
-            selectedImages.remove(bitmap);
-            if (selectedImages.isEmpty()) {
-                imagesScrollView.setVisibility(View.GONE);
-            }
-        });
-
-        // Add to the container
-        imagesContainer.addView(imageView);
-
-        // Make sure the scroll view is visible
-        imagesScrollView.setVisibility(View.VISIBLE);
-    }
-*/
     private void addImageToGallery(Bitmap bitmap) {
         // Add to the collection
         selectedImages.add(bitmap);
@@ -466,11 +437,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         // Make sure the scroll view is visible
         imagesScrollView.setVisibility(View.VISIBLE);
-    }
-    // Helper method to convert dp to pixels
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
     }
 
     private void askCameraPermission() {

@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 //import com.example.canada_geese.Adapters.UserSearchAdapter;
+import com.bumptech.glide.Glide;
 import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Adapters.UsersAdapter;
 import com.example.canada_geese.Fragments.RequestsDialogFragment;
@@ -223,18 +224,18 @@ public class fragment_user_profile_page extends Fragment{
                 profileContentContainer.setVisibility(View.GONE);
 
                 // Fetch all users from the database
-                DatabaseManager.getInstance().fetchAllUsers(task -> {
-                    if (task.isSuccessful()) {
-                        List<Users> newList = new ArrayList<>();
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Users user = document.toObject(Users.class);
-                            newList.add(user);
-                        }
-                        usersAdapter.updateList(newList);
-                    } else {
-                        Log.e("FetchError", "Error getting documents: ", task.getException());
-                    }
-                });
+//                DatabaseManager.getInstance().fetchAllUsers(task -> {
+//                    if (task.isSuccessful()) {
+//                        List<Users> newList = new ArrayList<>();
+//                        for (DocumentSnapshot document : task.getResult()) {
+//                            Users user = document.toObject(Users.class);
+//                            newList.add(user);
+//                        }
+//                        usersAdapter.updateList(newList);
+//                    } else {
+//                        Log.e("FetchError", "Error getting documents: ", task.getException());
+//                    }
+//                });
             }
 
         });
@@ -307,9 +308,23 @@ public class fragment_user_profile_page extends Fragment{
                         if (documentSnapshot.exists()) {
                             String username = documentSnapshot.getString("username");
                             usernameText.setText(username);
+                             //firestore tingz
+                            String profileImageUrl = documentSnapshot.getString("image_profile");
+                            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                                Glide.with(this)
+                                        .load(profileImageUrl)
+                                        .circleCrop()
+                                        .placeholder(R.drawable.profile)
+                                        .error(R.drawable.profile)
+                                        .into(profileImage);
+                            } else {
+                                // Use placeholder if no image URL
+                                profileImage.setImageResource(R.drawable.profile);
+                            }
                         }
                     });
-            // Ignoring firestore storage setup for current implementation for user profile
+
+            /*// Ignoring firestore storage setup for current implementation for user profile
             // Load profile picture if available
             Uri profileUri = user.getPhotoUrl();
             if (profileUri != null) {
@@ -317,7 +332,8 @@ public class fragment_user_profile_page extends Fragment{
             } else {
                 profileImage.setImageResource(R.drawable.profile); // Placeholder image
             }
-//            profileImage.setImageResource(R.drawable.profile);
+//            profileImage.setImageResource(R.drawable.profile);*/
+
 
             // Load Followers to the user profile
             db.collection("users").document(user.getUid()).collection("followers").get()
@@ -333,7 +349,6 @@ public class fragment_user_profile_page extends Fragment{
                     });
         }
     }
-
     private void showFollowersList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -392,13 +407,22 @@ public class fragment_user_profile_page extends Fragment{
     // Add this helper method to perform the actual filtering
     private void performFiltering(String searchText) {
         List<Users> filteredList = new ArrayList<>();
+        List<Users> secondaryList = new ArrayList<>();
         for (Users user : AllUsers) {
-            // Add user to filtered list if username contains search text (case insensitive)
-            if (user.getUsername() != null &&
-                    user.getUsername().toLowerCase().contains(searchText.toLowerCase())) {
-                filteredList.add(user);
+            if (user.getUsername() != null ) {
+                String username = user.getUsername().toLowerCase();
+                String query = searchText.toLowerCase();
+
+                if (username.startsWith(query)) {
+                    filteredList.add(user);
+                } else if (username.contains(query)) {
+                    secondaryList.add(user);
+                }
             }
         }
+
+        // Add secondary matches to the end of the filtered list
+        filteredList.addAll(secondaryList);
 
         // Update adapter with filtered results
         usersAdapter.updateList(filteredList);

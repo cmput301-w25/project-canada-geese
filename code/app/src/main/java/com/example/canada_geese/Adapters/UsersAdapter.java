@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.canada_geese.Models.Users;
 import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -58,12 +59,21 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Users users = filteredUsersList.get(position);
         if (users != null) {
             holder.textUsername.setText(users.getUsername());
-            holder.profileImage.setImageResource(R.drawable.profile);
+            if (users.getImage_profile() != null && !users.getImage_profile().isEmpty()) {
+                Glide.with(context)
+                        .load(users.getImage_profile())
+                        .circleCrop()
+                        .placeholder(R.drawable.profile)
+                        .error(R.drawable.profile)
+                        .into(holder.profileImage);
+            } else {
+                holder.profileImage.setImageResource(R.drawable.profile);
+            }
+
             holder.itemView.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onItemClick(users);
@@ -77,7 +87,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public int getItemCount() {
         return filteredUsersList.size();
     }
-
     private void showUserDetailsDialog(Users user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -90,7 +99,19 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         TextView about = dialogView.findViewById(R.id.dialog_about);
         Button actionButton = dialogView.findViewById(R.id.dialog_action_button);
 
-        profileImage.setImageResource(R.drawable.profile);
+        // Profile image
+        if (user.getImage_profile() != null && !user.getImage_profile().isEmpty()) {
+            Glide.with(context)
+                    .load(user.getImage_profile())
+                    .circleCrop()
+                    .placeholder(R.drawable.profile)
+                    .error(R.drawable.profile)
+                    .into(profileImage);
+        } else {
+            // No image? No problem
+            profileImage.setImageResource(R.drawable.profile);
+        }
+
         username.setText(user.getUsername());
         about.setText(user.getAbout() != null ? user.getAbout() : "No description available");
 
@@ -119,7 +140,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         });
     }
 
-    // Asynchronous check if current user is following this user shows follow or send message button
+    // Not following, follow request
     private void checkIfFollowing(String clickedUsername, OnFollowCheckListener callback) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
