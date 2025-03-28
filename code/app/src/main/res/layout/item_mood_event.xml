@@ -77,14 +77,12 @@
 
         <LinearLayout
             android:id="@+id/details_container"
-            android:layout_width="321dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/comment_button2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.08"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mood_emoji">
 
@@ -121,17 +119,17 @@
                 android:id="@+id/image_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
 
             <!-- Location -->
             <TextView
                 android:id="@+id/tv_location_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Location"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textStyle="bold" />
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/map_view"
@@ -140,35 +138,17 @@
                 android:layout_marginTop="8dp"
                 android:visibility="gone" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="305dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <Button
-                    android:id="@+id/btn_edit"
-                    android:layout_width="116dp"
-                    android:layout_height="45dp"
-                    android:backgroundTint="#673AB7"
-                    android:text="Edit Mood"
-                    android:textColor="#FFFFFF"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_delete"
-                    android:layout_width="99dp"
-                    android:layout_height="43dp"
-                    android:layout_marginStart="12dp"
-                    android:backgroundTint="#EAEAEA"
-                    android:text="Delete"
-                    android:textColor="#666666"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/btn_edit"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/options_menu_button"
+                android:layout_width="49dp"
+                android:layout_height="34dp"
+                android:layout_gravity="left|end"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="Options menu"
+                android:src="@drawable/ic_more_vert_24"
+                android:visibility="visible" />
         </LinearLayout>
 
         <!-- Edit container (only visible in edit mode) -->

@@ -32,9 +32,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import android.widget.PopupMenu;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.ViewHolder> {
     private List<MoodEventModel> moodEventList;
@@ -187,22 +189,46 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.GONE); // 👈 Hide label
         }
 
-        holder.editButton.setOnClickListener(v -> {
-            isInEditMode = true;
-            notifyItemChanged(expandedPosition);
-            if (editListener != null) editListener.onMoodEventEdit(event, holder.getAdapterPosition());
-        });
+//        holder.editButton.setOnClickListener(v -> {
+//            isInEditMode = true;
+//            notifyItemChanged(expandedPosition);
+//            if (editListener != null) editListener.onMoodEventEdit(event, holder.getAdapterPosition());
+//        });
+//
+//        holder.deleteButton.setOnClickListener(v -> {
+//            if (longClickListener != null) longClickListener.onMoodEventLongClick(event);
+//        });
 
-        holder.deleteButton.setOnClickListener(v -> {
-            if (longClickListener != null) longClickListener.onMoodEventLongClick(event);
+        holder.optionsMenuButton.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(holder.optionsMenuButton.getContext(), holder.optionsMenuButton);
+            popup.getMenuInflater().inflate(R.menu.mood_options_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.option_edit) {
+                    isInEditMode = true;
+                    notifyItemChanged(holder.getAdapterPosition());
+                    if (editListener != null) {
+                        editListener.onMoodEventEdit(event, holder.getAdapterPosition());
+                    }
+                    return true;
+                } else if (itemId == R.id.option_delete) {
+                    if (longClickListener != null) {
+                        longClickListener.onMoodEventLongClick(event);
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            popup.show();
         });
 
         if (isFriendPage) {
-            holder.editButton.setVisibility(View.GONE);
-            holder.deleteButton.setVisibility(View.GONE);
+            
+            holder.optionsMenuButton.setVisibility(View.GONE);
         } else {
-            holder.editButton.setVisibility(View.VISIBLE);
-            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.optionsMenuButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -250,6 +276,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         TextView usernameView;
         LinearLayout imageContainer;
         TextView locationLabel;
+        ImageButton optionsMenuButton;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -274,6 +301,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             usernameView = itemView.findViewById(R.id.tv_username);
             imageContainer = itemView.findViewById(R.id.image_container);
             locationLabel = itemView.findViewById(R.id.tv_location_label);
+            optionsMenuButton = itemView.findViewById(R.id.options_menu_button);
 
         }
     }
