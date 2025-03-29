@@ -141,23 +141,30 @@ public class fragment_friends_moods_page extends Fragment {
         Fragment existingFragment = fragmentManager.findFragmentById(R.id.filter_bar_fragment_container);
 
         View filterButtonsContainer = getView().findViewById(R.id.filter_bar_fragment_container);
+        View spaceAboveRecycler = getView().findViewById(R.id.space); // 👈 Space view
 
         if (existingFragment == null) {
             FilterBarFragment filterBarFragment = new FilterBarFragment();
-            // Call the method on the instance, not on the class
             filterBarFragment.setIsForFriendsPage(true);
-
             filterBarFragment.setAdapter(adapter);
             transaction.replace(R.id.filter_bar_fragment_container, filterBarFragment);
             transaction.commit();
+
             if (filterButtonsContainer != null) {
                 filterButtonsContainer.setVisibility(View.VISIBLE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.VISIBLE);
             }
         } else {
             transaction.remove(existingFragment);
             transaction.commit();
+
             if (filterButtonsContainer != null) {
-                filterButtonsContainer.setVisibility(View.INVISIBLE);
+                filterButtonsContainer.setVisibility(View.GONE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.GONE);
             }
         }
     }

@@ -495,9 +495,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         for (int i = 0; i < selectedImages.size(); i++) {
             Bitmap bitmap = selectedImages.get(i);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            byte[] data = baos.toByteArray();
+            byte[] data = compressBitmapToLimit(bitmap, 65536);
 
             String filename = "mood_images/" + userId + "/" + System.currentTimeMillis() + "_edit" + i + ".jpg";
             StorageReference imgRef = storageRef.child(filename);
@@ -713,9 +711,7 @@ private void askgalleryPermission() {
 
         for (int i = 0; i < images.size(); i++) {
             Bitmap bitmap = images.get(i);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            byte[] data = baos.toByteArray();
+            byte[] data = compressBitmapToLimit(bitmap, 65536); // 64 KB
 
             String filename = "mood_images/" + userId + "/" + System.currentTimeMillis() + "_img" + i + ".jpg";
             StorageReference imgRef = storageRef.child(filename);
@@ -888,5 +884,19 @@ private void askgalleryPermission() {
         this.moodToEdit = mood;
         this.isEditMode = true;
         this.documentIdToUpdate = documentId;
+    }
+
+    private byte[] compressBitmapToLimit(Bitmap bitmap, int maxBytes) {
+        int quality = 100;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+
+        while (baos.toByteArray().length > maxBytes && quality > 10) {
+            baos.reset();
+            quality -= 5;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        }
+
+        return baos.toByteArray();
     }
 }

@@ -106,6 +106,13 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         holder.moodText.setText(event.getEmotion());
         holder.timestamp.setText(event.getFormattedTimestamp());
         holder.moodEmoji.setText(event.getEmoji());
+        String desc = event.getDescription();
+        if (desc == null || desc.trim().isEmpty()) {
+            holder.description.setVisibility(View.GONE);
+        } else {
+            holder.description.setText(desc);
+            holder.description.setVisibility(View.VISIBLE);
+        }
 
         if (isFriendPage && holder.usernameView != null) {
             holder.usernameView.setVisibility(View.VISIBLE);
@@ -127,6 +134,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             else populateDetails(holder, event);
         }
 
+        if (isFriendPage) {
+            holder.optionsMenuButton.setVisibility(View.GONE);
+        } else {
+            holder.optionsMenuButton.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             expandedPosition = (isExpanded && !isInEditMode) ? -1 : position;
             isInEditMode = false;
@@ -142,7 +155,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
     private void populateDetails(ViewHolder holder, MoodEventModel event) {
 
-        holder.description.setText(event.getDescription());
+
         holder.socialSituation.setText(event.getSocialSituation() != null ? event.getSocialSituation() : "Not specified");
 
         holder.imageContainer.removeAllViews();
@@ -225,7 +238,6 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
 
         if (isFriendPage) {
-            
             holder.optionsMenuButton.setVisibility(View.GONE);
         } else {
             holder.optionsMenuButton.setVisibility(View.VISIBLE);

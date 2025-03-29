@@ -75,11 +75,8 @@ public class DatabaseManager {
             Map<String, Object> moodMap = new HashMap<>();
             moodMap.put("userId", userId);
             moodMap.put("emotion", moodEvent.getEmotion());
-            if(moodEvent.getDescription().isEmpty()){
-                moodMap.put("description", "None provided");
-            }else{
-                moodMap.put("description", moodEvent.getDescription());
-            }
+            moodMap.put("description", moodEvent.getDescription());
+
 
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
