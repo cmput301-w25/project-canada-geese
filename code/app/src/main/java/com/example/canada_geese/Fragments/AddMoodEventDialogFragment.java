@@ -103,6 +103,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
     private Bitmap selectedImage = null;
     private ArrayList<Bitmap> selectedImages = new ArrayList<>();
+    private ArrayList<String> retainedImageUrls = new ArrayList<>();
 
     private HorizontalScrollView imagesScrollView;
     private LinearLayout imagesContainer;
@@ -289,12 +290,13 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                 if (mapContainer != null) {
                     mapContainer.setVisibility(View.VISIBLE);
                 }
-                showUserLocation();
+                showUserLocation(view);
             }
 
             // Load image URLs
             List<String> imageUrls = moodToEdit.getImageUrls();
             if (imageUrls != null && !imageUrls.isEmpty()) {
+                retainedImageUrls.clear(); // Reset when editing
                 for (String url : imageUrls) {
                     loadImageFromUrl(url); // ⬅️ We'll define this next
                 }
@@ -374,7 +376,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         addLocationCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             View mapContainer = view.findViewById(R.id.map_container);
             if (isChecked) {
-                requestLocationPermission();
+                requestLocationPermission(view);
                 if (mapContainer != null) {
                     mapContainer.setVisibility(View.VISIBLE);
                 }
@@ -425,15 +427,8 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                 updatedMood.setImageUrls(moodToEdit.getImageUrls()); // reuse old image URLs
                 updatedMood.setUserId(moodToEdit.getUserId());       // reuse user ID
 
-                DatabaseManager.getInstance().updateMoodEvent(updatedMood, documentIdToUpdate, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Mood updated successfully", Toast.LENGTH_SHORT).show();
-                        dismiss(); // close the dialog
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to update mood", Toast.LENGTH_SHORT).show();
-                        Log.e("UpdateMood", "Error updating mood event", task.getException());
-                    }
-                });
+                ArrayList<String> finalImageUrls = new ArrayList<>(retainedImageUrls); // Keep retained
+                uploadImagesThenUpdateMood(updatedMood);
 
             } else {
                 // ➕ ADD MODE LOGIC (your original code)
@@ -475,23 +470,85 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
         // Move this call here to avoid getView() being null
         if (isEditMode && moodToEdit != null && moodToEdit.HasLocation()) {
-            showUserLocation();
+            showUserLocation(view);;
         }
     }
 
+    private void uploadImagesThenUpdateMood(MoodEventModel updatedMood) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = user.getUid();
+        ArrayList<String> finalUrls = new ArrayList<>(retainedImageUrls);
+
+        if (selectedImages.isEmpty()) {
+            updatedMood.setImageUrls(finalUrls);
+            updateMoodInDatabase(updatedMood);
+            return;
+        }
+
+        ArrayList<String> uploadedUrls = new ArrayList<>();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+        for (int i = 0; i < selectedImages.size(); i++) {
+            Bitmap bitmap = selectedImages.get(i);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            byte[] data = baos.toByteArray();
+
+            String filename = "mood_images/" + userId + "/" + System.currentTimeMillis() + "_edit" + i + ".jpg";
+            StorageReference imgRef = storageRef.child(filename);
+
+            int finalI = i;
+            imgRef.putBytes(data)
+                    .addOnSuccessListener(taskSnapshot ->
+                            imgRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                uploadedUrls.add(uri.toString());
+                                if (uploadedUrls.size() == selectedImages.size()) {
+                                    finalUrls.addAll(uploadedUrls);
+                                    updatedMood.setImageUrls(finalUrls);
+                                    updateMoodInDatabase(updatedMood);
+                                }
+                            }))
+                    .addOnFailureListener(e ->
+                            Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        }
+    }
+
+    private void updateMoodInDatabase(MoodEventModel mood) {
+        DatabaseManager.getInstance().updateMoodEvent(mood, documentIdToUpdate, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireContext(), "Mood updated successfully", Toast.LENGTH_SHORT).show();
+                dismiss();
+            } else {
+                Toast.makeText(requireContext(), "Failed to update mood", Toast.LENGTH_SHORT).show();
+                Log.e("UpdateMood", "Error updating mood event", task.getException());
+            }
+        });
+    }
+
     private void loadImageFromUrl(String imageUrl) {
-        ImageView imageView = new ImageView(requireContext());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, 16, 0, 16);
-        imageView.setLayoutParams(params);
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imageView.setAdjustViewBounds(true);
+        retainedImageUrls.add(imageUrl); // Track what's kept
+
+        View imageLayout = LayoutInflater.from(requireContext()).inflate(R.layout.item_image, imagesContainer, false);
+        ImageView imageView = imageLayout.findViewById(R.id.image_view);
+        ImageButton deleteButton = imageLayout.findViewById(R.id.btn_delete);
 
         Glide.with(requireContext()).load(imageUrl).into(imageView);
-        imagesContainer.addView(imageView);
+
+        deleteButton.setOnClickListener(v -> {
+            imagesContainer.removeView(imageLayout);
+            retainedImageUrls.remove(imageUrl);
+            if (imagesContainer.getChildCount() == 0) {
+                imagesScrollView.setVisibility(View.GONE);
+            }
+        });
+
+        imagesContainer.addView(imageLayout);
         imagesScrollView.setVisibility(View.VISIBLE);
     }
 
@@ -697,11 +754,11 @@ private void askgalleryPermission() {
         }
         dismiss();
     }
-    private void requestLocationPermission() {
+    private void requestLocationPermission(View rootView) {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
         } else {
-            showUserLocation();
+            showUserLocation(rootView);
         }
     }
     @Override
@@ -710,7 +767,7 @@ private void askgalleryPermission() {
 
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showUserLocation();
+                showUserLocation(requireView());
             } else {
                 addLocationCheckbox.setChecked(false);
             }
@@ -733,10 +790,10 @@ private void askgalleryPermission() {
      * Shows the user's current location on the map.
      */
 
-    private void showUserLocation() {
-        Switch locationCheckbox = getView().findViewById(R.id.attach_location_checkbox);
+    private void showUserLocation(View rootView) {
+        Switch locationCheckbox = rootView.findViewById(R.id.attach_location_checkbox);
         if (locationCheckbox != null && locationCheckbox.isChecked()) { // ✅ Only show map if checked
-            View mapContainer = getView().findViewById(R.id.map_container);
+            View mapContainer = rootView.findViewById(R.id.map_container);
             if (mapContainer != null) {
                 mapContainer.setVisibility(View.VISIBLE);
             }

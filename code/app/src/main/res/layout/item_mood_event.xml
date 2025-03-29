@@ -82,6 +82,7 @@
             android:layout_marginTop="8dp"
             android:orientation="vertical"
             android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/comment_button2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mood_emoji">
@@ -138,17 +139,6 @@
                 android:layout_marginTop="8dp"
                 android:visibility="gone" />
 
-            <ImageButton
-                android:id="@+id/options_menu_button"
-                android:layout_width="49dp"
-                android:layout_height="34dp"
-                android:layout_gravity="left|end"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="Options menu"
-                android:src="@drawable/ic_more_vert_24"
-                android:visibility="visible" />
         </LinearLayout>
 
         <!-- Edit container (only visible in edit mode) -->
@@ -216,5 +206,17 @@
 
             </LinearLayout>
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/options_menu_button"
+            android:layout_width="49dp"
+            android:layout_height="34dp"
+            android:layout_gravity="left|end"
+            android:background="@android:color/transparent"
+            android:contentDescription="Options menu"
+            android:src="@drawable/ic_more_vert_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
