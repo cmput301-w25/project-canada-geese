@@ -63,6 +63,7 @@
     <string name="delete_mood">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="save_button">Save Changes</string>
 
     <!-- Delete Confirmation -->
     <string name="delete_confirmation_title">Are You Sure You Want to Delete?</string>

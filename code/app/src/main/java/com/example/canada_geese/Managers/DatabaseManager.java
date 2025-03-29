@@ -84,7 +84,7 @@ public class DatabaseManager {
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
-            moodMap.put("isPublic", moodEvent.hasTriggerWarning());
+            moodMap.put("isPrivate", moodEvent.hasTriggerWarning());
             moodMap.put("socialSituation", moodEvent.getSocialSituation());
 
             if (moodEvent.HasLocation()) {

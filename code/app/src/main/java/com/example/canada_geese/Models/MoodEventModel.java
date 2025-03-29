@@ -1,7 +1,5 @@
 package com.example.canada_geese.Models;
 
-import com.google.firebase.firestore.ServerTimestamp;
-
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -14,7 +12,7 @@ public class MoodEventModel {
     private Date timestamp;
     private String emoji;
     private int color;
-    private boolean isPrivate;
+    private boolean isPublic;
     private boolean hasLocation;
     private double latitude;
     private double longitude;
@@ -48,7 +46,7 @@ public class MoodEventModel {
         this.timestamp = timestamp;
         this.emoji = emoji;
         this.color = color;
-        this.isPrivate = isPrivate;
+        this.isPublic = isPrivate;
         this.hasLocation = hasLocation;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -102,28 +100,28 @@ public class MoodEventModel {
         this.color = color;
     }
 
-    public boolean isPrivate() {
-        return isPrivate;
+    public boolean isPublic() {
+        return isPublic;
     }
 
     public void setIsPrivate(boolean isPrivate) {
-        this.isPrivate = isPrivate;
+        this.isPublic = isPrivate;
     }
 
     public boolean getIsPrivate() {
-        return isPrivate;
+        return isPublic;
     }
 
     public boolean hasTriggerWarning() {
-        return isPrivate;
+        return isPublic;
     }
 
     public void setTriggerWarning(boolean triggerWarning) {
-        this.isPrivate = triggerWarning;
+        this.isPublic = triggerWarning;
     }
 
     public boolean getTriggerWarning() {
-        return isPrivate;
+        return isPublic;
     }
 
     public boolean HasLocation() {

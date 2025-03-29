@@ -2,14 +2,12 @@ package com.example.canada_geese.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,9 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -32,7 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import android.widget.PopupMenu;
+
+import java.util.Set;
+
 
 import android.os.Handler;
 import android.os.Looper;
@@ -233,7 +233,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
     private void populateEditFields(ViewHolder holder, MoodEventModel event) {
-        holder.privateMoodEdit.setChecked(event.isPrivate());
+        holder.privateMoodEdit.setChecked(event.isPublic());
         holder.descriptionEdit.setText(event.getDescription());
 
         holder.saveButton.setOnClickListener(v -> {
@@ -326,20 +326,24 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         notifyDataSetChanged();
     }
 
-    public void filter(String query, boolean last7Days, String selectedMood) {
-        this.moodEventList.clear();
-        long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
-        for (MoodEventModel e : moodEventListFull) {
-            if (e.getTimestamp() == null) continue;
-            boolean matchDate = !last7Days || e.getTimestamp().getTime() >= cutoff;
-            boolean matchQuery = query.isEmpty() || e.getDescription().toLowerCase().contains(query.toLowerCase());
-            boolean matchMood = selectedMood.isEmpty() || e.getEmotion().equalsIgnoreCase(selectedMood);
-            if (matchDate && matchQuery && matchMood) moodEventList.add(e);
-        }
-        expandedPosition = -1;
-        isInEditMode = false;
-        notifyDataSetChanged();
-    }
+   public void filter(String query, boolean last7Days, Set<String> selectedMoods, boolean isPrivateSelected) {
+       this.moodEventList.clear();
+       long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+       for (MoodEventModel e : moodEventListFull) {
+           if (e.getTimestamp() == null) continue;
+           boolean matchDate = !last7Days || e.getTimestamp().getTime() >= cutoff;
+           boolean matchQuery = query.isEmpty() || e.getDescription().toLowerCase().contains(query.toLowerCase());
+
+           // Check if this mood event matches any of the selected moods
+           boolean matchMood = selectedMoods.isEmpty() || selectedMoods.contains(e.getEmotion());
+
+           boolean matchesPrivacy = !isPrivateSelected || e.hasTriggerWarning();
+           if (matchDate && matchQuery && matchMood && matchesPrivacy) moodEventList.add(e);
+       }
+       expandedPosition = -1;
+       isInEditMode = false;
+       notifyDataSetChanged();
+   }
 
     public void collapseExpandedItem() {
         if (expandedPosition != -1) {

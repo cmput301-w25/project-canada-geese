@@ -1,71 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Google Map Fragment (background) -->
+
+    <!-- Top bar with search view, buttons, and chips -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-    <!-- Top bar with search view and buttons -->
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:background="@android:color/white"
         android:alpha="0.9"
-        android:padding="8dp"
-        android:elevation="5dp">
+        android:background="@android:color/white"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:padding="8dp">
 
-        <!-- SearchView for searching locations -->
-        <SearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:queryHint="Search location"
-            android:iconifiedByDefault="false"
-            android:background="@drawable/bg_search_view"/>
-
-        <!-- Row for buttons -->
+        <!-- Row for SearchView and Filter Button -->
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="3"
-            android:paddingTop="8dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Memory Button -->
-            <Button
-                android:id="@+id/btnMemory"
+            <!-- SearchView for searching locations -->
+            <SearchView
+                android:id="@+id/search_view"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:layout_weight="1"
+                android:background="@drawable/bg_search_view"
+                android:iconifiedByDefault="false"
+                android:queryHint="Search location" />
+
+            <!-- Filter Button -->
+            <ImageButton
+                android:id="@+id/filter_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/baseline_filter_alt_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Filter" />
+        </LinearLayout>
+
+        <!-- Row for Memory and Friends Chips -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+
+            <!-- Memory Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/btnMemory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:checkable="true"
                 android:text="Memory" />
 
-            <!-- Friends Button -->
-
-            <!-- Filter Icon -->
-            <Button
+            <!-- Friends Chip -->
+            <com.google.android.material.chip.Chip
                 android:id="@+id/btnFriends"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:checkable="true"
                 android:text="Friends" />
+        </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/btnFilter"
+        <!-- Filter Mood Chips -->
+        <HorizontalScrollView
+            android:id="@+id/filter_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/filter_chip_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Filter"
-                android:src="@drawable/baseline_filter_alt_24" />
-        </LinearLayout>
+                android:orientation="horizontal"
+                app:singleSelection="false"
+                >
+
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_last_7_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/last_7_days"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_clear_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_all"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_anger"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Anger"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_confusion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Confusion"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_disgust"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Disgust"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_fear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fear"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_happiness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Happiness"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_sadness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sadness"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_shame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shame"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_mood_surprise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Surprise"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/black"
+                    app:chipStrokeWidth="1dp"
+                    />
+
+
+                <!-- More Mood Chips... -->
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
     </LinearLayout>
 
 </FrameLayout>

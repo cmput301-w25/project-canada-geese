@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:background="@android:color/transparent">
 
-    <!-- HorizontalScrollView containing all elements -->
     <HorizontalScrollView
         android:id="@+id/filter_scroll_view"
         android:layout_width="match_parent"
@@ -14,134 +14,152 @@
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        >
 
-        <LinearLayout
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/filter_chip_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:singleSelection="false">
 
-            <!-- "Last 7 Days" Button -->
-            <Button
-                android:id="@+id/btn_last_7_days"
+            <!-- "Last 7 Days" Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_last_7_days"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="@string/last_7_days"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                app:checkedIconVisible="false"/>
 
-            <!-- Mood Selection Spinner -->
-            <Spinner
-                android:id="@+id/spinner_mood"
+            <!-- "Clear All" Chip -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_clear_all"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:minWidth="100dp"
-                android:spinnerMode="dropdown"
-                android:background="@drawable/filter_button_background"
-                android:popupBackground="@color/white"
-                android:layout_marginEnd="8dp" />
-
-            <!-- "Clear All" Button -->
-            <Button
-                android:id="@+id/btn_clear_all"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="@string/clear_all"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                app:checkedIconVisible="false"/>
 
-            <!-- Anger Button -->
-            <Button
-                android:id="@+id/btn_mood_anger"
+            <!-- Mood Chips -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_anger"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Anger"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Confusion Button -->
-            <Button
-                android:id="@+id/btn_mood_confusion"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_confusion"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Confusion"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Disgust Button -->
-            <Button
-                android:id="@+id/btn_mood_disgust"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_disgust"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Disgust"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Fear Button -->
-            <Button
-                android:id="@+id/btn_mood_fear"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_fear"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Fear"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Happiness Button -->
-            <Button
-                android:id="@+id/btn_mood_happiness"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_happiness"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Happiness"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Sadness Button -->
-            <Button
-                android:id="@+id/btn_mood_sadness"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_sadness"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Sadness"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Shame Button -->
-            <Button
-                android:id="@+id/btn_mood_shame"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_shame"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Shame"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-            <!-- Surprise Button -->
-            <Button
-                android:id="@+id/btn_mood_surprise"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_surprise"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:background="@drawable/filter_button_background"
+                android:layout_height="wrap_content"
                 android:text="Surprise"
-                android:textColor="#000000"
-                android:textSize="13sp" />
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_calm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calm"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
 
-        </LinearLayout>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mood_private"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Private"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                app:chipBackgroundColor="@color/white"
+                app:chipStrokeColor="@color/black"
+                app:chipStrokeWidth="1dp"
+                />
+
+
+        </com.google.android.material.chip.ChipGroup>
+
     </HorizontalScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
