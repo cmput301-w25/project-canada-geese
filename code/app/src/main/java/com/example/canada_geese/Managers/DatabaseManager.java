@@ -158,7 +158,7 @@ public class DatabaseManager {
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
-            moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("isPrivate", moodEvent.hasTriggerWarning());
             moodMap.put("hasLocation", moodEvent.HasLocation());
             moodMap.put("socialSituation", moodEvent.getSocialSituation());
             if (moodEvent.HasLocation()) {
@@ -388,7 +388,7 @@ public class DatabaseManager {
                     Task<QuerySnapshot> moodTask = db.collection("users")
                             .document(followedId)
                             .collection("moodEvents")
-                            .whereEqualTo("isPublic", true) // 👈 ONLY public moods
+                            .whereEqualTo("isPrivate", false) // 👈 ONLY public moods
                             .orderBy("timestamp", Query.Direction.DESCENDING)
                             .limit(3)
                             .get();
