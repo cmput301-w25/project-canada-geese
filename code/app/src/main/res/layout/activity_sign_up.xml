@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F1ED"
+    android:layout_gravity="center"
     tools:context=".Pages.SignUpActivity">
 
     <!-- Sign Up -->

@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:drawable/editbox_background"
+            android:background="@drawable/rounded_search_view"
             android:iconifiedByDefault="false"
             android:padding="5dp"
             android:queryHint="Search..." />
@@ -66,16 +66,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="374dp"
-        android:layout_height="484dp"
-        android:padding="10dp"
-        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.515"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.89" />
+        app:layout_constraintTop_toBottomOf="@+id/top_banner"
+        android:scrollbars="vertical"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
