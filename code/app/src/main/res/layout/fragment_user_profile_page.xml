@@ -55,52 +55,64 @@
     </LinearLayout>
 
     <!-- Regular profile content -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profile_content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        android:gravity="center"
-        android:orientation="vertical"
         android:visibility="visible">
 
         <ImageView
             android:id="@+id/profile_image"
             android:layout_width="140dp"
             android:layout_height="140dp"
-            android:layout_marginTop="55dp"
             android:background="@drawable/circle_border"
             android:clickable="true"
             android:focusable="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/circle_border" />
+            android:src="@drawable/circle_border"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.04000002" />
+
+        <!-- Followers & Following Section -->
 
         <TextView
             android:id="@+id/username_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/yourusername"
             android:textColor="#6B4F3F"
             android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profile_image" />
+
         <TextView
             android:id="@+id/about_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text="About me text goes here"
+            android:textAlignment="center"
             android:textColor="#6B4F3F"
+            android:textSize="16sp"
             android:visibility="visible"
-            android:textSize="16sp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/follow_stats_container"
+            app:layout_constraintVertical_bias="0.050000012" />
 
-        <!-- Followers & Following Section -->
         <LinearLayout
             android:id="@+id/follow_stats_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username_text">
 
             <LinearLayout
                 android:id="@+id/followers_section"
@@ -117,7 +129,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="150"
                     android:textColor="#6B4F3F"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -147,7 +158,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="120"
                     android:textColor="#6B4F3F"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -165,15 +175,16 @@
 
         <ListView
             android:id="@+id/followers_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
+            android:layout_width="409dp"
+            android:layout_height="365dp"
             android:clickable="true"
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"
             android:focusable="true"
-            android:visibility="gone" />
-    </LinearLayout>
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/about_text"
+            tools:layout_editor_absoluteX="2dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Search results container (initially hidden) -->
     <LinearLayout

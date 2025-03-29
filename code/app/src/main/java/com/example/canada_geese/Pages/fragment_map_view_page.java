@@ -79,6 +79,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private ImageButton filterButton;
     private HorizontalScrollView filterScrollView;
     private ChipGroup filterChipGroup;
+    private double currentUserLatitude = 0.0;
+    private double currentUserLongitude = 0.0;
+    private boolean currentLocationAvailable = false;
 
 
 
@@ -206,7 +209,16 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         List<MoodEventModel> sourceList = isFriendsMode ? friendsMoodEventList : moodEventList;
 
         for (MoodEventModel moodEvent : sourceList) {
-            if (selectedMoods.isEmpty() || selectedMoods.contains(moodEvent.getEmotion())) {
+            if ((selectedMoods.isEmpty() || selectedMoods.contains(moodEvent.getEmotion())) && moodEvent.HasLocation()) {
+                if (currentLocationAvailable) {
+                    double distance = calculateDistanceInKm(
+                            currentUserLatitude, currentUserLongitude,
+                            moodEvent.getLatitude(), moodEvent.getLongitude()
+                    );
+
+                    if (distance > 5.0) continue; // Skip events farther than 5 km
+                }
+
                 filteredList.add(moodEvent);
             }
         }
@@ -258,7 +270,11 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         fusedLocationClient.getCurrentLocation(com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(requireActivity(), location -> {
                     if (location != null) {
-                        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        currentUserLatitude = location.getLatitude();
+                        currentUserLongitude = location.getLongitude();
+                        currentLocationAvailable = true;
+
+                        LatLng userLocation = new LatLng(currentUserLatitude, currentUserLongitude);
                         mMap.addMarker(new MarkerOptions().position(userLocation).title("You are here"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
                     }
@@ -373,7 +389,21 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                     if (moodEvents != null) {
                         for (MoodEventModel moodEvent : moodEvents) {
                             if (moodEvent.HasLocation()) {
-                                friendsMoodEventList.add(moodEvent);
+                                if (currentLocationAvailable) {
+                                    double distance = calculateDistanceInKm(
+                                            currentUserLatitude,
+                                            currentUserLongitude,
+                                            moodEvent.getLatitude(),
+                                            moodEvent.getLongitude()
+                                    );
+
+                                    if (distance <= 5.0) {
+                                        friendsMoodEventList.add(moodEvent);
+                                    }
+                                } else {
+                                    // Optional: If location isn’t available yet, either skip or add it anyway
+                                    friendsMoodEventList.add(moodEvent);
+                                }
                             }
                         }
                         addFriendsMoodEventMarkers();
@@ -386,6 +416,19 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                 }
             });
         });
+    }
+
+    private double calculateDistanceInKm(double lat1, double lon1, double lat2, double lon2) {
+        double earthRadius = 6371.0; // in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c;
     }
 
 

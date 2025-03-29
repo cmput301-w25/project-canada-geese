@@ -167,20 +167,31 @@ public class fragment_user_moods_page extends Fragment {
         Fragment existingFragment = fragmentManager.findFragmentById(R.id.filter_bar_fragment_container);
 
         View filterButtonsContainer = getView().findViewById(R.id.filter_bar_fragment_container);
+        View spaceAboveRecycler = getView().findViewById(R.id.space); // 👈 Add this
 
         if (existingFragment == null) {
+            // Show both the filter bar and space
+            if (filterButtonsContainer != null) {
+                filterButtonsContainer.setVisibility(View.VISIBLE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.VISIBLE);
+            }
+
             FilterBarFragment filterBarFragment = new FilterBarFragment();
             filterBarFragment.setAdapter(adapter);
             transaction.replace(R.id.filter_bar_fragment_container, filterBarFragment);
             transaction.commit();
-            if (filterButtonsContainer != null) {
-                filterButtonsContainer.setVisibility(View.VISIBLE);
-            }
         } else {
+            // Hide both the filter bar and space
             transaction.remove(existingFragment);
             transaction.commit();
+
             if (filterButtonsContainer != null) {
-                filterButtonsContainer.setVisibility(View.INVISIBLE);
+                filterButtonsContainer.setVisibility(View.GONE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.GONE);
             }
         }
     }

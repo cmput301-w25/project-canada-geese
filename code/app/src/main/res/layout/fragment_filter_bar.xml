@@ -34,7 +34,7 @@
                 app:chipBackgroundColor="@color/white"
                 app:chipStrokeColor="@color/black"
                 app:chipStrokeWidth="1dp"
-                app:checkedIconVisible="false"/>
+                />
 
             <!-- "Clear All" Chip -->
             <com.google.android.material.chip.Chip

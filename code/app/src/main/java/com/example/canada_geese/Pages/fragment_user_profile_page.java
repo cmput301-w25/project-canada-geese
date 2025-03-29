@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -77,7 +78,7 @@ public class fragment_user_profile_page extends Fragment{
     private RecyclerView searchResultsList;
     private RecyclerView followRequestsList;
     LinearLayout searchResultsContainer;
-    LinearLayout profileContentContainer;
+    ConstraintLayout profileContentContainer;
     private List<String> userList;
     private List<Users> AllUsers;
     private UsersAdapter usersAdapter;
