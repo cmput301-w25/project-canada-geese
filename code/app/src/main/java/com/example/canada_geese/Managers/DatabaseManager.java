@@ -160,11 +160,17 @@ public class DatabaseManager {
             moodMap.put("color", moodEvent.getColor());
             moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
             moodMap.put("hasLocation", moodEvent.HasLocation());
+            moodMap.put("socialSituation", moodEvent.getSocialSituation());
             if (moodEvent.HasLocation()) {
                 moodMap.put("latitude", moodEvent.getLatitude());
                 moodMap.put("longitude", moodEvent.getLongitude());
             }
 
+            if (moodEvent.getImageUrls() != null && !moodEvent.getImageUrls().isEmpty()) {
+                moodMap.put("imageUrls", moodEvent.getImageUrls());
+            } else {
+                moodMap.put("imageUrls", new ArrayList<>()); // 🔄 Optional: clear all if none
+            }
             // Update the document
             db.collection("users").document(userId)
                     .collection("moodEvents").document(documentId)

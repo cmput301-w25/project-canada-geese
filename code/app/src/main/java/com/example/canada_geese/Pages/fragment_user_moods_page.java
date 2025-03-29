@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Fragments.AddMoodEventDialogFragment;
 import com.example.canada_geese.Fragments.CommentsFragment;
 import com.example.canada_geese.Fragments.FilterBarFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
@@ -197,7 +198,14 @@ public class fragment_user_moods_page extends Fragment {
 
         // Edit listener - used to handle UI transitions in the adapter
         adapter.setOnMoodEventEditListener((moodEvent, position) -> {
-            // No additional action needed here - the adapter handles the UI transition
+            AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
+            dialog.setMoodToEdit(moodEvent, moodEvent.getDocumentId());
+
+            dialog.setOnDismissListener(() -> {
+                refreshMoodEventList(); // Refresh after editing
+            });
+
+            dialog.show(getChildFragmentManager(), "EditMoodDialog");
         });
 
         // Long click listener - Show delete confirmation

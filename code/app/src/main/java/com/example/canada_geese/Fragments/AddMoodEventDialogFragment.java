@@ -44,6 +44,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.MoodEventModel;
 import com.example.canada_geese.R;
@@ -69,6 +70,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -101,6 +103,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
     private Bitmap selectedImage = null;
     private ArrayList<Bitmap> selectedImages = new ArrayList<>();
+    private ArrayList<String> retainedImageUrls = new ArrayList<>();
 
     private HorizontalScrollView imagesScrollView;
     private LinearLayout imagesContainer;
@@ -109,6 +112,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private ActivityResultLauncher<PickVisualMediaRequest> photoPickerLauncher;
     private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
 
+    private MoodEventModel moodToEdit = null;
+    private boolean isEditMode = false;
+    private String documentIdToUpdate = null;
     public interface OnDismissListener {
         void onDismiss();
     }
@@ -219,6 +225,8 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         addLocationCheckbox = view.findViewById(R.id.attach_location_checkbox);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
+
+
         String[] moodArray = new String[]{
                 "Happiness 😊", "Anger 😠", "Sadness 😢", "Fear 😨",
                 "Calm 😌", "Confusion 😕", "Disgust 🤢", "Shame 😳", "Surprise 😮"
@@ -241,6 +249,59 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                 socialSituationArray
         );
         socialSituationSpinner.setAdapter(socialAdapter);
+
+        if (isEditMode && moodToEdit != null) {
+            // Change button text
+            addMoodButton.setText("Save");
+
+            // Description
+            EditText descriptionInput = view.findViewById(R.id.description_input);
+            descriptionInput.setText(moodToEdit.getDescription());
+
+            // Trigger warning checkbox
+            Switch triggerWarningCheckbox = view.findViewById(R.id.trigger_warning_checkbox);
+            triggerWarningCheckbox.setChecked(moodToEdit.hasTriggerWarning());
+
+            // Set mood spinner
+            for (int i = 0; i < moodSpinner.getCount(); i++) {
+                String moodItem = moodSpinner.getItemAtPosition(i).toString();
+                if (moodItem.startsWith(moodToEdit.getEmotion())) {
+                    moodSpinner.setSelection(i);
+                    break;
+                }
+            }
+
+            // Set social situation spinner
+            for (int i = 0; i < socialSituationSpinner.getCount(); i++) {
+                if (socialSituationSpinner.getItemAtPosition(i).toString().equalsIgnoreCase(moodToEdit.getSocialSituation())) {
+                    socialSituationSpinner.setSelection(i);
+                    break;
+                }
+            }
+
+            // Location
+            if (moodToEdit.HasLocation()) {
+                addLocationCheckbox.setChecked(true);
+                currentLatitude = moodToEdit.getLatitude();
+                currentLongitude = moodToEdit.getLongitude();
+                locationRetrieved = true;
+
+                View mapContainer = view.findViewById(R.id.map_container);
+                if (mapContainer != null) {
+                    mapContainer.setVisibility(View.VISIBLE);
+                }
+                showUserLocation(view);
+            }
+
+            // Load image URLs
+            List<String> imageUrls = moodToEdit.getImageUrls();
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                retainedImageUrls.clear(); // Reset when editing
+                for (String url : imageUrls) {
+                    loadImageFromUrl(url); // ⬅️ We'll define this next
+                }
+            }
+        }
 
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -315,7 +376,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         addLocationCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             View mapContainer = view.findViewById(R.id.map_container);
             if (isChecked) {
-                requestLocationPermission();
+                requestLocationPermission(view);
                 if (mapContainer != null) {
                     mapContainer.setVisibility(View.VISIBLE);
                 }
@@ -329,67 +390,168 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         // click listener for the add mood button
         addMoodButton.setOnClickListener(v -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (currentUser != null) {
-                String selectedMood = moodSpinner.getSelectedItem().toString();
-                String moodName = selectedMood.split(" ")[0];
-                Switch triggerWarningCheckbox = getView().findViewById(R.id.trigger_warning_checkbox);
-                boolean triggerWarning = triggerWarningCheckbox.isChecked();
+            if (currentUser == null) {
+                Log.e("Auth", "User not logged in! Cannot add/edit mood.");
+                Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+            String selectedMood = moodSpinner.getSelectedItem().toString();
+            String moodName = selectedMood.split(" ")[0];
+            Switch triggerWarningCheckbox = requireView().findViewById(R.id.trigger_warning_checkbox);
+            boolean triggerWarning = triggerWarningCheckbox.isChecked();
 
-                EditText descriptionInput = getView().findViewById(R.id.description_input);
-                String description = descriptionInput.getText().toString();
+            String socialSituation = socialSituationSpinner.getSelectedItem().toString();
 
+            EditText descriptionInput = requireView().findViewById(R.id.description_input);
+            String description = descriptionInput.getText().toString();
 
+            boolean hasLocation = addLocationCheckbox.isChecked();
+            double latitude = (hasLocation && locationRetrieved) ? currentLatitude : 0.0;
+            double longitude = (hasLocation && locationRetrieved) ? currentLongitude : 0.0;
 
-                boolean hasLocation = addLocationCheckbox.isChecked();
-                double latitude = 0.0;
-                double longitude = 0.0;
+            if (isEditMode && moodToEdit != null && documentIdToUpdate != null) {
+                // 🔁 EDIT MODE LOGIC
+                MoodEventModel updatedMood = new MoodEventModel(
+                        moodName,
+                        description,
+                        moodToEdit.getTimestamp(), // preserve original timestamp
+                        getEmojiForEmotion(moodName),
+                        getColorForEmotion(moodName),
+                        triggerWarning,
+                        hasLocation,
+                        latitude,
+                        longitude
+                );
+                updatedMood.setSocialSituation(socialSituation);
+                updatedMood.setImageUrls(moodToEdit.getImageUrls()); // reuse old image URLs
+                updatedMood.setUserId(moodToEdit.getUserId());       // reuse user ID
+
+                ArrayList<String> finalImageUrls = new ArrayList<>(retainedImageUrls); // Keep retained
+                uploadImagesThenUpdateMood(updatedMood);
+
+            } else {
+                // ➕ ADD MODE LOGIC (your original code)
 
                 if (hasLocation) {
-                    // Use the stored location values instead of hardcoded ones
                     if (locationRetrieved) {
-                        latitude = currentLatitude;
-                        longitude = currentLongitude;
-
-                        // Create and save the mood event with the retrieved location
                         saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, latitude, longitude, selectedImages);
                     } else {
-                        // If location wasn't retrieved yet, try to get it now
                         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
                                 if (location != null) {
-                                    // Create and save the mood event with the retrieved location
                                     saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, location.getLatitude(), location.getLongitude(), selectedImages);
                                 } else {
-                                    // Create and save the mood event without location
                                     saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                                     Toast.makeText(requireContext(), "Could not get location", Toast.LENGTH_SHORT).show();
                                 }
                             }).addOnFailureListener(e -> {
-                                // Handle location retrieval failure
                                 Toast.makeText(requireContext(), "Failed to get location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                             });
                             return;
                         } else {
-                            // No location permission, save without location
                             saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                             Toast.makeText(requireContext(), "Location permission not granted", Toast.LENGTH_SHORT).show();
                         }
                     }
                 } else {
-                    // No location requested, save without location
                     saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                 }
-            } else {
-                Log.e("Auth", "User not logged in! Cannot add mood.");
-                Toast.makeText(requireContext(), "Error: User not logged in!", Toast.LENGTH_SHORT).show();
             }
         });
 
         return view;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Move this call here to avoid getView() being null
+        if (isEditMode && moodToEdit != null && moodToEdit.HasLocation()) {
+            showUserLocation(view);;
+        }
+    }
+
+    private void uploadImagesThenUpdateMood(MoodEventModel updatedMood) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = user.getUid();
+        ArrayList<String> finalUrls = new ArrayList<>(retainedImageUrls);
+
+        if (selectedImages.isEmpty()) {
+            updatedMood.setImageUrls(finalUrls);
+            updateMoodInDatabase(updatedMood);
+            return;
+        }
+
+        ArrayList<String> uploadedUrls = new ArrayList<>();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+        for (int i = 0; i < selectedImages.size(); i++) {
+            Bitmap bitmap = selectedImages.get(i);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            byte[] data = baos.toByteArray();
+
+            String filename = "mood_images/" + userId + "/" + System.currentTimeMillis() + "_edit" + i + ".jpg";
+            StorageReference imgRef = storageRef.child(filename);
+
+            int finalI = i;
+            imgRef.putBytes(data)
+                    .addOnSuccessListener(taskSnapshot ->
+                            imgRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                uploadedUrls.add(uri.toString());
+                                if (uploadedUrls.size() == selectedImages.size()) {
+                                    finalUrls.addAll(uploadedUrls);
+                                    updatedMood.setImageUrls(finalUrls);
+                                    updateMoodInDatabase(updatedMood);
+                                }
+                            }))
+                    .addOnFailureListener(e ->
+                            Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        }
+    }
+
+    private void updateMoodInDatabase(MoodEventModel mood) {
+        DatabaseManager.getInstance().updateMoodEvent(mood, documentIdToUpdate, task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireContext(), "Mood updated successfully", Toast.LENGTH_SHORT).show();
+                dismiss();
+            } else {
+                Toast.makeText(requireContext(), "Failed to update mood", Toast.LENGTH_SHORT).show();
+                Log.e("UpdateMood", "Error updating mood event", task.getException());
+            }
+        });
+    }
+
+    private void loadImageFromUrl(String imageUrl) {
+        retainedImageUrls.add(imageUrl); // Track what's kept
+
+        View imageLayout = LayoutInflater.from(requireContext()).inflate(R.layout.item_image, imagesContainer, false);
+        ImageView imageView = imageLayout.findViewById(R.id.image_view);
+        ImageButton deleteButton = imageLayout.findViewById(R.id.btn_delete);
+
+        Glide.with(requireContext()).load(imageUrl).into(imageView);
+
+        deleteButton.setOnClickListener(v -> {
+            imagesContainer.removeView(imageLayout);
+            retainedImageUrls.remove(imageUrl);
+            if (imagesContainer.getChildCount() == 0) {
+                imagesScrollView.setVisibility(View.GONE);
+            }
+        });
+
+        imagesContainer.addView(imageLayout);
+        imagesScrollView.setVisibility(View.VISIBLE);
+    }
+
     private void showImageSelectionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Select Image Source");
@@ -592,11 +754,11 @@ private void askgalleryPermission() {
         }
         dismiss();
     }
-    private void requestLocationPermission() {
+    private void requestLocationPermission(View rootView) {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
         } else {
-            showUserLocation();
+            showUserLocation(rootView);
         }
     }
     @Override
@@ -605,7 +767,7 @@ private void askgalleryPermission() {
 
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showUserLocation();
+                showUserLocation(requireView());
             } else {
                 addLocationCheckbox.setChecked(false);
             }
@@ -628,10 +790,10 @@ private void askgalleryPermission() {
      * Shows the user's current location on the map.
      */
 
-    private void showUserLocation() {
-        Switch locationCheckbox = getView().findViewById(R.id.attach_location_checkbox);
+    private void showUserLocation(View rootView) {
+        Switch locationCheckbox = rootView.findViewById(R.id.attach_location_checkbox);
         if (locationCheckbox != null && locationCheckbox.isChecked()) { // ✅ Only show map if checked
-            View mapContainer = getView().findViewById(R.id.map_container);
+            View mapContainer = rootView.findViewById(R.id.map_container);
             if (mapContainer != null) {
                 mapContainer.setVisibility(View.VISIBLE);
             }
@@ -721,5 +883,10 @@ private void askgalleryPermission() {
             case "Surprise": return R.color.color_surprise;
             default: return R.color.colorPrimaryDark;
         }
+    }
+    public void setMoodToEdit(MoodEventModel mood, String documentId) {
+        this.moodToEdit = mood;
+        this.isEditMode = true;
+        this.documentIdToUpdate = documentId;
     }
 }
