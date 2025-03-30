@@ -17,15 +17,15 @@
     <color name="green">#4CAF50</color>
 
     <!-- Emotional State Colors -->
-    <color name="color_happiness">#F4D06F</color>
-    <color name="color_anger">#D98E8E</color>
-    <color name="color_sadness">#A1C3D1</color>
-    <color name="color_fear">#DAB1DA</color>
+    <color name="color_happiness">#FFE082</color>
+    <color name="color_anger">#FFAB91</color>
+    <color name="color_sadness">#B4CBF0</color>
+    <color name="color_fear">#90CAF9</color>
     <color name="color_calm">#BDD4BC</color>
-    <color name="color_confusion">#FF9800</color>
-    <color name="color_disgust">#8BC34A</color>
-    <color name="color_shame">#FF5722</color>
-    <color name="color_surprise">#9C27B0</color>
+    <color name="color_confusion">#D1C4E9</color>
+    <color name="color_disgust">#C5E1A5</color>
+    <color name="color_shame">#CE93D8</color>
+    <color name="color_surprise"> #FFF59D</color>
 
     <!-- Alternative Emotional State Colors (Retained from Main) -->
     <color name="mood_happiness">#FFE082</color>  <!-- Yellow -->
@@ -48,7 +48,8 @@
     <color name="delete_button">#FF5252</color>
     <color name="cancel_button">#757575</color>
     <color name="offline_indicator">#FF9800</color>
-    <color name = "banner">#91B4A4</color>
+    <color name = "banner">#E8EDF2</color>
+    <color name = "whatevs">#A4B8C4</color>
     <color name="primary" />
 
 

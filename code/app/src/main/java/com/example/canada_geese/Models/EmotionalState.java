@@ -6,7 +6,7 @@ import com.example.canada_geese.R;
  * Enum representing different emotional states with associated display names, colors, and emojis.
  */
 public enum EmotionalState {
-    HAPPINESS("Happiness", R.color.mood_happiness, "😊"),
+    HAPPY("Happy", R.color.mood_happiness, "😊"),
     ANGER("Anger", R.color.mood_anger, "😠"),
     SADNESS("Sadness", R.color.mood_sadness, "😢"),
     FEAR("Fear", R.color.mood_fear, "😨"),
