@@ -75,16 +75,13 @@ public class DatabaseManager {
             Map<String, Object> moodMap = new HashMap<>();
             moodMap.put("userId", userId);
             moodMap.put("emotion", moodEvent.getEmotion());
-            if(moodEvent.getDescription().isEmpty()){
-                moodMap.put("description", "None provided");
-            }else{
-                moodMap.put("description", moodEvent.getDescription());
-            }
+            moodMap.put("description", moodEvent.getDescription());
+
 
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
-            moodMap.put("isPublic", moodEvent.hasTriggerWarning());
+            moodMap.put("isPrivate", moodEvent.hasTriggerWarning());
             moodMap.put("socialSituation", moodEvent.getSocialSituation());
 
             if (moodEvent.HasLocation()) {
@@ -158,13 +155,19 @@ public class DatabaseManager {
             moodMap.put("timestamp", moodEvent.getTimestamp());
             moodMap.put("emoji", moodEvent.getEmoji());
             moodMap.put("color", moodEvent.getColor());
-            moodMap.put("triggerWarning", moodEvent.hasTriggerWarning());
+            moodMap.put("isPrivate", moodEvent.hasTriggerWarning());
             moodMap.put("hasLocation", moodEvent.HasLocation());
+            moodMap.put("socialSituation", moodEvent.getSocialSituation());
             if (moodEvent.HasLocation()) {
                 moodMap.put("latitude", moodEvent.getLatitude());
                 moodMap.put("longitude", moodEvent.getLongitude());
             }
 
+            if (moodEvent.getImageUrls() != null && !moodEvent.getImageUrls().isEmpty()) {
+                moodMap.put("imageUrls", moodEvent.getImageUrls());
+            } else {
+                moodMap.put("imageUrls", new ArrayList<>()); // 🔄 Optional: clear all if none
+            }
             // Update the document
             db.collection("users").document(userId)
                     .collection("moodEvents").document(documentId)
@@ -382,7 +385,7 @@ public class DatabaseManager {
                     Task<QuerySnapshot> moodTask = db.collection("users")
                             .document(followedId)
                             .collection("moodEvents")
-                            .whereEqualTo("isPublic", true) // 👈 ONLY public moods
+                            .whereEqualTo("isPrivate", false) // 👈 ONLY public moods
                             .orderBy("timestamp", Query.Direction.DESCENDING)
                             .limit(3)
                             .get();

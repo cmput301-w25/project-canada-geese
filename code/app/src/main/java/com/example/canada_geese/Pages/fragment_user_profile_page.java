@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -63,6 +64,7 @@ public class fragment_user_profile_page extends Fragment{
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private TextView usernameText;
+    private TextView userBioText;
     private TextView followersCountText;
     private TextView followingCountText;
     private ImageButton menuImageButton;
@@ -76,7 +78,7 @@ public class fragment_user_profile_page extends Fragment{
     private RecyclerView searchResultsList;
     private RecyclerView followRequestsList;
     LinearLayout searchResultsContainer;
-    LinearLayout profileContentContainer;
+    ConstraintLayout profileContentContainer;
     private List<String> userList;
     private List<Users> AllUsers;
     private UsersAdapter usersAdapter;
@@ -120,6 +122,7 @@ public class fragment_user_profile_page extends Fragment{
         // Find Views for the UI components of the profile content container
         usernameText = rootView.findViewById(R.id.username_text);
         profileImage = rootView.findViewById(R.id.profile_image);
+        userBioText = rootView.findViewById(R.id.about_text);
         followersSection = rootView.findViewById(R.id.followers_section);
         followingSection = rootView.findViewById(R.id.following_section);
         followersCountText = rootView.findViewById(R.id.followers_count);
@@ -250,7 +253,12 @@ public class fragment_user_profile_page extends Fragment{
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterUsers(newText);
+                if (newText.isEmpty()) {
+                    // Clear the list and notify the adapter
+                    usersAdapter.updateList(new ArrayList<>());
+                } else {
+                    filterUsers(newText);
+                }
                 return false;
             }
         });
@@ -321,6 +329,12 @@ public class fragment_user_profile_page extends Fragment{
                                 // Use placeholder if no image URL
                                 profileImage.setImageResource(R.drawable.profile);
                             }
+                            String bio = documentSnapshot.getString("about");
+                            if (bio != null && !bio.isEmpty()) {
+                                userBioText.setText(bio);
+                            } else {
+                                userBioText.setVisibility(View.GONE);
+                            }
                         }
                     });
 
@@ -364,7 +378,6 @@ public class fragment_user_profile_page extends Fragment{
 
         }
     }
-
     private void showFollowingList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -508,16 +521,11 @@ public class fragment_user_profile_page extends Fragment{
         String senderId = currentUser.getUid();  // Current user ID
         String recipientUsername = user.getUsername();  // Clicked user's username
 
-//        Log.d("UnfollowRequest", "Sender ID: " + senderId);
-//        Log.d("UnfollowRequest", "Recipient Username: " + recipientUsername);
-
         // First, get sender's username
         db.collection("users").document(senderId).get()
                 .addOnSuccessListener(senderDoc -> {
                     if (senderDoc.exists()) {
                         String senderName = senderDoc.getString("username");
-//                        Log.d("UnfollowRequest", "Sender Username: " + senderName);
-
                         // Now find the recipient's document ID by querying for their username
                         db.collection("users")
                                 .whereEqualTo("username", recipientUsername)
@@ -528,9 +536,6 @@ public class fragment_user_profile_page extends Fragment{
                                         // Get the recipient's document ID
                                         DocumentSnapshot recipientDoc = querySnapshot.getDocuments().get(0);
                                         String recipientId = recipientDoc.getId();
-
-//                                        Log.d("UnfollowRequest", "Found recipient ID: " + recipientId);
-
                                         // Batch write to remove from following and followers collections
                                         WriteBatch batch = db.batch();
 

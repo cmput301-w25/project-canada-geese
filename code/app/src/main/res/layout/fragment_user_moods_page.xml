@@ -20,12 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Green Circle -->
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/new_circle_24" />
 
         <!-- Search Bar -->
         <SearchView
@@ -33,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@android:drawable/editbox_background"
+            android:background="@drawable/rounded_search_view"
             android:iconifiedByDefault="false"
             android:padding="5dp"
             android:queryHint="Search..." />
@@ -52,7 +46,7 @@
     </LinearLayout>
 
     <!-- Filter Bar Fragment -->
-    <androidx.fragment.app.FragmentContainerView
+    <FrameLayout
         android:id="@+id/filter_bar_fragment_container"
         android:name="com.example.canada_geese.Fragments.FilterBarFragment"
         android:layout_width="match_parent"
@@ -61,20 +55,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_banner"
-        tools:layout="@layout/fragment_filter_bar" />
+        tools:layout="@layout/fragment_filter_bar"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="374dp"
-        android:layout_height="484dp"
-        android:padding="10dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.89" />
+        app:layout_constraintTop_toBottomOf="@+id/space" />
+
+    <Space
+        android:id="@+id/space"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_banner" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

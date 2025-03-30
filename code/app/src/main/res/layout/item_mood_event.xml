@@ -36,11 +36,12 @@
             android:id="@+id/timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:textColor="@android:color/black"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_username" />
 
         <TextView
             android:id="@+id/tv_username"
@@ -50,6 +51,8 @@
             android:textColor="#333333"
             android:textSize="14sp"
             android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
@@ -60,10 +63,13 @@
             android:layout_height="71dp"
             android:gravity="center"
             android:textSize="55dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_username" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <!-- Details container (only visible when expanded) -->
+
         <TextView
             android:id="@+id/mood_name"
             android:layout_width="205dp"
@@ -71,36 +77,21 @@
             android:paddingStart="12dp"
             android:textSize="30sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/mood_emoji"
+            app:layout_constraintBottom_toTopOf="@+id/tv_description"
             app:layout_constraintStart_toEndOf="@+id/mood_emoji"
-            app:layout_constraintTop_toBottomOf="@+id/tv_username" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/details_container"
-            android:layout_width="321dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:orientation="vertical"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/comment_button2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.08"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mood_emoji">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Description"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_description"
-                android:layout_width="match_parent"
-                android:layout_height="21dp"
-                android:layout_marginTop="4dp"
-                android:minHeight="40dp" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_description">
 
             <!-- Social Situation -->
             <TextView
@@ -121,17 +112,17 @@
                 android:id="@+id/image_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
 
             <!-- Location -->
             <TextView
                 android:id="@+id/tv_location_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Location"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textStyle="bold" />
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/map_view"
@@ -140,35 +131,6 @@
                 android:layout_marginTop="8dp"
                 android:visibility="gone" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="305dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <Button
-                    android:id="@+id/btn_edit"
-                    android:layout_width="116dp"
-                    android:layout_height="45dp"
-                    android:backgroundTint="#673AB7"
-                    android:text="Edit Mood"
-                    android:textColor="#FFFFFF"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_delete"
-                    android:layout_width="99dp"
-                    android:layout_height="43dp"
-                    android:layout_marginStart="12dp"
-                    android:backgroundTint="#EAEAEA"
-                    android:text="Delete"
-                    android:textColor="#666666"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/btn_edit"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
         <!-- Edit container (only visible in edit mode) -->
@@ -236,5 +198,29 @@
 
             </LinearLayout>
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/options_menu_button"
+            android:layout_width="49dp"
+            android:layout_height="34dp"
+            android:layout_gravity="left|end"
+            android:background="@android:color/transparent"
+            android:contentDescription="Options menu"
+            android:src="@drawable/ic_more_vert_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="40dp"
+            android:textAlignment="viewStart"
+            android:visibility="visible"
+            app:layout_constraintEnd_toStartOf="@+id/comment_button2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/mood_emoji"
+            app:layout_constraintTop_toBottomOf="@+id/mood_emoji" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

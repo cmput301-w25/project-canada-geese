@@ -8,6 +8,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/sign_up"
     android:background="#F5F1ED"
+    android:layout_gravity="center"
     tools:context=".Pages.SignUpActivity">
 
   <!-- Sign Up -->
@@ -17,7 +18,7 @@
       android:layout_height="wrap_content"
       android:layout_centerHorizontal="true"
       android:layout_marginTop="90dp"
-      android:text="Sign In"
+      android:text="Sign-In"
       android:textColor="#6B4F3F"
       android:textSize="64sp"
       android:textStyle="normal" />
@@ -32,11 +33,6 @@
       android:layout_centerHorizontal="true"
       android:orientation="vertical">
 
-    <!-- Email -->
-
-    <!-- Verification Code -->
-
-    <!-- Username -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -108,8 +104,10 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/button_sign_in"
+      android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
       android:layout_marginTop="20dp"
+      android:layout_marginBottom="206dp"
       android:text="Don't have an account? Sign Up!"
       android:textColor="#6B4F3F"
       android:textSize="14sp" />

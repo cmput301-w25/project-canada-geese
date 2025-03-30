@@ -5,16 +5,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.canada_geese.Adapters.MoodEventAdapter;
+import com.example.canada_geese.Fragments.AddMoodEventDialogFragment;
 import com.example.canada_geese.Fragments.CommentsFragment;
 import com.example.canada_geese.Fragments.FilterBarFragment;
 import com.example.canada_geese.Managers.DatabaseManager;
@@ -28,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,6 +49,9 @@ public class fragment_user_moods_page extends Fragment {
     private boolean isLast7DaysSelected = false;
     private String selectedMood = "";
     private String searchQuery = "";
+    private ImageButton filterButton;
+    private boolean isPrivateSelected = false;
+
 
     /**
      * Required empty public constructor.
@@ -90,6 +97,7 @@ public class fragment_user_moods_page extends Fragment {
         // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         searchView = view.findViewById(R.id.searchView);
+        filterButton = view.findViewById(R.id.filter_button);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize empty list and adapter
@@ -97,14 +105,15 @@ public class fragment_user_moods_page extends Fragment {
         adapter = new MoodEventAdapter(moodEventList, getContext(), false);
         recyclerView.setAdapter(adapter);
 
-        // Create filter bar fragment and set adapter
+        filterButton.setOnClickListener(v -> toggleFilterBar());
+
+        /*// Create filter bar fragment and set adapter
         FilterBarFragment filterBarFragment = new FilterBarFragment();
         filterBarFragment.setAdapter(adapter);
-
         // Attach existing FilterBarFragment (which already modifies the adapter)
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.filter_bar_fragment_container, filterBarFragment)
-                .commit();
+                .commit();*/
 
         // Set up click listeners for mood events
         setupMoodEventClickListeners();
@@ -122,20 +131,20 @@ public class fragment_user_moods_page extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query, false, "");
+                adapter.filter(query, false, new HashSet<>(), isPrivateSelected);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText, false, "");
+                adapter.filter(newText, false, new HashSet<>(),isPrivateSelected);
                 return false;
             }
         });
 
         // Reset list when search is closed
         searchView.setOnCloseListener(() -> {
-            adapter.filter("", false, "");
+            adapter.filter("", false, new HashSet<>(), isPrivateSelected);
             return false;
         });
         adapter.setOnCommentClickListener(new MoodEventAdapter.OnCommentClickListener() {
@@ -152,6 +161,42 @@ public class fragment_user_moods_page extends Fragment {
         return view;
     }
 
+    private void toggleFilterBar() {
+        FragmentManager fragmentManager = getChildFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        Fragment existingFragment = fragmentManager.findFragmentById(R.id.filter_bar_fragment_container);
+
+        View filterButtonsContainer = getView().findViewById(R.id.filter_bar_fragment_container);
+        View spaceAboveRecycler = getView().findViewById(R.id.space); // 👈 Add this
+
+        if (existingFragment == null) {
+            // Show both the filter bar and space
+            if (filterButtonsContainer != null) {
+                filterButtonsContainer.setVisibility(View.VISIBLE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.VISIBLE);
+            }
+
+            FilterBarFragment filterBarFragment = new FilterBarFragment();
+            filterBarFragment.setAdapter(adapter);
+            transaction.replace(R.id.filter_bar_fragment_container, filterBarFragment);
+            transaction.commit();
+        } else {
+            // Hide both the filter bar and space
+            transaction.remove(existingFragment);
+            transaction.commit();
+
+            if (filterButtonsContainer != null) {
+                filterButtonsContainer.setVisibility(View.GONE);
+            }
+            if (spaceAboveRecycler != null) {
+                spaceAboveRecycler.setVisibility(View.GONE);
+            }
+        }
+    }
+
+
     /**
      * Set up click and long-click listeners for the mood events.
      */
@@ -164,7 +209,14 @@ public class fragment_user_moods_page extends Fragment {
 
         // Edit listener - used to handle UI transitions in the adapter
         adapter.setOnMoodEventEditListener((moodEvent, position) -> {
-            // No additional action needed here - the adapter handles the UI transition
+            AddMoodEventDialogFragment dialog = new AddMoodEventDialogFragment();
+            dialog.setMoodToEdit(moodEvent, moodEvent.getDocumentId());
+
+            dialog.setOnDismissListener(() -> {
+                refreshMoodEventList(); // Refresh after editing
+            });
+
+            dialog.show(getChildFragmentManager(), "EditMoodDialog");
         });
 
         // Long click listener - Show delete confirmation
@@ -284,7 +336,7 @@ public class fragment_user_moods_page extends Fragment {
     public void onResume() {
         super.onResume();
         if (adapter != null) {
-            adapter.filter("", false, ""); // Clear search filter on resume
+            adapter.filter("", false, new HashSet<>(), isPrivateSelected);
             // Refresh the mood events list
             refreshMoodEventList();
         }
