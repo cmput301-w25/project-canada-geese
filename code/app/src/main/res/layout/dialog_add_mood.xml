@@ -13,39 +13,58 @@
         android:background="@drawable/dialog_background"
         android:padding="16dp">
 
+
         <!-- Title: Mood Name -->
+
+        <ImageView
+            android:id="@+id/close_button"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:clickable="true"
+            android:contentDescription="Close"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/baseline_close_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Mood Selection Spinner with Background -->
+
+        <!-- Note Icon -->
+
         <TextView
             android:id="@+id/title_mood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
             android:text="@string/mood_name"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Mood Selection Spinner with Background -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mood_spinner_container"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/spinner_background"
             android:padding="8dp"
-            app:layout_constraintTop_toBottomOf="@id/title_mood"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp">
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_mood">
 
             <Spinner
                 android:id="@+id/emotion_spinner"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Note Icon -->
         <ImageView
             android:id="@+id/icon_reason"
             android:layout_width="24dp"

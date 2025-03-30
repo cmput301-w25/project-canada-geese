@@ -99,13 +99,14 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    /*public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         MoodEventModel event = moodEventList.get(position);
         if (event == null) return;
 
         holder.moodText.setText(event.getEmotion());
         holder.timestamp.setText(event.getFormattedTimestamp());
         holder.moodEmoji.setText(event.getEmoji());
+
         String desc = event.getDescription();
         if (desc == null || desc.trim().isEmpty()) {
             holder.description.setVisibility(View.GONE);
@@ -140,6 +141,70 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             holder.optionsMenuButton.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         }
 
+
+        holder.itemView.setOnClickListener(v -> {
+            expandedPosition = (isExpanded && !isInEditMode) ? -1 : position;
+            isInEditMode = false;
+            notifyDataSetChanged();
+        });
+
+        holder.itemView.setOnLongClickListener(v -> longClickListener != null && longClickListener.onMoodEventLongClick(event));
+
+        holder.commentButton.setOnClickListener(v -> {
+            if (commentClickListener != null) commentClickListener.onCommentClick(event);
+        });
+
+    }*/
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        MoodEventModel event = moodEventList.get(position);
+        if (event == null) return;
+
+        holder.moodText.setText(event.getEmotion());
+        holder.timestamp.setText(event.getFormattedTimestamp());
+        holder.moodEmoji.setText(event.getEmoji());
+
+        String desc = event.getDescription();
+        if (desc == null || desc.trim().isEmpty()) {
+            holder.description.setVisibility(View.GONE);
+        } else {
+            holder.description.setText(desc);
+            holder.description.setVisibility(View.VISIBLE);
+        }
+
+        if (isFriendPage && holder.usernameView != null) {
+            holder.usernameView.setVisibility(View.VISIBLE);
+            String displayName = uidToUsernameMap.get(event.getUserId());
+            holder.usernameView.setText("Posted by: " + (displayName != null ? displayName : "Unknown"));
+        } else if (holder.usernameView != null) {
+            holder.usernameView.setVisibility(View.GONE);
+        }
+
+        int color = event.getColor();
+        holder.cardView.setCardBackgroundColor(color != 0 ? context.getResources().getColor(color) : context.getResources().getColor(R.color.colorPrimaryDark));
+
+        boolean isExpanded = position == expandedPosition;
+        holder.detailsContainer.setVisibility(isExpanded && !isInEditMode ? View.VISIBLE : View.GONE);
+        holder.editContainer.setVisibility(isInEditMode && isExpanded ? View.VISIBLE : View.GONE);
+
+        if (isExpanded) {
+            if (isInEditMode) populateEditFields(holder, event);
+            else populateDetails(holder, event);
+        }
+
+        if (isFriendPage) {
+            holder.optionsMenuButton.setVisibility(View.GONE);
+        } else {
+            holder.optionsMenuButton.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+        }
+
+        // **Toggle Expand/Collapse Icon**
+        if (isExpanded) {
+            holder.expandIcon.setImageResource(R.drawable.baseline_expand_less_24);
+        } else {
+            holder.expandIcon.setImageResource(R.drawable.baseline_expand_more_24);
+        }
+
+        // **Set Click Listener for Expanding/Collapsing**
         holder.itemView.setOnClickListener(v -> {
             expandedPosition = (isExpanded && !isInEditMode) ? -1 : position;
             isInEditMode = false;
@@ -152,6 +217,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             if (commentClickListener != null) commentClickListener.onCommentClick(event);
         });
     }
+
 
     private void populateDetails(ViewHolder holder, MoodEventModel event) {
 
@@ -289,6 +355,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         LinearLayout imageContainer;
         TextView locationLabel;
         ImageButton optionsMenuButton;
+        ImageView expandIcon;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -314,6 +381,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             imageContainer = itemView.findViewById(R.id.image_container);
             locationLabel = itemView.findViewById(R.id.tv_location_label);
             optionsMenuButton = itemView.findViewById(R.id.options_menu_button);
+            expandIcon = itemView.findViewById(R.id.expand_icon);
 
         }
     }

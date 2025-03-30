@@ -3,7 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="#E8EDF2"
     android:padding="16dp">
+
+    <!-- Top Bar with Close Button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/close_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:padding="8dp"
+            android:src="@drawable/baseline_close_24"
+            android:contentDescription="Close"
+            android:clickable="true"
+            android:focusable="true" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Send Follow Request"
-        android:backgroundTint="@color/colorPrimary"
-        android:textColor="@android:color/white" />
+        android:backgroundTint="@color/whatevs"
+        android:textColor="@android:color/black" />
 
 </LinearLayout>
