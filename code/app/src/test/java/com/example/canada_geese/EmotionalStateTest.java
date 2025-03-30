@@ -91,8 +91,7 @@ public class EmotionalStateTest {
     }
 
     @Test
-    public void testEmotionalStateCount() {
-        assertEquals(9, EmotionalState.values().length);
+    public void testEmotionalStateCount() { assertEquals(9, EmotionalState.values().length);
     }
 }
 
