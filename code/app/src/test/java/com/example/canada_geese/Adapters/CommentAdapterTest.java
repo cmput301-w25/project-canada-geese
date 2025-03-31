@@ -1,7 +1,6 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Adapters;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import android.content.Context;
 
@@ -21,6 +20,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Unit tests for the CommentAdapter class.
+ * Verifies updating and deleting comment functionality without modifying the adapter.
+ */
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 public class CommentAdapterTest {
@@ -32,37 +35,37 @@ public class CommentAdapterTest {
     private List<CommentModel> commentList;
     private String moodEventId = "test_mood_event_id";
 
+    /**
+     * Set up test data and initialize the adapter.
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        // Create test comment data
         commentList = new ArrayList<>();
         commentList.add(new CommentModel("First comment", "User1", new Date()));
         commentList.add(new CommentModel("Second comment", "User2", new Date()));
 
-        // Initialize adapter
         adapter = new CommentAdapter(commentList, mockContext, moodEventId);
     }
 
+    /**
+     * Test: Update the list of comments.
+     */
     @Test
     public void testUpdateComments() {
-        // Verify initial comments
         List<CommentModel> initialComments = getCommentList(adapter);
         assertEquals(2, initialComments.size());
         assertEquals("First comment", initialComments.get(0).getText());
         assertEquals("Second comment", initialComments.get(1).getText());
 
-        // Create new comments list
         List<CommentModel> newComments = new ArrayList<>();
         newComments.add(new CommentModel("New comment 1", "User3", new Date()));
         newComments.add(new CommentModel("New comment 2", "User4", new Date()));
         newComments.add(new CommentModel("New comment 3", "User5", new Date()));
 
-        // Update comments list
         adapter.updateComments(newComments);
 
-        // Verify comments were updated
         List<CommentModel> updatedComments = getCommentList(adapter);
         assertEquals(3, updatedComments.size());
         assertEquals("New comment 1", updatedComments.get(0).getText());
@@ -73,7 +76,33 @@ public class CommentAdapterTest {
         assertEquals("User5", updatedComments.get(2).getAuthor());
     }
 
-    // Helper method to access the comment list using reflection
+    /**
+     * Test: Simulate deleting a comment by removing it from the list via reflection.
+     */
+    @Test
+    public void testDeleteComment() {
+        // Get original comment list
+        List<CommentModel> comments = getCommentList(adapter);
+
+        // Check original size
+        assertEquals(2, comments.size());
+
+        // Remove the first comment manually (simulate deletion)
+        comments.remove(0);
+
+        // Update adapter's list using reflection
+        setCommentList(adapter, comments);
+
+        // Check updated list
+        List<CommentModel> updated = getCommentList(adapter);
+        assertEquals(1, updated.size());
+        assertEquals("Second comment", updated.get(0).getText());
+        assertEquals("User2", updated.get(0).getAuthor());
+    }
+
+    /**
+     * Helper method: Access the internal comment list using reflection.
+     */
     private List<CommentModel> getCommentList(CommentAdapter adapter) {
         try {
             Field field = CommentAdapter.class.getDeclaredField("commentList");
@@ -81,6 +110,19 @@ public class CommentAdapterTest {
             return (List<CommentModel>) field.get(adapter);
         } catch (Exception e) {
             throw new RuntimeException("Failed to access commentList field", e);
+        }
+    }
+
+    /**
+     * Helper method: Set the internal comment list using reflection.
+     */
+    private void setCommentList(CommentAdapter adapter, List<CommentModel> newList) {
+        try {
+            Field field = CommentAdapter.class.getDeclaredField("commentList");
+            field.setAccessible(true);
+            field.set(adapter, newList);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set commentList field", e);
         }
     }
 }

@@ -74,6 +74,7 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation(libs.espresso.core)
+    implementation(libs.appcompat)
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
     implementation("androidx.test.espresso:espresso-contrib:3.5.1")
 

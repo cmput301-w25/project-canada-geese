@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Logic;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -124,6 +124,10 @@ public class EditProfileLogicTest {
         profileEditor = new ProfileEditor(mockContext, mockAuth, mockDb, mockStorage);
     }
 
+    /**
+     * Test: Save a profile with an image URI.
+     * Verifies that both about text and uploaded image URL are passed into Firestore update.
+     */
     @Test
     public void testSaveProfileWithImage() {
         // Prepare test data
@@ -174,6 +178,10 @@ public class EditProfileLogicTest {
                 capturedUpdates[0].get("image_profile"));
     }
 
+    /**
+     * Test: Remove the profile picture.
+     * Ensures that the Firestore update sets 'image_profile' field to null.
+     */
     @Test
     public void testRemoveProfilePicture() {
         // Setup document update to capture the update map

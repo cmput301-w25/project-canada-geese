@@ -1,5 +1,5 @@
-package com.example.canada_geese;
-
+package com.example.canada_geese.Fragments;
+import com.example.canada_geese.R;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;

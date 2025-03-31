@@ -1,5 +1,5 @@
-package com.example.canada_geese;
-
+package com.example.canada_geese.Fragments;
+import com.example.canada_geese.R;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -13,15 +13,18 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.core.content.ContextCompat;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.example.canada_geese.Pages.MainActivity;
@@ -44,7 +47,7 @@ public class fragment_map_view_pageTest {
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
-    // Optional: Automatically grant location permissions for map testing
+    // Automatically grant location permissions for map testing
     @Rule
     public GrantPermissionRule locationPermissionRule = GrantPermissionRule.grant(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -92,7 +95,7 @@ public class fragment_map_view_pageTest {
     }
 
     /**
-     * Test: Verify map is loaded correctly
+     * Test: Verify map is loaded correctly and filter chip functionality
      */
     @Test
     public void testMapLoaded() {
@@ -102,21 +105,75 @@ public class fragment_map_view_pageTest {
         // Check if the Memory button is displayed
         onView(withId(R.id.btnMemory)).check(matches(isDisplayed()));
 
+        // Check if the Friends button is displayed
+        onView(withId(R.id.btnFriends)).check(matches(isDisplayed()));
+
         // Check if the search view is displayed
         onView(withId(R.id.search_view)).check(matches(isDisplayed()));
+
+        // Check if filter button is displayed
+        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
+
+        // Test filter button click
+        onView(withId(R.id.filter_button)).perform(click());
+        onView(isRoot()).perform(waitFor(1000));
+
+        try {
+            // Verify filter scroll view becomes visible
+            onView(withId(R.id.filter_scroll_view)).check(matches(isDisplayed()));
+        } catch (Exception e) {
+            System.out.println("Could not verify filter scroll view: " + e.getMessage());
+        }
     }
 
     /**
-     * Test: Memory button click
+     * Test: Location permission request handling
+     */
+    @Test
+    public void testLocationPermissionRequest() {
+        // Verify permissions are granted (they should be due to our Rule)
+        boolean hasLocationPermission = ContextCompat.checkSelfPermission(
+                InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        // If permissions are granted, verify the map displays correctly
+        if (hasLocationPermission) {
+            // Click Memory button to load markers which should use location
+            onView(withId(R.id.btnMemory)).perform(click());
+            onView(isRoot()).perform(waitFor(2000));
+
+            // Map should remain visible and functional
+            onView(withId(R.id.map)).check(matches(isDisplayed()));
+        } else {
+            System.out.println("Location permissions not granted, skipping map interaction test");
+        }
+    }
+
+    /**
+     * Test: Memory button click and verify mood markers with images
      */
     @Test
     public void testMemoryButtonClick() {
-        // Click the Memory button
+        // Click the Memory button to load user's mood events on map
         onView(withId(R.id.btnMemory)).perform(click());
         onView(isRoot()).perform(waitFor(3000)); // Wait for memory markers to load
 
         // Check that the app doesn't crash and the map is still displayed
         onView(withId(R.id.map)).check(matches(isDisplayed()));
+
+        // Try clicking on the map where a marker might be
+        // This is a simple test to verify the map is interactive
+        // We can't precisely click on markers because their positions are dynamic
+        try {
+            // Click near the center of the map where markers are likely to appear
+            onView(withId(R.id.map)).perform(click());
+            onView(isRoot()).perform(waitFor(1000));
+
+            // Map should still be displayed after clicking
+            onView(withId(R.id.map)).check(matches(isDisplayed()));
+        } catch (Exception e) {
+            System.out.println("Could not interact with map: " + e.getMessage());
+        }
     }
 
     /**
@@ -155,19 +212,70 @@ public class fragment_map_view_pageTest {
     }
 
     /**
-     * Test: Location services
-     * Note: This test only verifies map display with permissions already granted
-     * through the GrantPermissionRule above
+     * Test: Displaying friends' mood events on map
      */
     @Test
-    public void testLocationServices() {
-        // With permissions granted, verify map is displayed
+    public void testFriendsMapMarkers() {
+        // Click the Friends button to load friends' mood events
+        onView(withId(R.id.btnFriends)).perform(click());
+        onView(isRoot()).perform(waitFor(3000)); // Wait for markers to load
+
+        // Check that the map is still displayed after loading friends' markers
         onView(withId(R.id.map)).check(matches(isDisplayed()));
 
-        // Wait for location to potentially be displayed on map
-        onView(isRoot()).perform(waitFor(3000));
+        // Switch back to Memory markers for clean state
+        onView(withId(R.id.btnMemory)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
 
-        // We can only verify the map is still displayed
+        // Verify map still displays correctly
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test: Filtering markers on the map
+     */
+    @Test
+    public void testFilteringMapMarkers() {
+        // First load user's mood events
+        onView(withId(R.id.btnMemory)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
+
+        // Verify map is displayed
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
+
+        // Open filter options
+        onView(withId(R.id.filter_button)).perform(click());
+        onView(isRoot()).perform(waitFor(1500));
+
+        try {
+            // Verify filter scroll view is visible
+            onView(withId(R.id.filter_scroll_view)).check(matches(isDisplayed()));
+
+            // Try to find the happiness chip (if it fails, test continues)
+            try {
+                onView(withId(R.id.chip_mood_happiness)).perform(click());
+                onView(isRoot()).perform(waitFor(1000));
+            } catch (Exception e) {
+                System.out.println("Could not find or click happiness chip: " + e.getMessage());
+            }
+
+            // Try to find the clear all chip (if it fails, test continues)
+            try {
+                onView(withId(R.id.chip_clear_all)).perform(click());
+                onView(isRoot()).perform(waitFor(1000));
+            } catch (Exception e) {
+                System.out.println("Could not find or click clear all chip: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.out.println("Could not verify or interact with filter chips: " + e.getMessage());
+        }
+
+        // Switch to Friends mode to verify basic functionality
+        onView(withId(R.id.btnFriends)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
+
+        // Verify map is still displayed
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 }

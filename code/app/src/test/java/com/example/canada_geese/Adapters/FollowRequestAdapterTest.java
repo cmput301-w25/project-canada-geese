@@ -1,15 +1,11 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Adapters;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Models.FollowRequestModel;
 
 import org.junit.Before;
@@ -20,8 +16,6 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +45,9 @@ public class FollowRequestAdapterTest {
         adapter = new FollowRequestAdapter(requestList, mockContext, mockListener);
     }
 
+    /**
+     * Test: Trigger listener manually and verify adapter handles request actions (accept/reject).
+     */
     @Test
     public void testOnRequestAction() {
         // Test that the adapter properly calls the listener when request actions are triggered
@@ -71,7 +68,7 @@ public class FollowRequestAdapterTest {
     }
 
     /**
-     * Alternative test that uses custom TestViewHolder to simulate click events
+     * Test: Simulate ViewHolder interaction and verify that the correct listener callbacks are triggered.
      */
     @Test
     public void testOnRequestActionWithHolder() {
