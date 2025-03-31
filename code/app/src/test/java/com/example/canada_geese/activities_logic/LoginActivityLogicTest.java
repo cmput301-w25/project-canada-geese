@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.activities_logic;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -42,14 +42,11 @@ public class LoginActivityLogicTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        // 创建最简单的 activity 实例（不执行生命周期、不加载 UI）
         activity = mock(LoginActivity.class);
 
-        // 注入 mock Firebase
         setPrivateField(activity, "mAuth", mockAuth);
         setPrivateField(activity, "db", mockFirestore);
 
-        // 只允许执行 loginWithUsername 的真实逻辑
         doCallRealMethod().when(activity).loginWithUsername(anyString(), anyString(), anyBoolean());
         doCallRealMethod().when(activity).isFinishing();
         doNothing().when(activity).finish();
@@ -75,7 +72,6 @@ public class LoginActivityLogicTest {
 
         activity.loginWithUsername("testUser", "testPass", false);
 
-        // 最简单的验证，只要 login 方法能跑，不崩溃，就通过
         assertNotNull(activity);
     }
 

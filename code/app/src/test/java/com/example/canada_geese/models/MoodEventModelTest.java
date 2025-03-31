@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.models;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +9,7 @@ import com.example.canada_geese.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -18,7 +19,6 @@ public class MoodEventModelTest {
 
     @Before
     public void setUp() {
-        // Initialize date format for parsing and comparison
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
@@ -100,7 +100,6 @@ public class MoodEventModelTest {
 
     @Test
     public void testMoodEventWithEmptyStringValues() {
-        // Use current date for empty timestamp test
         Date currentDate = new Date();
 
         MoodEventModel mood = new MoodEventModel("", "", currentDate, "", 0, false, false, 0.0, 0.0);
@@ -122,4 +121,42 @@ public class MoodEventModelTest {
         assertEquals("Color should default to 0", 0, mood.getColor());
         assertFalse("Trigger warning should be false", mood.hasTriggerWarning());
     }
+
+    @Test
+    public void testSetAndGetImageUrls() {
+        MoodEventModel mood = new MoodEventModel();
+        ArrayList<String> imageUrls = new ArrayList<>();
+        imageUrls.add("https://example.com/image1.jpg");
+
+        mood.setImageUrls(imageUrls);
+
+        assertNotNull("Image URLs should not be null", mood.getImageUrls());
+        assertEquals("Should have 1 image URL", 1, mood.getImageUrls().size());
+        assertEquals("URL should match", "https://example.com/image1.jpg", mood.getImageUrls().get(0));
+    }
+
+    @Test
+    public void testMultipleImageHandling() {
+        MoodEventModel mood = new MoodEventModel();
+        ArrayList<String> imageUrls = new ArrayList<>();
+        imageUrls.add("https://example.com/image1.jpg");
+        imageUrls.add("https://example.com/image2.jpg");
+        imageUrls.add("https://example.com/image3.jpg");
+
+        mood.setImageUrls(imageUrls);
+
+        assertEquals("Should store 3 image URLs", 3, mood.getImageUrls().size());
+        assertTrue("Should contain image2.jpg", mood.getImageUrls().contains("https://example.com/image2.jpg"));
+    }
+
+    @Test
+    public void testSocialSituationField() {
+        MoodEventModel mood = new MoodEventModel();
+        String situation = "With friends";
+
+        mood.setSocialSituation(situation);
+
+        assertEquals("Social situation should be set and retrieved correctly", "With friends", mood.getSocialSituation());
+    }
+
 }

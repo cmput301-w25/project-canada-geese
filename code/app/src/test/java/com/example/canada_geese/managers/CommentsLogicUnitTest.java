@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.managers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +61,6 @@ public class CommentsLogicUnitTest {
         MockitoAnnotations.openMocks(this);
         context = ApplicationProvider.getApplicationContext();
 
-        // Set up test comments
         testComments = new ArrayList<>();
         CommentModel comment1 = new CommentModel(TEST_COMMENT_TEXT, TEST_USERNAME, new Date());
         comment1.setDocumentId(TEST_COMMENT_ID);
@@ -96,17 +95,14 @@ public class CommentsLogicUnitTest {
      */
     @Test
     public void testAddComment() {
-        // Create a mock object that provides the "addComment" functionality
         CommentAdder mockCommentAdder = mock(CommentAdder.class);
 
-        // Configure the mock behavior
         doAnswer(invocation -> {
             String ownerId = invocation.getArgument(0);
             String eventId = invocation.getArgument(1);
             CommentModel comment = invocation.getArgument(2);
             OnCompleteListener<DocumentReference> listener = invocation.getArgument(3);
 
-            // Simulate successful operation
             Task<DocumentReference> mockTask = mock(Task.class);
             when(mockTask.isSuccessful()).thenReturn(true);
             listener.onComplete(mockTask);
@@ -114,30 +110,24 @@ public class CommentsLogicUnitTest {
         }).when(mockCommentAdder).addComment(
                 anyString(), anyString(), any(CommentModel.class), any(OnCompleteListener.class));
 
-        // Create comment to add
         CommentModel newComment = new CommentModel(TEST_COMMENT_TEXT, TEST_USERNAME, new Date());
 
-        // Capture the comment that's passed to addComment
         ArgumentCaptor<CommentModel> commentCaptor = ArgumentCaptor.forClass(CommentModel.class);
 
-        // Test adding comment with the mock
         mockCommentAdder.addComment(
                 TEST_MOOD_OWNER_ID,
                 TEST_MOOD_EVENT_ID,
                 newComment,
                 task -> {
-                    // Assert task was successful
                     assertEquals(true, task.isSuccessful());
                 });
 
-        // Verify the comment was passed to addComment
         verify(mockCommentAdder).addComment(
                 anyString(),
                 anyString(),
                 commentCaptor.capture(),
                 any());
 
-        // Assert comment content matches
         assertEquals(TEST_COMMENT_TEXT, commentCaptor.getValue().getText());
         assertEquals(TEST_USERNAME, commentCaptor.getValue().getAuthor());
     }
@@ -148,16 +138,13 @@ public class CommentsLogicUnitTest {
      */
     @Test
     public void testDeleteComment() {
-        // Create a mock object that provides the "deleteComment" functionality
         CommentDeleter mockCommentDeleter = mock(CommentDeleter.class);
 
-        // Configure the mock behavior
         doAnswer(invocation -> {
             String eventId = invocation.getArgument(0);
             String commentId = invocation.getArgument(1);
             OnCompleteListener<Void> listener = invocation.getArgument(2);
 
-            // Simulate successful operation
             Task<Void> mockVoidTask = mock(Task.class);
             when(mockVoidTask.isSuccessful()).thenReturn(true);
             listener.onComplete(mockVoidTask);
@@ -165,16 +152,13 @@ public class CommentsLogicUnitTest {
         }).when(mockCommentDeleter).deleteComment(
                 anyString(), anyString(), any(OnCompleteListener.class));
 
-        // Test deleting comment with the mock
         mockCommentDeleter.deleteComment(
                 TEST_MOOD_EVENT_ID,
                 TEST_COMMENT_ID,
                 task -> {
-                    // Assert task was successful
                     assertEquals(true, task.isSuccessful());
                 });
 
-        // Verify deleteComment was called with correct parameters
         verify(mockCommentDeleter).deleteComment(
                 eq(TEST_MOOD_EVENT_ID),
                 eq(TEST_COMMENT_ID),

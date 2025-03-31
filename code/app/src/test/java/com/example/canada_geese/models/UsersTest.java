@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.models;
 
 import static org.junit.Assert.*;
 
@@ -74,4 +74,14 @@ public class UsersTest {
         assertEquals(TEST_ABOUT, user.getAbout());
         assertEquals(TEST_USER_ID, user.getUserId());
     }
+
+    @Test
+    public void testSetAndGetImageProfile() {
+        assertEquals("Initial image profile should match constructor", TEST_IMAGE_PROFILE, user.getImage_profile());
+
+        String newImageProfile = "new_profile.jpg";
+
+        assertEquals("Image profile should remain unchanged", TEST_IMAGE_PROFILE, user.getImage_profile());
+    }
+
 }

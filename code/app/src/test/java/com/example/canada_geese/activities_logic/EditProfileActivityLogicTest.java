@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.activities_logic;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

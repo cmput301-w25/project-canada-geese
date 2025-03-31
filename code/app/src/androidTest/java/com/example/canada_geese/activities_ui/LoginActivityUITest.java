@@ -1,7 +1,6 @@
-package com.example.canada_geese;
+package com.example.canada_geese.activities_ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.CheckBox;
 import android.widget.EditText;

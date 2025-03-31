@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.models;
 
 
 import org.junit.Test;

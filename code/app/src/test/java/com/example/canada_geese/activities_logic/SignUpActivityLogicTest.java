@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.activities_logic;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -25,7 +25,6 @@ public class SignUpActivityLogicTest {
         MockitoAnnotations.openMocks(this);
         activity = mock(SignUpActivity.class);
 
-        // mock 掉 signUp 方法本身，确保不会触发任何 Firebase、UI、构造逻辑
         doNothing().when(activity).signUp(anyString(), anyString(), anyString());
     }
 

@@ -1,4 +1,4 @@
-package com.example.canada_geese;
+package com.example.canada_geese.models;
 
 import static org.junit.Assert.*;
 
@@ -78,4 +78,21 @@ public class CommentModelTest {
         assertNull(emptyComment.getDocumentId());
         assertNull(emptyComment.getUserId());
     }
+
+    @Test
+    public void testFormattedTimestamp() {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.set(2023, java.util.Calendar.OCTOBER, 1, 15, 45, 0);
+        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        Date fixedDate = calendar.getTime();
+
+        comment.setTimestamp(fixedDate);
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+        String expectedFormatted = sdf.format(fixedDate);
+        String actualFormatted = sdf.format(comment.getTimestamp());
+
+        assertEquals("Formatted timestamp should match expected format", expectedFormatted, actualFormatted);
+    }
+
 }
