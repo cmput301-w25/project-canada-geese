@@ -52,4 +52,4 @@ cd mood-tracker
 - [Wiki Link](https://github.com/cmput301-w25/project-canada-geese/wiki)
 - [Scrum Board](https://github.com/orgs/cmput301-w25/projects/93)
 - [UI Mockups](https://github.com/cmput301-w25/project-canada-geese/wiki/Part-3%E2%80%90-User-Interface-Mockup-&-Storyboard)
-- [UML](https://github.com/cmput301-w25/project-canada-geese/wiki/CRC-Cards-(Part-2))
+- [UML](https://github.com/cmput301-w25/project-canada-geese/wiki/Part-4-%E2%80%90-UML)
