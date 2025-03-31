@@ -18,7 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- Divider line above navigation bar -->
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"

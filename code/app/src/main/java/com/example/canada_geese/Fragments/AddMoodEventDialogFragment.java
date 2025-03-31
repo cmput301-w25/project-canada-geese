@@ -17,6 +17,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Bitmap;
 import androidx.activity.result.ActivityResultLauncher;
@@ -228,7 +231,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         closeButton.setOnClickListener(v -> dismiss());
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-
+        EditText descriptionInput = view.findViewById(R.id.description_input);
+        TextView descriptionCounter = view.findViewById(R.id.description_counter);
+        setupDescriptionCharacterCounter(descriptionInput, descriptionCounter);
 
         String[] moodArray = new String[]{
                 "Happy 😊", "Angry 😠", "Sad 😢", "Scared 😨",
@@ -253,12 +258,32 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         );
         socialSituationSpinner.setAdapter(socialAdapter);
 
+
         if (isEditMode && moodToEdit != null) {
             // Change button text
             addMoodButton.setText("Save");
 
             // Description
-            EditText descriptionInput = view.findViewById(R.id.description_input);
+
+            descriptionInput.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    int currentLength = s.length();
+                    if (currentLength > 200) {
+                        descriptionInput.setText(s.subSequence(0, 200));
+                        descriptionInput.setSelection(200); // Move cursor to end
+                        Toast.makeText(requireContext(), "Max 200 characters allowed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        descriptionCounter.setText(currentLength + " / 200");
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
             descriptionInput.setText(moodToEdit.getDescription());
 
             // Trigger warning checkbox
@@ -406,7 +431,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
             String socialSituation = socialSituationSpinner.getSelectedItem().toString();
 
-            EditText descriptionInput = requireView().findViewById(R.id.description_input);
+            //EditText descriptionInput = requireView().findViewById(R.id.description_input);
             String description = descriptionInput.getText().toString();
 
             boolean hasLocation = addLocationCheckbox.isChecked();
@@ -475,6 +500,28 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         if (isEditMode && moodToEdit != null && moodToEdit.HasLocation()) {
             showUserLocation(view);;
         }
+    }
+
+    private void setupDescriptionCharacterCounter(EditText descriptionInput, TextView descriptionCounter) {
+        descriptionInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int currentLength = s.length();
+                if (currentLength > 200) {
+                    descriptionInput.setText(s.subSequence(0, 200));
+                    descriptionInput.setSelection(200);
+                    Toast.makeText(requireContext(), "Max 200 characters allowed", Toast.LENGTH_SHORT).show();
+                } else {
+                    descriptionCounter.setText(currentLength + " / 200");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private void uploadImagesThenUpdateMood(MoodEventModel updatedMood) {

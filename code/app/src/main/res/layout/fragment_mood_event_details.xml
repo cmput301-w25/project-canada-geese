@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- Details View (initially visible) -->
     <LinearLayout
         android:id="@+id/details_layout"
         android:layout_width="match_parent"
@@ -107,7 +106,6 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- Edit View (initially hidden) -->
     <LinearLayout
         android:id="@+id/edit_layout"
         android:layout_width="match_parent"

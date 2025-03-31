@@ -2,36 +2,51 @@ package com.example.canada_geese.Adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.widget.Toast;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.canada_geese.Managers.DatabaseManager;
 import com.example.canada_geese.Models.CommentModel;
 import com.example.canada_geese.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.android.gms.tasks.OnCompleteListener;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
+/**
+ * Adapter class for displaying comments related to a specific mood event in a RecyclerView.
+ */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     private List<CommentModel> commentList;
-    private Context context;
-    private String moodEventId;  // The mood event ID that these comments belong to
+    private final Context context;
+    private final String moodEventId;
 
+    /**
+     * Constructs a CommentAdapter.
+     *
+     * @param commentList the list of comments to display
+     * @param context     the context used for inflating views and dialogs
+     * @param moodEventId the ID of the mood event associated with these comments
+     */
     public CommentAdapter(List<CommentModel> commentList, Context context, String moodEventId) {
         this.commentList = commentList;
         this.context = context;
         this.moodEventId = moodEventId;
     }
 
+    /**
+     * Updates the list of comments and refreshes the RecyclerView.
+     *
+     * @param newComments the new list of comments
+     */
     public void updateComments(List<CommentModel> newComments) {
         this.commentList = newComments;
         notifyDataSetChanged();
@@ -47,15 +62,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         CommentModel comment = commentList.get(position);
+
         holder.tvAuthor.setText(comment.getAuthor());
         holder.tvCommentText.setText(comment.getText());
-        String relativeTime = getRelativeTime(comment.getTimestamp());
-        holder.tvCommentDate.setText(relativeTime);
+        holder.tvCommentDate.setText(getRelativeTime(comment.getTimestamp()));
 
-        // Set long-press listener if the current user posted this comment
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
         if (currentUser != null && comment.getUserId() != null &&
                 comment.getUserId().equals(currentUser.getUid())) {
+
             holder.itemView.setOnLongClickListener(v -> {
                 new AlertDialog.Builder(context)
                         .setMessage("Do you want to delete this comment?")
@@ -72,6 +88,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         .show();
                 return true;
             });
+
         } else {
             holder.itemView.setOnLongClickListener(null);
         }
@@ -82,8 +99,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         return commentList != null ? commentList.size() : 0;
     }
 
+    /**
+     * ViewHolder class for individual comment items.
+     */
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView tvAuthor, tvCommentText, tvCommentDate;
+
+        /**
+         * Constructs a new CommentViewHolder.
+         *
+         * @param itemView the view for a single comment item
+         */
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
             tvAuthor = itemView.findViewById(R.id.tv_comment_author);
@@ -92,9 +118,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
     }
 
-    // Helper method to calculate relative time
+    /**
+     * Returns a human-readable relative time string from the given timestamp.
+     *
+     * @param timestamp the timestamp to evaluate
+     * @return a relative time string (e.g., "2 hours", "3 days")
+     */
     private String getRelativeTime(Date timestamp) {
         if (timestamp == null) return "";
+
         long diff = System.currentTimeMillis() - timestamp.getTime();
         long seconds = diff / 1000;
         if (seconds < 60) return seconds + " seconds";

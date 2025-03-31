@@ -225,20 +225,6 @@ public class fragment_user_profile_page extends Fragment{
                 returnButton.setVisibility(View.VISIBLE);
                 searchResultsContainer.setVisibility(View.VISIBLE);
                 profileContentContainer.setVisibility(View.GONE);
-
-                // Fetch all users from the database
-//                DatabaseManager.getInstance().fetchAllUsers(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<Users> newList = new ArrayList<>();
-//                        for (DocumentSnapshot document : task.getResult()) {
-//                            Users user = document.toObject(Users.class);
-//                            newList.add(user);
-//                        }
-//                        usersAdapter.updateList(newList);
-//                    } else {
-//                        Log.e("FetchError", "Error getting documents: ", task.getException());
-//                    }
-//                });
             }
 
         });
@@ -316,7 +302,6 @@ public class fragment_user_profile_page extends Fragment{
                         if (documentSnapshot.exists()) {
                             String username = documentSnapshot.getString("username");
                             usernameText.setText(username);
-                             //firestore tingz
                             String profileImageUrl = documentSnapshot.getString("image_profile");
                             if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                                 Glide.with(this)
@@ -337,17 +322,6 @@ public class fragment_user_profile_page extends Fragment{
                             }
                         }
                     });
-
-            /*// Ignoring firestore storage setup for current implementation for user profile
-            // Load profile picture if available
-            Uri profileUri = user.getPhotoUrl();
-            if (profileUri != null) {
-                profileImage.setImageURI(profileUri);
-            } else {
-                profileImage.setImageResource(R.drawable.profile); // Placeholder image
-            }
-//            profileImage.setImageResource(R.drawable.profile);*/
-
 
             // Load Followers to the user profile
             db.collection("users").document(user.getUid()).collection("followers").get()

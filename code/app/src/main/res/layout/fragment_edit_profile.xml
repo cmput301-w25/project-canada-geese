@@ -54,7 +54,7 @@
             android:gravity="top"
             android:hint="About"
             android:inputType="textMultiLine"
-            android:lines="1" />
+            android:lines="6" />
 
         <Button
             android:id="@+id/save_button"

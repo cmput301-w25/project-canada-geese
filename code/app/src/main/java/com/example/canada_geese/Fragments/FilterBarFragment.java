@@ -18,9 +18,14 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ * Fragment representing the filter bar for mood event filtering.
+ * Allows filtering by emotion, time range, and privacy setting.
+ */
 public class FilterBarFragment extends Fragment {
+
     private static final String TAG = "FilterBarFragment";
+
     private Chip chipLast7Days, chipClearAll, chipPrivate;
     private Set<String> selectedMoods = new HashSet<>();
     private MoodEventAdapter adapter;
@@ -29,13 +34,20 @@ public class FilterBarFragment extends Fragment {
     private String currentQuery = "";
     private boolean isForFriendsPage = false;
 
-
-
     public FilterBarFragment() {}
 
+    /**
+     * Sets the adapter that will be filtered.
+     * @param adapter The MoodEventAdapter to apply filters to.
+     */
     public void setAdapter(MoodEventAdapter adapter) {
         this.adapter = adapter;
     }
+
+    /**
+     * Sets whether this filter bar is being used on the friends page.
+     * @param isForFriendsPage True if used on friends page.
+     */
     public void setIsForFriendsPage(boolean isForFriendsPage) {
         this.isForFriendsPage = isForFriendsPage;
     }
@@ -45,10 +57,10 @@ public class FilterBarFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_filter_bar, container, false);
 
-        // Initialize chips
         chipLast7Days = view.findViewById(R.id.chip_last_7_days);
         chipClearAll = view.findViewById(R.id.chip_clear_all);
         chipPrivate = view.findViewById(R.id.chip_mood_private);
+
         if (isForFriendsPage) {
             chipPrivate.setVisibility(View.GONE);
         }
@@ -58,8 +70,10 @@ public class FilterBarFragment extends Fragment {
         return view;
     }
 
-
-
+    /**
+     * Sets up actions for all chips in the filter bar.
+     * @param view The root view containing chips.
+     */
     private void setupChipActions(View view) {
         chipLast7Days.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d(TAG, "Last 7 days chip changed to: " + isChecked);
@@ -75,12 +89,12 @@ public class FilterBarFragment extends Fragment {
             resetMoodChips(view);
             applyFilters();
         });
+
         chipPrivate.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d(TAG, "Private chip changed to: " + isChecked);
             isPrivateSelected = isChecked;
             applyFilters();
         });
-
 
         setupMoodChip(view.findViewById(R.id.chip_mood_anger), "Angry");
         setupMoodChip(view.findViewById(R.id.chip_mood_confusion), "Confused");
@@ -93,6 +107,11 @@ public class FilterBarFragment extends Fragment {
         setupMoodChip(view.findViewById(R.id.chip_mood_calm), "Calm");
     }
 
+    /**
+     * Sets up a mood chip and its filter logic.
+     * @param chip The Chip view.
+     * @param mood The mood label.
+     */
     private void setupMoodChip(Chip chip, String mood) {
         chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d(TAG, mood + " chip changed to: " + isChecked);
@@ -105,6 +124,10 @@ public class FilterBarFragment extends Fragment {
         });
     }
 
+    /**
+     * Unchecks all mood chips except clear chip.
+     * @param view The root view containing the chip group.
+     */
     private void resetMoodChips(View view) {
         ChipGroup chipGroup = view.findViewById(R.id.filter_chip_group);
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
@@ -114,6 +137,10 @@ public class FilterBarFragment extends Fragment {
             }
         }
     }
+
+    /**
+     * Applies current filters to the adapter.
+     */
     private void applyFilters() {
         if (adapter != null) {
             Log.d(TAG, "Applying filters - Last 7 days: " + isLast7DaysSelected +
@@ -123,9 +150,4 @@ public class FilterBarFragment extends Fragment {
             Log.e(TAG, "Cannot apply filters: adapter is null");
         }
     }
-
-
-    }
-
-
-
+}

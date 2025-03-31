@@ -157,8 +157,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         Chip clearAllChip = rootView.findViewById(R.id.chip_clear_all);
         clearAllChip.setOnClickListener(v -> clearAllFilters());
 
-        //happinessChip.setOnCheckedChangeListener((buttonView, isChecked) -> updateMoodFilter("Happiness", isChecked));
-
         setupSearchView();
 
         return rootView;

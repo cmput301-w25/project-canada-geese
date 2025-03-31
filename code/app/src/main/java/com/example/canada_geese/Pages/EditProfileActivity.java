@@ -1,40 +1,24 @@
 package com.example.canada_geese.Pages;
 
-
-
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.Manifest;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
-
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.canada_geese.R;
@@ -43,40 +27,37 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Activity that allows users to edit their profile including bio and profile image.
+ */
 public class EditProfileActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int CAMERA_REQUEST_CODE = 2;
+
     private ImageView profileImageView;
     private EditText aboutEditText;
     private Button saveButton;
+    private ImageButton pencilThingy;
     private Uri imageUri;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private StorageReference storageRef;
-    private ImageButton pencilThingy;
-    private static final int TAKE_PHOTO_REQUEST = 2;
-    //private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
-    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
     private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
     private ActivityResultLauncher<Intent> cameraLauncher;
-    private static final int CAMERA_REQUEST_CODE = 2;
 
-
+    /**
+     * Initializes the activity and sets up Firebase, UI components, and event listeners.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,14 +76,13 @@ public class EditProfileActivity extends AppCompatActivity {
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
                     if (isGranted) {
-                        // Permission granted, launch camera
                         openCamera();
                     } else {
-                        // Permission denied
                         Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
+
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -118,14 +98,13 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 }
         );
+
         requestGalleryPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
                     if (isGranted) {
-                        // Permission granted, open gallery
                         chooseFromGallery();
                     } else {
-                        // Permission denied
                         Toast.makeText(this, "Allow permissions to access gallery", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -136,10 +115,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Intent data = result.getData();
-
-                        // Camera or Gallery, that is the question
                         if (data.getExtras() != null && data.getExtras().containsKey("data")) {
-                            // For Camera
                             Bitmap photo = (Bitmap) data.getExtras().get("data");
                             if (photo != null) {
                                 profileImageView.setImageBitmap(photo);
@@ -147,7 +123,6 @@ public class EditProfileActivity extends AppCompatActivity {
                                 Log.d("EditProfileActivity", "Camera photo captured");
                             }
                         } else if (data.getData() != null) {
-                            // For Gallery:
                             imageUri = data.getData();
                             Glide.with(this)
                                     .load(imageUri)
@@ -159,14 +134,15 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
         );
 
-        //pencilThingy.setOnClickListener(v -> openFileChooser());
         pencilThingy.setOnClickListener(v -> showImageOptionsDialog());
-
         saveButton.setOnClickListener(v -> saveProfile());
 
         loadProfile();
     }
 
+    /**
+     * Loads the user's current profile details from Firestore.
+     */
     private void loadProfile() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -191,6 +167,10 @@ public class EditProfileActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> Log.e("EditProfile", "Failed to load user profile", e));
         }
     }
+
+    /**
+     * Displays options for choosing a new profile picture.
+     */
     private void showImageOptionsDialog() {
         String[] options = {"Choose from Gallery", "Take a New Picture", "Remove Picture"};
 
@@ -208,37 +188,42 @@ public class EditProfileActivity extends AppCompatActivity {
                 .show();
     }
 
-    /*private void chooseFromGallery() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-        imagePickerLauncher.launch(intent);
-    }*/
+    /**
+     * Opens the gallery to allow the user to pick an image.
+     */
     private void chooseFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imagePickerLauncher.launch(intent);
     }
 
+    /**
+     * Checks for camera permission and opens the camera if granted.
+     * If permission is not granted, it requests the permission.
+     */
     private void takeNewPicture() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
             openCamera();
         } else {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
 
+    /**
+     * Launches the camera app to take a new picture.
+     */
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-       // startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
         imagePickerLauncher.launch(cameraIntent);
     }
 
-
-
-
+    /**
+     * Handles the result of permission requests.
+     *
+     * @param requestCode  The request code passed in requestPermissions
+     * @param permissions  The requested permissions
+     * @param grantResults The grant results for the corresponding permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -250,6 +235,11 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
     }
+
+    /**
+     * Prompts the user to confirm removal of the profile picture.
+     * If confirmed, it resets the image and updates Firestore.
+     */
     private void removeProfilePicture() {
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Remove Profile Picture")
@@ -274,7 +264,12 @@ public class EditProfileActivity extends AppCompatActivity {
                 .show();
     }
 
-
+    /**
+     * Converts a Bitmap to a Uri by inserting it into the MediaStore.
+     *
+     * @param bitmap the bitmap to convert
+     * @return the Uri of the saved image
+     */
     private Uri getImageUri(Bitmap bitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -282,6 +277,9 @@ public class EditProfileActivity extends AppCompatActivity {
         return Uri.parse(path);
     }
 
+    /**
+     * Saves the user's profile information, including uploading the profile image if one is selected.
+     */
     private void saveProfile() {
         String aboutText = aboutEditText.getText().toString().trim();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -297,7 +295,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                             userUpdates.put("image_profile", uri.toString());
                             updateUserProfile(userId, userUpdates);
-                            finish(); // Move this inside the success callback
+                            finish();
                         }))
                         .addOnFailureListener(e -> {
                             Log.e("EditProfile", "Failed to upload image", e);
@@ -310,9 +308,17 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Updates the user's profile document in Firestore with the given data.
+     *
+     * @param userId      the ID of the user
+     * @param userUpdates the map of profile fields to update
+     */
     private void updateUserProfile(String userId, Map<String, Object> userUpdates) {
         db.collection("users").document(userId).update(userUpdates)
-                .addOnSuccessListener(aVoid -> Toast.makeText(EditProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Log.e("EditProfile", "Failed to update profile", e));
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(EditProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                        Log.e("EditProfile", "Failed to update profile", e));
     }
 }

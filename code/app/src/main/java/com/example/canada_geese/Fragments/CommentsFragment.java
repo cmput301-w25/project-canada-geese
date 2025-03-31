@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * A BottomSheetDialogFragment that displays and manages comments for a given mood event.
+ */
 public class CommentsFragment extends BottomSheetDialogFragment {
 
     private String moodEventId;
@@ -51,6 +54,13 @@ public class CommentsFragment extends BottomSheetDialogFragment {
 
     public CommentsFragment() {}
 
+    /**
+     * Creates a new instance of CommentsFragment with the given mood event and owner.
+     *
+     * @param moodEventId The ID of the mood event.
+     * @param moodOwnerId The ID of the owner of the mood event.
+     * @return A new instance of CommentsFragment.
+     */
     public static CommentsFragment newInstance(String moodEventId, String moodOwnerId) {
         CommentsFragment fragment = new CommentsFragment();
         Bundle args = new Bundle();
@@ -118,78 +128,87 @@ public class CommentsFragment extends BottomSheetDialogFragment {
             }, 100);
         }
 
-        btnPost.setOnClickListener(v -> {
-            String commentText = etComment.getText().toString().trim();
-            if (commentText.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter a comment", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (firebaseUser == null) {
-                Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String uid = firebaseUser.getUid();
-            FirebaseFirestore.getInstance().collection("users")
-                    .document(uid)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                            String username = task.getResult().getString("username");
-                            if (username == null || username.isEmpty()) {
-                                username = firebaseUser.getEmail();
-                            }
-                            CommentModel comment = new CommentModel(commentText, username, new Date());
-                            comment.setUserId(uid);
+        btnPost.setOnClickListener(v -> postComment(etComment));
+        loadComments();
+    }
 
-                            DatabaseManager.getInstance().addComment(moodOwnerId, moodEventId, comment, new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> postTask) {
-                                    if (postTask.isSuccessful()) {
-                                        Toast.makeText(getContext(), "Comment posted", Toast.LENGTH_SHORT).show();
-                                        etComment.setText("");
-                                    } else {
-                                        String errorMsg = postTask.getException() != null ? postTask.getException().getMessage() : "Unknown error";
-                                        Toast.makeText(getContext(), "Failed to post comment: " + errorMsg, Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
-                        } else {
-                            Toast.makeText(getContext(), "Failed to retrieve username", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        });
-
-        // ✅ Now listen on the actual mood owner's doc
-        if (moodOwnerId != null && moodEventId != null) {
-            FirebaseFirestore.getInstance().collection("users")
-                    .document(moodOwnerId)
-                    .collection("moodEvents")
-                    .document(moodEventId)
-                    .collection("comments")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
-                    .addSnapshotListener((snapshots, error) -> {
-                        if (error != null) return;
-
-                        commentList.clear();
-                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                            CommentModel comment = doc.toObject(CommentModel.class);
-                            if (comment != null) {
-                                comment.setDocumentId(doc.getId());
-                                commentList.add(comment);
-                            }
-                        }
-
-                        if (commentList.isEmpty()) {
-                            tvNoComments.setVisibility(View.VISIBLE);
-                            rvComments.setVisibility(View.GONE);
-                        } else {
-                            tvNoComments.setVisibility(View.GONE);
-                            rvComments.setVisibility(View.VISIBLE);
-                        }
-
-                        commentAdapter.updateComments(commentList);
-                    });
+    /**
+     * Posts a new comment to Firestore and updates the UI.
+     */
+    private void postComment(EditText etComment) {
+        String commentText = etComment.getText().toString().trim();
+        if (commentText.isEmpty()) {
+            Toast.makeText(getContext(), "Please enter a comment", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null) {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String uid = firebaseUser.getUid();
+        FirebaseFirestore.getInstance().collection("users")
+                .document(uid)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                        String username = task.getResult().getString("username");
+                        if (username == null || username.isEmpty()) {
+                            username = firebaseUser.getEmail();
+                        }
+                        CommentModel comment = new CommentModel(commentText, username, new Date());
+                        comment.setUserId(uid);
+
+                        DatabaseManager.getInstance().addComment(moodOwnerId, moodEventId, comment, postTask -> {
+                            if (postTask.isSuccessful()) {
+                                Toast.makeText(getContext(), "Comment posted", Toast.LENGTH_SHORT).show();
+                                etComment.setText("");
+                            } else {
+                                String errorMsg = postTask.getException() != null ? postTask.getException().getMessage() : "Unknown error";
+                                Toast.makeText(getContext(), "Failed to post comment: " + errorMsg, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), "Failed to retrieve username", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /**
+     * Loads the list of comments from Firestore and updates the adapter.
+     */
+    private void loadComments() {
+        if (moodOwnerId == null || moodEventId == null) return;
+
+        FirebaseFirestore.getInstance().collection("users")
+                .document(moodOwnerId)
+                .collection("moodEvents")
+                .document(moodEventId)
+                .collection("comments")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) return;
+
+                    commentList.clear();
+                    for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                        CommentModel comment = doc.toObject(CommentModel.class);
+                        if (comment != null) {
+                            comment.setDocumentId(doc.getId());
+                            commentList.add(comment);
+                        }
+                    }
+
+                    if (commentList.isEmpty()) {
+                        tvNoComments.setVisibility(View.VISIBLE);
+                        rvComments.setVisibility(View.GONE);
+                    } else {
+                        tvNoComments.setVisibility(View.GONE);
+                        rvComments.setVisibility(View.VISIBLE);
+                    }
+
+                    commentAdapter.updateComments(commentList);
+                });
     }
 }

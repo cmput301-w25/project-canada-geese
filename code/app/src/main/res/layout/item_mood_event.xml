@@ -16,7 +16,6 @@
         android:layout_height="match_parent"
         android:padding="10dp">
 
-        <!-- Header section (always visible) -->
         <ImageButton
             android:id="@+id/comment_button2"
             android:layout_width="35dp"
@@ -68,7 +67,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <!--For expansion -->
 
         <ImageView
             android:id="@+id/expand_icon"
@@ -83,7 +81,6 @@
             app:layout_constraintTop_toBottomOf="@+id/details_container" />
 
 
-        <!-- Details container (only visible when expanded) -->
 
         <TextView
             android:id="@+id/mood_name"
@@ -108,7 +105,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_description">
 
-            <!-- Social Situation -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,7 +126,6 @@
                 android:layout_marginTop="8dp"
                 android:orientation="vertical" />
 
-            <!-- Location -->
             <TextView
                 android:id="@+id/tv_location_label"
                 android:layout_width="match_parent"
@@ -148,7 +143,6 @@
 
         </LinearLayout>
 
-        <!-- Edit container (only visible in edit mode) -->
         <LinearLayout
             android:id="@+id/edit_container"
             android:layout_width="match_parent"

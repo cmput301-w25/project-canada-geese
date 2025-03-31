@@ -15,17 +15,35 @@ import com.example.canada_geese.R;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying and handling follow requests in a RecyclerView.
+ */
 public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdapter.ViewHolder> {
 
     private List<FollowRequestModel> requestList;
-    private Context context;
-    private OnRequestActionListener listener;
+    private final Context context;
+    private final OnRequestActionListener listener;
 
-    // Interface for handling request actions
+    /**
+     * Listener interface to handle accept/reject actions on follow requests.
+     */
     public interface OnRequestActionListener {
+        /**
+         * Callback for follow request actions.
+         *
+         * @param username the username associated with the request
+         * @param action   either "accepted" or "rejected"
+         */
         void onRequestAction(String username, String action);
     }
 
+    /**
+     * Constructs a FollowRequestAdapter.
+     *
+     * @param requestList the list of follow requests
+     * @param context     the context used for inflating views
+     * @param listener    the listener to handle request actions
+     */
     public FollowRequestAdapter(List<FollowRequestModel> requestList, Context context, OnRequestActionListener listener) {
         this.requestList = requestList;
         this.context = context;
@@ -42,16 +60,15 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FollowRequestModel request = requestList.get(position);
-        holder.usernameText.setText(request.getUsername()); // Updated field name
 
-        // Handle Accept Button Click
+        holder.usernameText.setText(request.getUsername());
+
         holder.acceptButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onRequestAction(request.getUsername(), "accepted");
             }
         });
 
-        // Handle Reject Button Click
         holder.rejectButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onRequestAction(request.getUsername(), "rejected");
@@ -61,14 +78,22 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
 
     @Override
     public int getItemCount() {
-        return requestList.size();
+        return requestList != null ? requestList.size() : 0;
     }
 
-    // ViewHolder Class
+    /**
+     * ViewHolder for follow request items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView usernameText;
-        Button acceptButton, rejectButton;
+        Button acceptButton;
+        Button rejectButton;
 
+        /**
+         * Constructs a ViewHolder for a follow request item.
+         *
+         * @param itemView the inflated layout for the item
+         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameText = itemView.findViewById(R.id.username_text);

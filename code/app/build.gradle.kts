@@ -93,14 +93,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.5.0")
 
-    // 添加Robolectric所需的额外依赖
     testImplementation("org.robolectric:robolectric:4.10.3")
     testImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     testImplementation("org.hamcrest:hamcrest-all:1.3")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("androidx.test.ext:truth:1.5.0")
 
-    // Android Instrumented Tests
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
