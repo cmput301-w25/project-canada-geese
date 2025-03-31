@@ -6,6 +6,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -30,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MoodSyncWorker extends Worker {
-
+    public static final String WORK_NAME = "MoodSyncWork";
     public MoodSyncWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
@@ -82,15 +83,17 @@ public class MoodSyncWorker extends Worker {
 
         return Result.success();
     }
+
     public static void scheduleSync(Context context) {
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
+        WorkManager workManager = WorkManager.getInstance(context);
+
+        OneTimeWorkRequest syncRequest = new OneTimeWorkRequest.Builder(MoodSyncWorker.class)
                 .build();
 
-        WorkRequest syncRequest = new OneTimeWorkRequest.Builder(MoodSyncWorker.class)
-                .setConstraints(constraints)
-                .build();
-
-        WorkManager.getInstance(context).enqueue(syncRequest);
+        workManager.enqueueUniqueWork(
+                WORK_NAME,
+                ExistingWorkPolicy.KEEP, // or REPLACE depending on your needs
+                syncRequest
+        );
     }
 }
