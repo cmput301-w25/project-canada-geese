@@ -116,8 +116,6 @@ public class AddMoodEventDialogFragmentTest {
     @Test
     public void testAddMoodWithValidInput() {
         launchDialog();
-
-        // Wait for the dialog to fully load
         Espresso.onView(isRoot()).perform(waitFor(1000));
 
         Espresso.onView(withId(R.id.description_input))
@@ -126,7 +124,6 @@ public class AddMoodEventDialogFragmentTest {
         Espresso.onView(withId(R.id.add_mood_button))
                 .perform(ViewActions.click());
 
-        // Just verify that it didn't crash and dismissed
     }
 
     /**
@@ -136,23 +133,16 @@ public class AddMoodEventDialogFragmentTest {
     public void testAddMoodWithEmptyDescription() {
         launchDialog();
 
-        // Wait for dialog to fully appear with a longer timeout
         Espresso.onView(isRoot()).perform(waitFor(2000));
 
-        // Focus on description field first before clearing it
         Espresso.onView(withId(R.id.description_input))
                 .perform(ViewActions.click(), ViewActions.clearText());
-
-        // Wait a bit after clearing the text
         Espresso.onView(isRoot()).perform(waitFor(500));
 
-        // Ensure click on button is clean
         Espresso.onView(withId(R.id.add_mood_button))
-                .perform(ViewActions.scrollTo())  // Make sure button is visible
-                .check(matches(isDisplayed()))  // Verify it's displayed
-                .perform(ViewActions.click());  // Then click it
-
-        // Wait to ensure dialog dismisses properly
+                .perform(ViewActions.scrollTo())
+                .check(matches(isDisplayed()))
+                .perform(ViewActions.click());
         Espresso.onView(isRoot()).perform(waitFor(2000));
     }
 
@@ -163,26 +153,16 @@ public class AddMoodEventDialogFragmentTest {
     public void testAddMoodWithLocation() {
         launchDialog();
 
-        // Wait for dialog to fully load
         Espresso.onView(isRoot()).perform(waitFor(1000));
 
-        // Click location checkbox
         Espresso.onView(withId(R.id.attach_location_checkbox))
                 .perform(ViewActions.click());
-
-        // Give UI time to update - this is key
         Espresso.onView(isRoot()).perform(waitFor(2000));
-
-        // If map container is still not visible, we can check why
         try {
-            // Try to check if map container is visible
             Espresso.onView(withId(R.id.map_container))
                     .check(matches(isDisplayed()));
         } catch (Exception e) {
-            // If it fails, try to check what's preventing map container from showing
             System.out.println("Map container not displayed. May need additional actions.");
-
-            // Check if location checkbox is indeed checked
             Espresso.onView(withId(R.id.attach_location_checkbox))
                     .check(matches(isChecked()));
         }
@@ -194,28 +174,18 @@ public class AddMoodEventDialogFragmentTest {
     @Test
     public void testAddMoodWithImage() {
         launchDialog();
-
-        // Allow time for the dialog to fully load
         Espresso.onView(isRoot()).perform(waitFor(1000));
-
-        // Click the camera button
         Espresso.onView(withId(R.id.camera_button))
                 .perform(ViewActions.click());
-
-        // Wait for the image selection dialog to appear
         Espresso.onView(isRoot()).perform(waitFor(1000));
 
-        // Match against the image selection dialog's title
         try {
             Espresso.onData(anything())
                     .inRoot(isDialog())
                     .atPosition(0)  // Camera option
                     .perform(ViewActions.click());
 
-            // The test might fail here since we can't fully simulate camera,
-            // but at least we've verified the dialog appears
         } catch (Exception e) {
-            // Verify at least that the dialog appears
             Espresso.onView(withText("Select Image Source"))
                     .inRoot(isDialog())
                     .check(matches(isDisplayed()));
@@ -228,32 +198,24 @@ public class AddMoodEventDialogFragmentTest {
     @Test
     public void testSocialSituationSelection() {
         launchDialog();
-
-        // Wait for dialog to fully load
         Espresso.onView(isRoot()).perform(waitFor(1000));
 
-        // Check if the spinner is displayed
         Espresso.onView(withId(R.id.social_situation_spinner))
                 .check(matches(isDisplayed()));
 
-        // Test the spinner is clickable
         Espresso.onView(withId(R.id.social_situation_spinner))
                 .check(matches(isClickable()));
 
-        // Add a description
         Espresso.onView(withId(R.id.description_input))
                 .perform(ViewActions.replaceText("Testing social situations"));
 
-        // Test trigger warning checkbox
         Espresso.onView(withId(R.id.trigger_warning_checkbox))
                 .perform(ViewActions.click())
                 .check(matches(isChecked()));
 
-        // Submit the mood event
         Espresso.onView(withId(R.id.add_mood_button))
                 .perform(ViewActions.click());
 
-        // Wait to ensure dialog dismisses
         Espresso.onView(isRoot()).perform(waitFor(1000));
     }
 
@@ -266,46 +228,30 @@ public class AddMoodEventDialogFragmentTest {
     public void testAddMoodWithMultipleImages() {
         launchDialog();
 
-        // Wait more generously for dialog to fully load
         Espresso.onView(isRoot()).perform(waitFor(2000));
 
-        // Verify dialog components are properly displayed
         Espresso.onView(withId(R.id.camera_button))
                 .check(matches(isDisplayed()));
 
-        // Click the camera button to trigger image selection dialog
         try {
             Espresso.onView(withId(R.id.camera_button))
                     .perform(ViewActions.click());
 
-            // Wait for image selection dialog to appear
             Espresso.onView(isRoot()).perform(waitFor(1000));
 
-            // Press back to dismiss any system dialogs
             Espresso.pressBack();
         } catch (Exception e) {
-            // Log any issues for debugging
             System.out.println("Exception when clicking camera button: " + e.getMessage());
         }
 
-        // Wait after dismissing dialog
         Espresso.onView(isRoot()).perform(waitFor(1000));
 
-        // Proceed with other actions that should work regardless of image selection
         Espresso.onView(withId(R.id.description_input))
                 .perform(ViewActions.click())
                 .perform(ViewActions.typeText("Test with multiple images"));
-
-        // Wait after typing
         Espresso.onView(isRoot()).perform(waitFor(500));
-
-        // Close soft keyboard before clicking button
         Espresso.closeSoftKeyboard();
-
-        // Wait after keyboard close
         Espresso.onView(isRoot()).perform(waitFor(500));
-
-        // Submit the form - scrollTo first to ensure button is visible
         Espresso.onView(withId(R.id.add_mood_button))
                 .perform(ViewActions.scrollTo(), ViewActions.click());
     }

@@ -97,30 +97,18 @@ public class EditProfileLogicTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-
-        // Setup context mock
         when(mockContext.getContentResolver()).thenReturn(mockContentResolver);
-
-        // Setup Firebase Auth mock
         when(mockAuth.getCurrentUser()).thenReturn(mockUser);
         when(mockUser.getUid()).thenReturn("test_user_id");
-
-        // Setup Firestore mock
         when(mockDb.collection(anyString())).thenReturn(mockCollectionRef);
         when(mockCollectionRef.document(anyString())).thenReturn(mockDocRef);
         when(mockDocRef.update(any(Map.class))).thenReturn(mockTask);
-
-        // Setup Storage mock
         when(mockStorage.getReference(anyString())).thenReturn(mockStorageRef);
         when(mockStorageRef.child(anyString())).thenReturn(mockFileRef);
         when(mockFileRef.putFile(any(Uri.class))).thenReturn(mockUploadTask);
         when(mockUploadTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockUploadTask);
         when(mockUploadTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockUploadTask);
-
-        // Setup Uri mock
         when(mockUri.toString()).thenReturn("content://test/image.jpg");
-
-        // Initialize the profile editor with mocks
         profileEditor = new ProfileEditor(mockContext, mockAuth, mockDb, mockStorage);
     }
 
@@ -130,12 +118,10 @@ public class EditProfileLogicTest {
      */
     @Test
     public void testSaveProfileWithImage() {
-        // Prepare test data
         String aboutText = "Test user bio";
         Uri imageUri = mockUri;
         final String[] uploadedImageUrl = {null};
 
-        // Setup mocks to capture the uploaded image URL
         doAnswer(new Answer<UploadTask>() {
             @Override
             public UploadTask answer(InvocationOnMock invocation) throws Throwable {
@@ -157,7 +143,6 @@ public class EditProfileLogicTest {
             }
         }).when(mockUriTask).addOnSuccessListener(any(OnSuccessListener.class));
 
-        // Setup document update to capture the update map
         final Map<String, Object>[] capturedUpdates = new Map[1];
         doAnswer(new Answer<Task<Void>>() {
             @Override
@@ -166,8 +151,6 @@ public class EditProfileLogicTest {
                 return mockTask;
             }
         }).when(mockDocRef).update(any(Map.class));
-
-        // Execute the method under test
         boolean result = profileEditor.saveProfile(aboutText, imageUri);
 
         // Verify the result
@@ -184,7 +167,6 @@ public class EditProfileLogicTest {
      */
     @Test
     public void testRemoveProfilePicture() {
-        // Setup document update to capture the update map
         final Map<String, Object>[] capturedUpdates = new Map[1];
         doAnswer(new Answer<Task<Void>>() {
             @Override
@@ -194,10 +176,8 @@ public class EditProfileLogicTest {
             }
         }).when(mockDocRef).update(any(Map.class));
 
-        // Execute the method under test
         boolean result = profileEditor.removeProfilePicture();
 
-        // Verify the result
         assertTrue("Profile picture removal should return true", result);
         assertNotNull("Should have captured updates", capturedUpdates[0]);
         assertNull("Image profile should be set to null", capturedUpdates[0].get("image_profile"));
@@ -246,7 +226,6 @@ public class EditProfileLogicTest {
             userUpdates.put("about", aboutText);
 
             if (imageUri != null) {
-                // Upload image to storage
                 StorageReference fileReference = storage.getReference("profile_images").child(userId + ".jpg");
                 fileReference.putFile(imageUri)
                         .addOnSuccessListener(taskSnapshot -> {
@@ -256,7 +235,6 @@ public class EditProfileLogicTest {
                             });
                         })
                         .addOnFailureListener(e -> {
-                            // Handle failure in real app
                         });
             } else {
                 updateUserProfile(userId, userUpdates);

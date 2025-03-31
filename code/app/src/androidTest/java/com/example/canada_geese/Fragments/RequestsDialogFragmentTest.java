@@ -65,7 +65,6 @@ public class RequestsDialogFragmentTest {
     private void addMockRequestAndLaunch(String currentUserUid, Runnable whenReady) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Insert a mock request into Firestore
         Map<String, Object> mockRequest = new HashMap<>();
         mockRequest.put("username", "mock_user");
         mockRequest.put("status", "pending");

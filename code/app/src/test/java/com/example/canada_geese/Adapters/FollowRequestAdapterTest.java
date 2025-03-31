@@ -36,12 +36,10 @@ public class FollowRequestAdapterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        // Create test request data
         requestList = new ArrayList<>();
         requestList.add(new FollowRequestModel("testuser1", "pending"));
         requestList.add(new FollowRequestModel("testuser2", "pending"));
 
-        // Initialize adapter
         adapter = new FollowRequestAdapter(requestList, mockContext, mockListener);
     }
 
@@ -50,20 +48,15 @@ public class FollowRequestAdapterTest {
      */
     @Test
     public void testOnRequestAction() {
-        // Test that the adapter properly calls the listener when request actions are triggered
 
-        // Create a test request
         FollowRequestModel testRequest = new FollowRequestModel("testuser3", "pending");
         requestList.add(testRequest);
 
-        // Directly test the behavior that would happen when buttons are clicked
         mockListener.onRequestAction("testuser3", "accepted");
         verify(mockListener).onRequestAction("testuser3", "accepted");
 
         mockListener.onRequestAction("testuser3", "rejected");
         verify(mockListener).onRequestAction("testuser3", "rejected");
-
-        // Optional: Check the adapter's item count
         assertEquals(3, adapter.getItemCount());
     }
 
@@ -72,18 +65,12 @@ public class FollowRequestAdapterTest {
      */
     @Test
     public void testOnRequestActionWithHolder() {
-        // Create a custom TestViewHolder to access the adapter's ViewHolder behavior
         FollowRequestModel testRequest = new FollowRequestModel("testuser3", "pending");
         TestViewHolder testHolder = new TestViewHolder();
-
-        // Simulate binding
         testHolder.bindView(testRequest);
 
-        // Simulate accept button click
         testHolder.clickAccept();
         verify(mockListener).onRequestAction("testuser3", "accepted");
-
-        // Simulate reject button click
         testHolder.clickReject();
         verify(mockListener).onRequestAction("testuser3", "rejected");
     }

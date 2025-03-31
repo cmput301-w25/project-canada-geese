@@ -143,7 +143,9 @@ public class UsersAdapterTest {
         assertFalse("Glide should not be used for null profile image", adapter.shouldUseGlideForUser(user));
     }
 
-    // Helper method to set image_profile via reflection
+    /**
+     * Helper method to set image_profile via reflection
+     */
     private void setUserImageProfile(Users user, String newValue) {
         try {
             java.lang.reflect.Field field = Users.class.getDeclaredField("image_profile");

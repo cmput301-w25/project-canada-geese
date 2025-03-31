@@ -81,19 +81,13 @@ public class CommentAdapterTest {
      */
     @Test
     public void testDeleteComment() {
-        // Get original comment list
         List<CommentModel> comments = getCommentList(adapter);
 
-        // Check original size
         assertEquals(2, comments.size());
-
-        // Remove the first comment manually (simulate deletion)
         comments.remove(0);
 
-        // Update adapter's list using reflection
         setCommentList(adapter, comments);
 
-        // Check updated list
         List<CommentModel> updated = getCommentList(adapter);
         assertEquals(1, updated.size());
         assertEquals("Second comment", updated.get(0).getText());

@@ -44,18 +44,15 @@ public class MoodEventAdapterTest {
         originalList = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
 
-        // Mood event for today
         MoodEventModel todayMood = new MoodEventModel(
                 "Happiness", "Today I'm happy", new Date(), "\uD83D\uDE0A",
                 R.color.color_happiness, false, false, 0.0, 0.0);
 
-        // Mood event from 10 days ago
         cal.add(Calendar.DAY_OF_YEAR, -10);
         MoodEventModel tenDaysAgoMood = new MoodEventModel(
                 "Anger", "I was angry last week", cal.getTime(), "\uD83D\uDE20",
                 R.color.color_anger, true, false, 0.0, 0.0);
 
-        // Mood event from 3 days ago
         cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -3);
         MoodEventModel threeDaysAgoMood = new MoodEventModel(
