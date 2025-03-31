@@ -10,6 +10,13 @@ import com.example.canada_geese.Fragments.AddMoodEventDialogFragment;
 import com.example.canada_geese.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+// Offline
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
+
+import com.example.canada_geese.Workers.MoodSyncWorker;
 /**
  * The main activity of the application that manages the bottom navigation and loads different fragments.
  * Handles user navigation between different pages such as User Moods, Friends' Moods, Map View, and Profile.
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle bottom navigation item selection
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
             /**
              * Handles navigation item selection to load the appropriate fragment.
              *
@@ -68,6 +76,15 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 return loadFragment(fragment);
+            }
+        });
+        MoodSyncWorker.scheduleSync(this);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest request = new NetworkRequest.Builder().build();
+        cm.registerNetworkCallback(request, new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                MoodSyncWorker.scheduleSync(getApplicationContext());
             }
         });
     }
