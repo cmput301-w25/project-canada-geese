@@ -8,11 +8,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -49,7 +52,9 @@ import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.canada_geese.Managers.DatabaseManager;
+import com.example.canada_geese.Managers.OfflineDatabase;
 import com.example.canada_geese.Models.MoodEventModel;
+import com.example.canada_geese.Models.PendingMoodEvent;
 import com.example.canada_geese.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -69,6 +74,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -454,36 +461,84 @@ public class AddMoodEventDialogFragment extends DialogFragment {
 
             } else {
                 // ➕ ADD MODE LOGIC (your original code)
+                ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
 
-                if (hasLocation) {
-                    if (locationRetrieved) {
-                        saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, latitude, longitude, selectedImages);
-                    } else {
-                        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                                if (location != null) {
-                                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, location.getLatitude(), location.getLongitude(), selectedImages);
-                                } else {
-                                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
-                                    Toast.makeText(requireContext(), "Could not get location", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(e -> {
-                                Toast.makeText(requireContext(), "Failed to get location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
-                            });
-                            return;
+                if (isConnected) {
+                    if (hasLocation) {
+                        if (locationRetrieved) {
+                            saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, latitude, longitude, selectedImages);
                         } else {
-                            saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
-                            Toast.makeText(requireContext(), "Location permission not granted", Toast.LENGTH_SHORT).show();
+                            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                                    if (location != null) {
+                                        saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, location.getLatitude(), location.getLongitude(), selectedImages);
+                                    } else {
+                                        saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
+                                        Toast.makeText(requireContext(), "Could not get location", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(e -> {
+                                    Toast.makeText(requireContext(), "Failed to get location: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
+                                });
+                                return;
+                            } else {
+                                saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
+                                Toast.makeText(requireContext(), "Location permission not granted", Toast.LENGTH_SHORT).show();
+                            }
                         }
+                    } else {
+                        saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
                     }
                 } else {
-                    saveMoodEventWithLocationAndImage(moodName, description, triggerWarning, socialSituation, 0, 0, selectedImages);
+                    // 📥 Offline mode: save locally
+                    saveMoodLocally(moodName, description, triggerWarning, socialSituation, latitude, longitude, selectedImages);
                 }
             }
         });
 
+
+
+
         return view;
+    }
+
+    private void saveMoodLocally(String moodName, String description, boolean triggerWarning, String socialSituation,
+                                 double latitude, double longitude, ArrayList<Bitmap> images) {
+        List<String> imagePaths = new ArrayList<>();
+
+        for (Bitmap bitmap : images) {
+            String filename = "mood_" + System.currentTimeMillis() + ".jpg";
+            File file = new File(requireContext().getFilesDir(), filename);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                imagePaths.add(file.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        PendingMoodEvent event = new PendingMoodEvent();
+        event.emotion = moodName;
+        event.description = description;
+        event.emoji = getEmojiForEmotion(moodName);
+        event.color = getColorForEmotion(moodName);
+        event.isPrivate = triggerWarning;
+        event.hasLocation = (latitude != 0 || longitude != 0);
+        event.latitude = latitude;
+        event.longitude = longitude;
+        event.socialSituation = socialSituation;
+        event.timestamp = new Date().getTime();
+        event.imagePaths = imagePaths;
+
+        new Thread(() -> {
+            OfflineDatabase.getInstance(requireContext()).pendingMoodDao().insert(event);
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(requireContext(), "Mood saved offline. Will upload when back online.", Toast.LENGTH_LONG).show();
+                dismiss();
+            });
+        }).start();
     }
 
     /**

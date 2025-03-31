@@ -29,6 +29,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+
     }
     testOptions {
         unitTests {
@@ -47,6 +49,7 @@ android {
 }
 configurations.all {
     exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    exclude(group = "com.google.android", module = "annotations")
 }
 
 dependencies {
@@ -82,6 +85,18 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.exifinterface:exifinterface:1.3.6")
 
+    // Room (for local database)
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+
+    // Gson (for serializing imagePaths in Room DB)
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // WorkManager (for syncing offline moods in background)
+    implementation("androidx.work:work-runtime:2.9.0")
+    implementation("com.google.guava:guava:31.1-android")
+
+
     // Unit Tests (JVM)
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:5.2.0")
@@ -111,5 +126,8 @@ dependencies {
 
     androidTestImplementation("com.linkedin.dexmaker:dexmaker-mockito:2.28.1") {
         exclude(group = "com.google.protobuf", module = "protobuf-lite")
+        exclude(group = "com.google.android", module = "annotations")
     }
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
 }
