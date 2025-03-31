@@ -11,7 +11,7 @@
         android:id="@+id/launch"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#5E564D"
+        android:background="#E8EDF2"
         android:clipToOutline="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,10 +30,10 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="110dp"
-            android:layout_marginTop="128dp"
+            android:layout_marginTop="295dp"
             android:layout_marginEnd="110dp"
             android:layout_marginRight="110dp"
-            android:layout_marginBottom="580dp"
+            android:layout_marginBottom="415dp"
             android:background="@drawable/goose"
             android:scaleType="fitCenter" />
     </RelativeLayout>

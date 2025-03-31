@@ -1,13 +1,14 @@
 package com.example.canada_geese.activities_ui;
-import com.example.canada_geese.R;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
+import static com.example.canada_geese.Fragments.AddMoodEventDialogFragmentTest.isDialog;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,11 +23,13 @@ import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.matcher.IntentMatchers;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.example.canada_geese.Pages.EditProfileActivity;
+import com.example.canada_geese.R;
 
 import org.hamcrest.Matcher;
 import org.junit.After;
@@ -57,41 +60,30 @@ public class EditProfileActivityUITest {
         Intents.release();
     }
 
-    /**
-     * Helper method to wait for a specific duration.
-     */
-    public static ViewAction waitFor(final long millis) {
+    private ViewAction waitAndClick() {
         return new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
-                return isRoot();
+                return isDisplayed();
             }
 
             @Override
             public String getDescription() {
-                return "Wait for " + millis + " milliseconds.";
+                return "Wait for animations and click";
             }
 
             @Override
             public void perform(UiController uiController, View view) {
-                uiController.loopMainThreadForAtLeast(millis);
+                uiController.loopMainThreadForAtLeast(500);
+                view.performClick();
             }
         };
     }
 
     @Test
     public void testShowImageOptionsDialog() {
-        // First wait to ensure activity is loaded
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Click the edit profile image button
-        onView(withId(R.id.edit_profile_image)).perform(click());
-
-        // Give the dialog time to fully appear
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Now check if the dialog content is displayed
-        onView(withId(android.R.id.content)).check(matches(isDisplayed()));
+        onView(ViewMatchers.withId(R.id.edit_profile_image)).perform(waitAndClick());
+        onView(withText("Choose from Gallery")).check(matches(isDisplayed()));
     }
 
     @Test
@@ -102,26 +94,18 @@ public class EditProfileActivityUITest {
         Instrumentation.ActivityResult result =
                 new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
 
-        intending(IntentMatchers.hasAction(Intent.ACTION_PICK)).respondWith(result);
+        Intents.intending(IntentMatchers.anyIntent()).respondWith(result);
 
-        // Wait for activity to fully load
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+
         onView(isRoot()).perform(waitFor(1000));
 
-        // Click the edit profile image button
-        onView(withId(R.id.edit_profile_image)).perform(click());
-
-        // Wait for dialog to appear
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Testing gallery selection flow
-        try {
-            onView(withText("Choose from Gallery")).perform(click());
-        } catch (Exception e) {
-            // If specific text not found, try clicking the gallery button by position
-            // Note: This is a fallback and not ideal for production tests
-            onView(isRoot()).perform(waitFor(500));
-        }
+        onView(withText("Choose from Gallery"))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click());
     }
+
 
     @Test
     public void testTakeNewPicture() {
@@ -129,48 +113,99 @@ public class EditProfileActivityUITest {
         resultData.putExtra("data", android.graphics.Bitmap.createBitmap(100, 100, android.graphics.Bitmap.Config.ARGB_8888));
         Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
 
-        intending(IntentMatchers.hasAction(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(result);
+        Intents.intending(IntentMatchers.anyIntent()).respondWith(result);
 
-        // Wait for activity to fully load
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Click the edit profile image button
-        onView(withId(R.id.edit_profile_image)).perform(click());
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+        onView(withText("Take a New Picture")).perform(waitAndClick());
     }
 
     @Test
     public void testRemoveProfilePicture() {
-        // Wait for activity to fully load
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Click the edit profile image button
-        onView(withId(R.id.edit_profile_image)).perform(click());
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+        onView(withText("Remove Picture")).perform(waitAndClick());
     }
 
     @Test
     public void testSaveProfileWithImageChanges() {
-        // Wait for activity to fully load
+        Intent galleryIntent = new Intent();
+        galleryIntent.setData(Uri.parse("content://media/external/images/media/1"));
+        Instrumentation.ActivityResult result =
+                new Instrumentation.ActivityResult(Activity.RESULT_OK, galleryIntent);
+        Intents.intending(IntentMatchers.anyIntent()).respondWith(result);
+
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+
+        onView(withText("Choose from Gallery")).perform(waitAndClick());
+
+        onView(isRoot()).perform(waitFor(1000));
+        Espresso.pressBack();
         onView(isRoot()).perform(waitFor(1000));
 
-        // Click save button directly
-        onView(withId(R.id.save_button)).perform(click());
+        onView(withId(R.id.save_button)).perform(waitAndClick());
     }
+
 
     @Test
     public void testUpdateProfileInformation() {
-        // Wait for activity to fully load
-        onView(isRoot()).perform(waitFor(1000));
-
-        // Verify about edit text is displayed
         onView(withId(R.id.about_edit_text)).check(matches(isDisplayed()));
     }
 
     @Test
     public void testChangeProfilePicture() {
-        // Wait for activity to fully load
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+        onView(withText("Choose from Gallery")).check(matches(isDisplayed()));
+        onView(withText("Take a New Picture")).check(matches(isDisplayed()));
+        onView(withText("Remove Picture")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testProfileImageUploadFlow() {
+        Intent galleryIntent = new Intent();
+        galleryIntent.setData(Uri.parse("content://media/external/images/media/1"));
+        Instrumentation.ActivityResult result =
+                new Instrumentation.ActivityResult(Activity.RESULT_OK, galleryIntent);
+        Intents.intending(IntentMatchers.anyIntent()).respondWith(result);
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+
+        onView(withText("Choose from Gallery")).perform(waitAndClick());
+
+        onView(isRoot()).perform(waitFor(1000));
+        Espresso.pressBack();
         onView(isRoot()).perform(waitFor(1000));
 
-        // Verify profile image view is displayed
-        onView(withId(R.id.edit_profile_image)).check(matches(isDisplayed()));
+        onView(withId(R.id.save_button)).perform(waitAndClick());
+    }
+
+    @Test
+    public void testSaveProfileWithMultipleChanges() {
+        onView(withId(R.id.edit_profile_image)).perform(waitAndClick());
+
+        onView(withText("Remove Picture")).perform(waitAndClick());
+
+        onView(isRoot()).perform(waitFor(1000));
+        Espresso.pressBack();
+
+        onView(isRoot()).perform(waitFor(1000));
+
+        onView(withId(R.id.save_button)).perform(waitAndClick());
+    }
+
+    public static ViewAction waitFor(long delay) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wait for " + delay + " milliseconds.";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                uiController.loopMainThreadForAtLeast(delay);
+            }
+        };
     }
 }
