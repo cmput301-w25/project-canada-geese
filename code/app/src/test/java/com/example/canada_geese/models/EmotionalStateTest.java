@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 
 
 import com.example.canada_geese.Models.EmotionalState;
-import com.example.canada_geese.R;
 
 
 public class EmotionalStateTest {
@@ -14,7 +13,7 @@ public class EmotionalStateTest {
 
     @Test
     public void testGetDisplayName() {
-        assertEquals("Happiness", EmotionalState.HAPPINESS.getDisplayName());
+        assertEquals("Happiness", EmotionalState.HAPPY.getDisplayName());
         assertEquals("Anger", EmotionalState.ANGER.getDisplayName());
         assertEquals("Sadness", EmotionalState.SADNESS.getDisplayName());
         assertEquals("Fear", EmotionalState.FEAR.getDisplayName());
@@ -28,7 +27,7 @@ public class EmotionalStateTest {
 
     @Test
     public void testGetColorResId() {
-        assertEquals(R.color.mood_happiness, EmotionalState.HAPPINESS.getColorResId());
+        assertEquals(R.color.mood_happiness, EmotionalState.HAPPY.getColorResId());
         assertEquals(R.color.mood_anger, EmotionalState.ANGER.getColorResId());
         assertEquals(R.color.mood_sadness, EmotionalState.SADNESS.getColorResId());
         assertEquals(R.color.mood_fear, EmotionalState.FEAR.getColorResId());
@@ -42,7 +41,7 @@ public class EmotionalStateTest {
 
     @Test
     public void testGetEmoji() {
-        assertEquals("😊", EmotionalState.HAPPINESS.getEmoji());
+        assertEquals("😊", EmotionalState.HAPPY.getEmoji());
         assertEquals("😠", EmotionalState.ANGER.getEmoji());
         assertEquals("😢", EmotionalState.SADNESS.getEmoji());
         assertEquals("😨", EmotionalState.FEAR.getEmoji());
@@ -56,7 +55,7 @@ public class EmotionalStateTest {
 
     @Test
     public void testFromStringValid() {
-        assertEquals(EmotionalState.HAPPINESS, EmotionalState.fromString("Happiness"));
+        assertEquals(EmotionalState.HAPPY, EmotionalState.fromString("Happiness"));
         assertEquals(EmotionalState.ANGER, EmotionalState.fromString("Anger"));
         assertEquals(EmotionalState.SADNESS, EmotionalState.fromString("sadness"));
         assertEquals(EmotionalState.SURPRISE, EmotionalState.fromString("SurPriSe"));

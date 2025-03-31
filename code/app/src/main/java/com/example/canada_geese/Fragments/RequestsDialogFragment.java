@@ -7,14 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.espresso.remote.EspressoRemoteMessage;
 
 import com.example.canada_geese.Adapters.FollowRequestAdapter;
 import com.example.canada_geese.Models.FollowRequestModel;
@@ -28,16 +27,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DialogFragment for displaying and handling incoming follow requests.
+ */
 public class RequestsDialogFragment extends DialogFragment {
+
     private RecyclerView recyclerView;
     private FollowRequestAdapter adapter;
     private List<FollowRequestModel> requestList;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private String currentUser;
+    private ImageView closeButton;
 
+    /**
+     * Default constructor for RequestsDialogFragment.
+     */
     public RequestsDialogFragment() {}
 
+    /**
+     * Creates a new instance of RequestsDialogFragment.
+     * @return A new instance of RequestsDialogFragment.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -48,6 +59,10 @@ public class RequestsDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * Called when the fragment is created.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,8 +76,7 @@ public class RequestsDialogFragment extends DialogFragment {
         currentUser = mAuth.getCurrentUser().getUid();
 
         requestList = new ArrayList<>();
-        adapter = new FollowRequestAdapter(requestList, getContext(), (username, action) -> handleRequestAction(username, action));
-
+        adapter = new FollowRequestAdapter(requestList, getContext(), this::handleRequestAction);
         recyclerView.setAdapter(adapter);
 
         loadFollowRequests();
@@ -70,6 +84,11 @@ public class RequestsDialogFragment extends DialogFragment {
         return view;
     }
 
+    /**
+     * Handles accepting or rejecting a follow request.
+     * @param username the username of the requesting user
+     * @param action either "accepted" or "rejected"
+     */
     private void handleRequestAction(String username, String action) {
         db.collection("users").document(currentUser).collection("requests")
                 .whereEqualTo("username", username)
@@ -77,82 +96,64 @@ public class RequestsDialogFragment extends DialogFragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                        String docId = document.getId(); // Get the document ID
+                        String docId = document.getId();
 
                         if (action.equals("accepted")) {
-                            // Add the requesting user to the current user's Followers collection
                             Map<String, Object> followerData = new HashMap<>();
                             followerData.put("username", username);
 
-                            // Use .add() to generate auto ID instead of .document(username).set()
                             db.collection("users").document(currentUser)
                                     .collection("followers")
-                                    .add(followerData)  // This generates an auto ID
-                                    .addOnSuccessListener(documentReference ->
-                                            Log.d("TAG", "Added to current user's Followers collection with ID: " +
-                                                    documentReference.getId()))
+                                    .add(followerData)
+                                    .addOnSuccessListener(docRef ->
+                                            Log.d("TAG", "Added to followers with ID: " + docRef.getId()))
                                     .addOnFailureListener(e ->
-                                            Log.d("TAG", "Error adding to current user's Followers collection", e));
+                                            Log.d("TAG", "Error adding to followers", e));
 
-                            // Get the current user's username
-                            db.collection("users").document(currentUser)
-                                    .get()
+                            db.collection("users").document(currentUser).get()
                                     .addOnSuccessListener(currentUserDoc -> {
                                         if (currentUserDoc.exists()) {
                                             String currentUsername = currentUserDoc.getString("username");
 
-                                            // Find the requesting user's document ID by their username
                                             db.collection("users")
                                                     .whereEqualTo("username", username)
                                                     .limit(1)
                                                     .get()
-                                                    .addOnSuccessListener(requestorQuerySnapshot -> {
-                                                        if (!requestorQuerySnapshot.isEmpty()) {
-                                                            // Get the requesting user's document ID
-                                                            DocumentSnapshot requestorDoc = requestorQuerySnapshot.getDocuments().get(0);
-                                                            String requestorId = requestorDoc.getId();
+                                                    .addOnSuccessListener(requestorQuery -> {
+                                                        if (!requestorQuery.isEmpty()) {
+                                                            String requestorId = requestorQuery.getDocuments().get(0).getId();
 
-                                                            // Add the current user to the requesting user's Following collection
                                                             Map<String, Object> followingData = new HashMap<>();
                                                             followingData.put("username", currentUsername);
 
-                                                            // Use .add() to generate auto ID instead of .document(currentUsername).set()
                                                             db.collection("users").document(requestorId)
                                                                     .collection("following")
-                                                                    .add(followingData)  // This generates an auto ID
-                                                                    .addOnSuccessListener(documentReference ->
-                                                                            Log.d("TAG", "Added to requesting user's Following collection with ID: " +
-                                                                                    documentReference.getId()))
+                                                                    .add(followingData)
+                                                                    .addOnSuccessListener(docRef ->
+                                                                            Log.d("TAG", "Added to following with ID: " + docRef.getId()))
                                                                     .addOnFailureListener(e ->
-                                                                            Log.d("TAG", "Error adding to requesting user's Following collection", e));
-                                                        } else {
-                                                            Log.d("TAG", "Requesting user not found");
+                                                                            Log.d("TAG", "Error adding to following", e));
                                                         }
-                                                    })
-                                                    .addOnFailureListener(e ->
-                                                            Log.d("TAG", "Error finding requesting user", e));
-                                        } else {
-                                            Log.d("TAG", "Current user document not found");
+                                                    });
                                         }
-                                    })
-                                    .addOnFailureListener(e ->
-                                            Log.d("TAG", "Error getting current user info", e));
+                                    });
                         }
 
-                        // Delete the follow request document after processing
                         db.collection("users").document(currentUser)
                                 .collection("requests").document(docId)
                                 .delete()
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d("TAG", "Request removed successfully");
                                     removeRequestFromList(username);
-                                })
-                                .addOnFailureListener(e -> Log.d("TAG", "Error deleting request", e));
+                                });
                     }
-                })
-                .addOnFailureListener(e -> Log.d("TAG", "Error processing follow request", e));
+                });
     }
 
+    /**
+     * Removes a follow request from the UI list.
+     * @param username the username to remove
+     */
     private void removeRequestFromList(String username) {
         for (FollowRequestModel request : requestList) {
             if (request.getUsername().equals(username)) {
@@ -163,18 +164,20 @@ public class RequestsDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Loads pending follow requests from Firestore.
+     */
     private void loadFollowRequests() {
         db.collection("users").document(currentUser).collection("requests")
                 .whereEqualTo("status", "pending")
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
+                .addOnSuccessListener(querySnapshot -> {
                     requestList.clear();
-                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         String username = document.getString("username");
                         requestList.add(new FollowRequestModel(username, "pending"));
                     }
                     adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> Log.d("TAG", "Error getting requests", e));
+                });
     }
 }

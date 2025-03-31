@@ -284,6 +284,10 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     *
+     * @param listener
+     */
     public void fetchAllUsers(OnCompleteListener<QuerySnapshot> listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) {
@@ -294,6 +298,14 @@ public class DatabaseManager {
         usersRef.get().addOnCompleteListener(listener);
     }
 
+    /**
+     * Adds a comment to a mood event.
+     *
+     * @param ownerUserId The ID of the user who owns the mood event
+     * @param moodEventId The ID of the mood event
+     * @param comment     The CommentModel object containing comment details
+     * @param listener    Optional listener to handle completion events
+     */
     public void addComment(String ownerUserId, String moodEventId, CommentModel comment, OnCompleteListener<DocumentReference> listener) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null && ownerUserId != null && moodEventId != null) {
@@ -312,6 +324,13 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Deletes a comment from a mood event.
+     *
+     * @param moodEventId The ID of the mood event
+     * @param commentId   The ID of the comment to delete
+     * @param listener    Optional listener to handle completion events
+     */
     public void deleteComment(String moodEventId, String commentId, OnCompleteListener<Void> listener) {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null && moodEventId != null && commentId != null) {
@@ -328,6 +347,12 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Fetches mood events from users that the current user is following.
+     * Only public mood events are fetched.
+     *
+     * @param finalListener the OnCompleteListener to handle the query result.
+     */
     public void fetchFollowedUsersMoodEvents(OnCompleteListener<List<MoodEventModel>> finalListener) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -412,6 +437,11 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Fetches all usernames from the Firestore database.
+     *
+     * @param listener the OnSuccessListener to handle the query result.
+     */
     public void fetchAllUsernames(OnSuccessListener<Map<String, String>> listener) {
         db.collection("users").get().addOnSuccessListener(querySnapshot -> {
             Map<String, String> result = new HashMap<>();

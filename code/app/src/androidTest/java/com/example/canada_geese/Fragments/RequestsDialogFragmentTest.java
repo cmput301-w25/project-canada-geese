@@ -1,5 +1,5 @@
-package com.example.canada_geese;
-
+package com.example.canada_geese.Fragments;
+import com.example.canada_geese.R;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -65,7 +65,6 @@ public class RequestsDialogFragmentTest {
     private void addMockRequestAndLaunch(String currentUserUid, Runnable whenReady) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Insert a mock request into Firestore
         Map<String, Object> mockRequest = new HashMap<>();
         mockRequest.put("username", "mock_user");
         mockRequest.put("status", "pending");

@@ -1,4 +1,5 @@
-package com.example.canada_geese;
+package com.example.canada_geese.Fragments;
+import com.example.canada_geese.R;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -35,6 +36,14 @@ import org.junit.runner.RunWith;
 
 /**
  * UI tests for the fragment_user_profile_page
+ * Tests the user profile functionality including:
+ * - Profile information display
+ * - Following/Followers list viewing
+ * - User search functionality
+ * - Follow request sending
+ * - Profile image display
+ * - Profile editing
+ * - Sign out functionality
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -67,25 +76,18 @@ public class fragment_user_profile_pageTest {
     }
 
     /**
-     * Setup method to ensure we log in and navigate to the user profile page
+     * Setup method to ensure we log in and navigate to the user profile page before each test
      */
     @Before
     public void setup() {
-        // Wait for the login screen to load
+
         onView(isRoot()).perform(waitFor(2000));
 
         try {
-            // Enter login credentials - replace with valid test account details
             onView(withId(R.id.username_input)).perform(typeText("testuser"), closeSoftKeyboard());
             onView(withId(R.id.password_input)).perform(typeText("password"), closeSoftKeyboard());
-
-            // Click sign in
             onView(withId(R.id.button_sign_in)).perform(click());
-
-            // Wait for login to complete and main activity to load
             onView(isRoot()).perform(waitFor(3000));
-
-            // Navigate to the user profile page
             onView(withId(R.id.page5)).perform(click());
             onView(isRoot()).perform(waitFor(2000));
         } catch (Exception e) {
@@ -95,14 +97,13 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Verify user profile information is displayed
+     * This test checks that basic profile elements like username, profile image,
+     * followers count, and following count are visible.
      */
     @Test
     public void testProfileInformationDisplayed() {
         try {
-            // Check if the profile content container is displayed
             onView(withId(R.id.profile_content_container)).check(matches(isDisplayed()));
-
-            // Check if basic profile elements are displayed
             onView(withId(R.id.username_text)).check(matches(isDisplayed()));
             onView(withId(R.id.profile_image)).check(matches(isDisplayed()));
             onView(withId(R.id.followers_count)).check(matches(isDisplayed()));
@@ -114,15 +115,13 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: View followers list
+     * This test checks that clicking on the followers section displays the followers list.
      */
     @Test
     public void testViewFollowers() {
         try {
-            // Click on the followers section
             onView(withId(R.id.followers_section)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Check if the followers list is displayed
             onView(withId(R.id.followers_list)).check(matches(isDisplayed()));
         } catch (Exception e) {
             System.out.println("View followers test failed: " + e.getMessage());
@@ -131,15 +130,13 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: View following list
+     * This test checks that clicking on the following section displays the following list.
      */
     @Test
     public void testViewFollowing() {
         try {
-            // Click on the following section
             onView(withId(R.id.following_section)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Check if the followers list is displayed (it's reused for following)
             onView(withId(R.id.followers_list)).check(matches(isDisplayed()));
         } catch (Exception e) {
             System.out.println("View following test failed: " + e.getMessage());
@@ -148,23 +145,19 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Search users functionality
+     * This test checks that clicking on the search view displays the search results container
+     * and that typing a search query works correctly.
      */
     @Test
     public void testSearchUsers() {
         try {
-            // Check if search view is displayed
             onView(withId(R.id.searchView)).check(matches(isDisplayed()));
-
-            // Click on the search view
             onView(withId(R.id.searchView)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Verify the search results container is displayed
             onView(withId(R.id.search_results_container)).check(matches(isDisplayed()));
             onView(withId(R.id.search_results_list)).check(matches(isDisplayed()));
 
             try {
-                // Type a search query
                 onView(allOf(
                         isAssignableFrom(EditText.class),
                         isDescendantOfA(withId(R.id.searchView))
@@ -172,11 +165,8 @@ public class fragment_user_profile_pageTest {
 
                 onView(isRoot()).perform(waitFor(2000));
 
-                // Return to profile view
                 onView(withId(R.id.back_button)).perform(click());
                 onView(isRoot()).perform(waitFor(1000));
-
-                // Verify we're back to the profile content
                 onView(withId(R.id.profile_content_container)).check(matches(isDisplayed()));
             } catch (Exception e) {
                 System.out.println("Search users typing test failed: " + e.getMessage());
@@ -188,21 +178,18 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Send follow request functionality
+     * This test checks that searching for a user and sending a follow request works correctly.
      */
     @Test
     public void testSendFollowRequest() {
         try {
-            // First search for users
             onView(withId(R.id.searchView)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Try to click on the first user in search results (if any)
             try {
                 onView(withId(R.id.search_results_list))
                         .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
                 onView(isRoot()).perform(waitFor(1000));
 
-                // Look for the action button in the dialog
                 try {
                     onView(withId(R.id.dialog_action_button)).check(matches(isDisplayed()));
                     onView(withId(R.id.dialog_action_button)).perform(click());
@@ -211,13 +198,11 @@ public class fragment_user_profile_pageTest {
                     System.out.println("Could not find follow button: " + e.getMessage());
                 }
 
-                // Return to profile
                 onView(withId(R.id.back_button)).perform(click());
                 onView(isRoot()).perform(waitFor(1000));
             } catch (Exception e) {
                 System.out.println("Could not click on user in search results: " + e.getMessage());
 
-                // Return to profile
                 try {
                     onView(withId(R.id.back_button)).perform(click());
                     onView(isRoot()).perform(waitFor(1000));
@@ -232,26 +217,22 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Unfollow user functionality
+     * This test checks that unfollowing a user works correctly.
      */
     @Test
     public void testUnfollowUser() {
         try {
-            // First view following list
             onView(withId(R.id.following_section)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // For testing search and unfollow
             onView(withId(R.id.searchView)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
 
             try {
-                // Try to click on the first user
                 onView(withId(R.id.search_results_list))
                         .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
                 onView(isRoot()).perform(waitFor(1000));
 
                 try {
-                    // Check if action button exists
                     onView(withId(R.id.dialog_action_button)).check(matches(isDisplayed()));
                     onView(withId(R.id.dialog_action_button)).perform(click());
                     onView(isRoot()).perform(waitFor(1000));
@@ -259,13 +240,11 @@ public class fragment_user_profile_pageTest {
                     System.out.println("Could not find action button: " + e.getMessage());
                 }
 
-                // Return to profile
                 onView(withId(R.id.back_button)).perform(click());
                 onView(isRoot()).perform(waitFor(1000));
             } catch (Exception e) {
                 System.out.println("Could not click on a user: " + e.getMessage());
 
-                // Return to profile
                 try {
                     onView(withId(R.id.back_button)).perform(click());
                     onView(isRoot()).perform(waitFor(1000));
@@ -279,20 +258,85 @@ public class fragment_user_profile_pageTest {
     }
 
     /**
+     * Test: Complete follow/unfollow user flow
+     * This test checks the complete flow of searching for a user,
+     * sending a follow request, and then unfollowing the user.
+     */
+    @Test
+    public void testCompleteFollowUnfollowFlow() {
+        try {
+            onView(withId(R.id.searchView)).perform(click());
+            onView(isRoot()).perform(waitFor(1000));
+
+            onView(allOf(
+                    isAssignableFrom(EditText.class),
+                    isDescendantOfA(withId(R.id.searchView))
+            )).perform(typeText("test"), closeSoftKeyboard());
+            onView(isRoot()).perform(waitFor(2000));
+
+            try {
+                onView(withId(R.id.search_results_list))
+                        .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+                onView(isRoot()).perform(waitFor(1000));
+
+                try {
+                    onView(withId(R.id.dialog_action_button)).check(matches(isDisplayed()));
+                    onView(withId(R.id.dialog_action_button)).check(matches(withText("Send Follow Request")));
+                    onView(withId(R.id.dialog_action_button)).perform(click());
+                    onView(isRoot()).perform(waitFor(1500));
+
+                    onView(withId(R.id.back_button)).perform(click());
+                    onView(isRoot()).perform(waitFor(1000));
+
+                    onView(withId(R.id.searchView)).perform(click());
+                    onView(isRoot()).perform(waitFor(1000));
+
+                    onView(allOf(
+                            isAssignableFrom(EditText.class),
+                            isDescendantOfA(withId(R.id.searchView))
+                    )).perform(typeText("test"), closeSoftKeyboard());
+                    onView(isRoot()).perform(waitFor(2000));
+
+                    onView(withId(R.id.search_results_list))
+                            .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+                    onView(isRoot()).perform(waitFor(1000));
+
+                    try {
+                        onView(withId(R.id.dialog_action_button)).check(matches(isDisplayed()));
+                        onView(withId(R.id.dialog_action_button)).check(matches(withText("Unfollow")));
+                        onView(withId(R.id.dialog_action_button)).perform(click());
+                        onView(isRoot()).perform(waitFor(1500));
+                    } catch (Exception e) {
+                        System.out.println("Could not perform unfollow action: " + e.getMessage());
+                    }
+
+                    onView(withId(R.id.back_button)).perform(click());
+                    onView(isRoot()).perform(waitFor(1000));
+
+                } catch (Exception e) {
+                    System.out.println("Could not complete follow action: " + e.getMessage());
+                }
+            } catch (Exception e) {
+                System.out.println("Could not click on user in search results: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            System.out.println("Complete follow/unfollow flow test failed: " + e.getMessage());
+        }
+    }
+
+    /**
      * Test: Show requests dialog
+     * This test checks that clicking on the requests option in the menu displays the requests dialog.
      */
     @Test
     public void testShowRequestsDialog() {
         try {
-            // Click on the menu button
             onView(withId(R.id.menu_button)).perform(click());
             onView(isRoot()).perform(waitFor(500));
 
-            // Click on the requests option - using text instead of resource
-            onView(withText("Requests")).perform(click());
+            onView(withText("Follow Requests")).perform(click());
             onView(isRoot()).perform(waitFor(1000));
 
-            // Check if requests dialog is displayed
             try {
                 onView(withId(R.id.request_lists)).check(matches(isDisplayed()));
                 onView(isRoot()).perform(waitFor(1000));
@@ -306,19 +350,17 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Navigate to edit profile
+     * This test checks that clicking on the settings option in the menu navigates to the edit profile page.
      */
     @Test
     public void testNavigateToEditProfile() {
         try {
-            // Click on the menu button
             onView(withId(R.id.menu_button)).perform(click());
             onView(isRoot()).perform(waitFor(500));
 
-            // Click on the settings option - using text instead of resource
             onView(withText("Settings")).perform(click());
             onView(isRoot()).perform(waitFor(1000));
 
-            // Check if edit profile screen is displayed
             try {
                 onView(withId(R.id.profile_image_view)).check(matches(isDisplayed()));
                 onView(withId(R.id.about_edit_text)).check(matches(isDisplayed()));
@@ -333,44 +375,18 @@ public class fragment_user_profile_pageTest {
     }
 
     /**
-     * Test: Sign out functionality
-     * Note: This test should be run last as it will exit the app
-     */
-    @Test
-    public void testSignOut() {
-        try {
-            // Click on the menu button
-            onView(withId(R.id.menu_button)).perform(click());
-            onView(isRoot()).perform(waitFor(500));
-
-            // Click on the sign out option - using text instead of resource
-            onView(withText("Sign Out")).perform(click());
-
-            // Wait to ensure the action completes
-            onView(isRoot()).perform(waitFor(1000));
-        } catch (Exception e) {
-            System.out.println("Sign out test failed: " + e.getMessage());
-        }
-    }
-    /**
      * Test: Verify profile image is correctly displayed
+     * This test checks that the profile image is displayed and has content.
      */
     @Test
     public void testProfileImageDisplayed() {
         try {
-            // Check if the profile image is displayed
             onView(withId(R.id.profile_image)).check(matches(isDisplayed()));
 
-            // Verify it has content by checking if it's not empty
-            // This is a basic check since we can't verify the actual image content with Espresso
-            // In a real scenario, you might want to add a content description or tag to verify
             onView(withId(R.id.profile_image)).check(matches(not(withContentDescription(""))));
 
-            // Another approach is to check the parent container is also visible
             onView(withId(R.id.profile_content_container)).check(matches(isDisplayed()));
 
-            // Note: Since we can't verify the actual image content loaded,
-            // we're mainly checking that the image view exists and is visible
         } catch (Exception e) {
             System.out.println("Profile image displayed test failed: " + e.getMessage());
         }
@@ -378,51 +394,53 @@ public class fragment_user_profile_pageTest {
 
     /**
      * Test: Verify profile image loading process
-     * This test simulates the process of changing profile pictures
+     * This test simulates the process of changing profile pictures by navigating to the edit profile page
+     * and clicking on the edit profile image button.
      */
     @Test
     public void testProfileImageLoading() {
         try {
-            // First verify the profile image is currently displayed
+
             onView(withId(R.id.profile_image)).check(matches(isDisplayed()));
 
-            // Navigate to edit profile page to test image loading
             onView(withId(R.id.menu_button)).perform(click());
             onView(isRoot()).perform(waitFor(500));
 
-            // Click on the settings option
             onView(withText("Settings")).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Check if we're on the edit profile page
             onView(withId(R.id.profile_image_view)).check(matches(isDisplayed()));
-
-            // Click on the profile image edit button to trigger image options dialog
             onView(withId(R.id.edit_profile_image)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
-
-            // Since we can't interact with the system dialogs in Espresso tests,
-            // we'll just verify that clicking the edit button works and doesn't crash the app
-            // The app should still be responsive after clicking the edit button
-
-            // Wait a moment to ensure any dialogs have had time to appear
             onView(isRoot()).perform(waitFor(1000));
 
-            // Verify we're still on the edit profile page
             onView(withId(R.id.profile_image_view)).check(matches(isDisplayed()));
-
-            // Navigate back to profile page
-            // First press the back button (device back button)
-            // Note: This uses a custom pressBack action since Espresso's pressBack() can be unreliable
             pressBack();
             onView(isRoot()).perform(waitFor(1000));
 
-            // Verify we're back on the profile page
             onView(withId(R.id.profile_content_container)).check(matches(isDisplayed()));
             onView(withId(R.id.profile_image)).check(matches(isDisplayed()));
 
         } catch (Exception e) {
             System.out.println("Profile image loading test failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test: Sign out functionality
+     * This test checks that clicking on the sign out option in the menu signs the user out.
+     * Note: This test should be run last as it will exit the app
+     */
+    @Test
+    public void testSignOut() {
+        try {
+            onView(withId(R.id.menu_button)).perform(click());
+            onView(isRoot()).perform(waitFor(500));
+
+            onView(withText("Sign Out")).perform(click());
+
+            onView(isRoot()).perform(waitFor(1000));
+        } catch (Exception e) {
+            System.out.println("Sign out test failed: " + e.getMessage());
         }
     }
 

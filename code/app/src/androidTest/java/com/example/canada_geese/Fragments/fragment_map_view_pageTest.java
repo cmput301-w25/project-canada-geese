@@ -1,5 +1,5 @@
-package com.example.canada_geese;
-
+package com.example.canada_geese.Fragments;
+import com.example.canada_geese.R;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -13,15 +13,18 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.core.content.ContextCompat;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.example.canada_geese.Pages.MainActivity;
@@ -39,12 +42,10 @@ import org.junit.runner.RunWith;
 @LargeTest
 public class fragment_map_view_pageTest {
 
-    // Use MainActivity instead of LaunchActivity
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
-    // Optional: Automatically grant location permissions for map testing
     @Rule
     public GrantPermissionRule locationPermissionRule = GrantPermissionRule.grant(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -77,46 +78,73 @@ public class fragment_map_view_pageTest {
      */
     @Before
     public void setup() {
-        // Wait for the main activity to load completely
         onView(isRoot()).perform(waitFor(2000));
 
         try {
-            // Navigate to the map view page (page4 in bottom navigation)
             onView(withId(R.id.page4)).perform(click());
-            // Wait for map to load (maps can take longer)
             onView(isRoot()).perform(waitFor(3000));
         } catch (Exception e) {
-            // Log any navigation errors but continue with the test
             System.out.println("Could not navigate to map view page: " + e.getMessage());
         }
     }
 
     /**
-     * Test: Verify map is loaded correctly
+     * Test: Verify map is loaded correctly and filter chip functionality
      */
     @Test
     public void testMapLoaded() {
-        // Check if the map fragment is displayed
         onView(withId(R.id.map)).check(matches(isDisplayed()));
-
-        // Check if the Memory button is displayed
         onView(withId(R.id.btnMemory)).check(matches(isDisplayed()));
-
-        // Check if the search view is displayed
+        onView(withId(R.id.btnFriends)).check(matches(isDisplayed()));
         onView(withId(R.id.search_view)).check(matches(isDisplayed()));
+        onView(withId(R.id.filter_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.filter_button)).perform(click());
+        onView(isRoot()).perform(waitFor(1000));
+
+        try {
+            onView(withId(R.id.filter_scroll_view)).check(matches(isDisplayed()));
+        } catch (Exception e) {
+            System.out.println("Could not verify filter scroll view: " + e.getMessage());
+        }
     }
 
     /**
-     * Test: Memory button click
+     * Test: Location permission request handling
+     */
+    @Test
+    public void testLocationPermissionRequest() {
+
+        boolean hasLocationPermission = ContextCompat.checkSelfPermission(
+                InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        if (hasLocationPermission) {
+            onView(withId(R.id.btnMemory)).perform(click());
+            onView(isRoot()).perform(waitFor(2000));
+
+            onView(withId(R.id.map)).check(matches(isDisplayed()));
+        } else {
+            System.out.println("Location permissions not granted, skipping map interaction test");
+        }
+    }
+
+    /**
+     * Test: Memory button click and verify mood markers with images
      */
     @Test
     public void testMemoryButtonClick() {
-        // Click the Memory button
         onView(withId(R.id.btnMemory)).perform(click());
-        onView(isRoot()).perform(waitFor(3000)); // Wait for memory markers to load
-
-        // Check that the app doesn't crash and the map is still displayed
+        onView(isRoot()).perform(waitFor(3000));
         onView(withId(R.id.map)).check(matches(isDisplayed()));
+
+        try {
+            onView(withId(R.id.map)).perform(click());
+            onView(isRoot()).perform(waitFor(1000));
+
+            onView(withId(R.id.map)).check(matches(isDisplayed()));
+        } catch (Exception e) {
+            System.out.println("Could not interact with map: " + e.getMessage());
+        }
     }
 
     /**
@@ -124,25 +152,19 @@ public class fragment_map_view_pageTest {
      */
     @Test
     public void testSearchLocation() {
-        // Check if search view is displayed
         onView(withId(R.id.search_view)).check(matches(isDisplayed()));
 
         try {
-            // Click on the search view
             onView(withId(R.id.search_view)).perform(click());
             onView(isRoot()).perform(waitFor(1000));
 
             try {
-                // Use custom matcher to find the EditText within SearchView
                 onView(allOf(
                         isAssignableFrom(EditText.class),
                         isDescendantOfA(withId(R.id.search_view))
                 )).perform(typeText("New York"), closeSoftKeyboard());
 
-                // Wait for search results
                 onView(isRoot()).perform(waitFor(3000));
-
-                // Check that the map is still displayed after search
                 onView(withId(R.id.map)).check(matches(isDisplayed()));
 
             } catch (Exception e) {
@@ -155,19 +177,53 @@ public class fragment_map_view_pageTest {
     }
 
     /**
-     * Test: Location services
-     * Note: This test only verifies map display with permissions already granted
-     * through the GrantPermissionRule above
+     * Test: Displaying friends' mood events on map
      */
     @Test
-    public void testLocationServices() {
-        // With permissions granted, verify map is displayed
-        onView(withId(R.id.map)).check(matches(isDisplayed()));
-
-        // Wait for location to potentially be displayed on map
+    public void testFriendsMapMarkers() {
+        onView(withId(R.id.btnFriends)).perform(click());
         onView(isRoot()).perform(waitFor(3000));
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
+        onView(withId(R.id.btnMemory)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
+    }
 
-        // We can only verify the map is still displayed
+    /**
+     * Test: Filtering markers on the map
+     */
+    @Test
+    public void testFilteringMapMarkers() {
+        onView(withId(R.id.btnMemory)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
+
+        onView(withId(R.id.map)).check(matches(isDisplayed()));
+        onView(withId(R.id.filter_button)).perform(click());
+        onView(isRoot()).perform(waitFor(1500));
+
+        try {
+            onView(withId(R.id.filter_scroll_view)).check(matches(isDisplayed()));
+
+            try {
+                onView(withId(R.id.chip_mood_happiness)).perform(click());
+                onView(isRoot()).perform(waitFor(1000));
+            } catch (Exception e) {
+                System.out.println("Could not find or click happiness chip: " + e.getMessage());
+            }
+            try {
+                onView(withId(R.id.chip_clear_all)).perform(click());
+                onView(isRoot()).perform(waitFor(1000));
+            } catch (Exception e) {
+                System.out.println("Could not find or click clear all chip: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.out.println("Could not verify or interact with filter chips: " + e.getMessage());
+        }
+
+        onView(withId(R.id.btnFriends)).perform(click());
+        onView(isRoot()).perform(waitFor(2000));
+
         onView(withId(R.id.map)).check(matches(isDisplayed()));
     }
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -49,7 +50,7 @@ public class fragment_user_moods_page extends Fragment {
     private boolean isLast7DaysSelected = false;
     private String selectedMood = "";
     private String searchQuery = "";
-    private ImageButton filterButton;
+    private LinearLayout filterButton;
     private boolean isPrivateSelected = false;
 
 
@@ -107,14 +108,6 @@ public class fragment_user_moods_page extends Fragment {
 
         filterButton.setOnClickListener(v -> toggleFilterBar());
 
-        /*// Create filter bar fragment and set adapter
-        FilterBarFragment filterBarFragment = new FilterBarFragment();
-        filterBarFragment.setAdapter(adapter);
-        // Attach existing FilterBarFragment (which already modifies the adapter)
-        getChildFragmentManager().beginTransaction()
-                .replace(R.id.filter_bar_fragment_container, filterBarFragment)
-                .commit();*/
-
         // Set up click listeners for mood events
         setupMoodEventClickListeners();
 
@@ -161,7 +154,12 @@ public class fragment_user_moods_page extends Fragment {
         return view;
     }
 
+    /**
+     * Toggles the visibility of the filter bar and the space above the recycler view.
+     */
     private void toggleFilterBar() {
+        boolean isSelected = filterButton.isSelected();
+        filterButton.setSelected(!isSelected);
         FragmentManager fragmentManager = getChildFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         Fragment existingFragment = fragmentManager.findFragmentById(R.id.filter_bar_fragment_container);

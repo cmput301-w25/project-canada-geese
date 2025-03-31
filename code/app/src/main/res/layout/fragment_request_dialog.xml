@@ -5,9 +5,6 @@
     android:padding="16dp"
     android:background="@android:color/white">
 
-    <!-- Title with improved styling -->
-
-    <!-- Styled RecyclerView -->
 
     <TextView
         android:id="@+id/Requests"

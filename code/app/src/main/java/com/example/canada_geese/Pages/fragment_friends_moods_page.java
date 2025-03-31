@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -35,7 +36,7 @@ public class fragment_friends_moods_page extends Fragment {
     private boolean isLast7DaysSelected = false;
     private String selectedMood = "";
     private String searchQuery = "";
-    private ImageButton filterButton;
+    private LinearLayout filterButton;
     private MoodEventAdapter adapter;
     private SearchView searchView;
     private boolean isPrivateSelected = false;
@@ -135,7 +136,12 @@ public class fragment_friends_moods_page extends Fragment {
         return rootView;
     }
 
+    /**
+     * Toggles the visibility of the filter bar.
+     */
     private void toggleFilterBar() {
+        boolean isSelected = filterButton.isSelected();
+        filterButton.setSelected(!isSelected);
         FragmentManager fragmentManager = getChildFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         Fragment existingFragment = fragmentManager.findFragmentById(R.id.filter_bar_fragment_container);

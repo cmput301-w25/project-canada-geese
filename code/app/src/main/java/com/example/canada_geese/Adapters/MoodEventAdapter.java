@@ -12,6 +12,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.PopupMenu;
+
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,49 +27,68 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import android.widget.PopupMenu;
-
 import java.util.Set;
 
-
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
-
+/**
+ * Adapter for displaying mood events in a RecyclerView.
+ * Supports expanding/collapsing, inline editing, filtering, and comment interactions.
+ */
 public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.ViewHolder> {
     private List<MoodEventModel> moodEventList;
     private List<MoodEventModel> moodEventListFull;
     private Context context;
     private int expandedPosition = -1;
     private boolean isInEditMode = false;
-
-
-    public interface OnMoodEventClickListener {
-        void onMoodEventClick(MoodEventModel moodEvent);
-    }
-    public interface OnMoodEventLongClickListener {
-        boolean onMoodEventLongClick(MoodEventModel moodEvent);
-    }
-    public interface OnMoodEventEditListener {
-        void onMoodEventEdit(MoodEventModel moodEvent, int position);
-    }
-    public interface OnCommentClickListener {
-        void onCommentClick(MoodEventModel moodEvent);
-    }
+    private boolean isFriendPage = false;
 
     private OnMoodEventClickListener clickListener;
     private OnMoodEventLongClickListener longClickListener;
     private OnMoodEventEditListener editListener;
     private OnCommentClickListener commentClickListener;
 
-    private boolean isFriendPage = false;
     private Map<String, String> uidToUsernameMap = new HashMap<>();
 
+    /**
+     * Listener interface for handling mood event interactions.
+     */
+    public interface OnMoodEventClickListener {
+        void onMoodEventClick(MoodEventModel moodEvent);
+    }
+    /**
+     * Listener interface for handling long-click interactions on mood events.
+     */
+    public interface OnMoodEventLongClickListener {
+        boolean onMoodEventLongClick(MoodEventModel moodEvent);
+    }
+
+    /**
+     * Listener interface for handling edit interactions on mood events.
+     */
+    public interface OnMoodEventEditListener {
+        void onMoodEventEdit(MoodEventModel moodEvent, int position);
+    }
+
+    /**
+     * Listener interface for handling comment interactions on mood events.
+     */
+    public interface OnCommentClickListener {
+        void onCommentClick(MoodEventModel moodEvent);
+    }
+
+    /**
+     * Constructs a MoodEventAdapter.
+     *
+     * @param moodEventList the list of mood events to display
+     * @param context       the context used for inflating views
+     * @param isFriendPage  whether the adapter is used in a friend's page context
+     */
     public MoodEventAdapter(List<MoodEventModel> moodEventList, Context context, boolean isFriendPage) {
         this.moodEventList = new ArrayList<>(moodEventList);
         this.moodEventListFull = new ArrayList<>(moodEventList);
@@ -74,23 +96,56 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         this.isFriendPage = isFriendPage;
     }
 
+    /**
+     * Sets whether the adapter is used in a friend's page context.
+     *
+     * @param isFriendPage true if used in a friend's page context, false otherwise
+     */
     public void setUidToUsernameMap(Map<String, String> uidToUsernameMap) {
         this.uidToUsernameMap = uidToUsernameMap;
     }
 
+    /**
+     * Sets whether the adapter is used in a friend's page context.
+     *
+     * @param isFriendPage true if used in a friend's page context, false otherwise
+     */
     public void setOnMoodEventClickListener(OnMoodEventClickListener listener) {
         this.clickListener = listener;
     }
+
+    /**
+     * Sets the listener for long-click interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnMoodEventLongClickListener(OnMoodEventLongClickListener listener) {
         this.longClickListener = listener;
     }
+
+    /**
+     * Sets the listener for edit interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnMoodEventEditListener(OnMoodEventEditListener listener) {
         this.editListener = listener;
     }
+
+    /**
+     * Sets the listener for comment interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnCommentClickListener(OnCommentClickListener listener) {
         this.commentClickListener = listener;
     }
 
+    /**
+     * Sets whether the adapter is in edit mode.
+     *
+     * @param isInEditMode true if in edit mode, false otherwise
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -98,6 +153,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds the data to the views in the ViewHolder.
+     *
+     * @param holder   the ViewHolder for the mood event item
+     * @param position the position of the item in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         MoodEventModel event = moodEventList.get(position);
@@ -106,6 +167,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         holder.moodText.setText(event.getEmotion());
         holder.timestamp.setText(event.getFormattedTimestamp());
         holder.moodEmoji.setText(event.getEmoji());
+
         String desc = event.getDescription();
         if (desc == null || desc.trim().isEmpty()) {
             holder.description.setVisibility(View.GONE);
@@ -134,11 +196,8 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             else populateDetails(holder, event);
         }
 
-        if (isFriendPage) {
-            holder.optionsMenuButton.setVisibility(View.GONE);
-        } else {
-            holder.optionsMenuButton.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
-        }
+        holder.optionsMenuButton.setVisibility(isFriendPage ? View.GONE : isExpanded ? View.VISIBLE : View.GONE);
+        holder.expandIcon.setImageResource(isExpanded ? R.drawable.baseline_expand_less_24 : R.drawable.baseline_expand_more_24);
 
         holder.itemView.setOnClickListener(v -> {
             expandedPosition = (isExpanded && !isInEditMode) ? -1 : position;
@@ -147,15 +206,18 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
 
         holder.itemView.setOnLongClickListener(v -> longClickListener != null && longClickListener.onMoodEventLongClick(event));
-
         holder.commentButton.setOnClickListener(v -> {
             if (commentClickListener != null) commentClickListener.onCommentClick(event);
         });
     }
 
+    /**
+     * Populates the details of the mood event in the ViewHolder.
+     *
+     * @param holder the ViewHolder to populate
+     * @param event  the mood event to display
+     */
     private void populateDetails(ViewHolder holder, MoodEventModel event) {
-
-
         holder.socialSituation.setText(event.getSocialSituation() != null ? event.getSocialSituation() : "Not specified");
 
         holder.imageContainer.removeAllViews();
@@ -163,24 +225,14 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
         if (urls != null && !urls.isEmpty()) {
             holder.imageContainer.setVisibility(View.VISIBLE);
-
             for (String url : urls) {
                 ImageView img = new ImageView(context);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.setMargins(0, 16, 0, 16);
-
                 img.setLayoutParams(params);
                 img.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                img.setAdjustViewBounds(true); // 🔥 key for portrait pics
-
-                Glide.with(context)
-                        .load(url)
-                        .into(img);
-
+                img.setAdjustViewBounds(true);
+                Glide.with(context).load(url).into(img);
                 holder.imageContainer.addView(img);
             }
         } else {
@@ -189,8 +241,7 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
         if (event.HasLocation()) {
             holder.mapView.setVisibility(View.VISIBLE);
-            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.VISIBLE); // 👈 Show label
-
+            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.VISIBLE);
             holder.mapView.onCreate(null);
             holder.mapView.getMapAsync(googleMap -> {
                 LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
@@ -199,55 +250,37 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             });
         } else {
             holder.mapView.setVisibility(View.GONE);
-            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.GONE); // 👈 Hide label
+            if (holder.locationLabel != null) holder.locationLabel.setVisibility(View.GONE);
         }
-
-//        holder.editButton.setOnClickListener(v -> {
-//            isInEditMode = true;
-//            notifyItemChanged(expandedPosition);
-//            if (editListener != null) editListener.onMoodEventEdit(event, holder.getAdapterPosition());
-//        });
-//
-//        holder.deleteButton.setOnClickListener(v -> {
-//            if (longClickListener != null) longClickListener.onMoodEventLongClick(event);
-//        });
 
         holder.optionsMenuButton.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(holder.optionsMenuButton.getContext(), holder.optionsMenuButton);
             popup.getMenuInflater().inflate(R.menu.mood_options_menu, popup.getMenu());
-
             popup.setOnMenuItemClickListener(item -> {
-                int itemId = item.getItemId();
-                if (itemId == R.id.option_edit) {
+                if (item.getItemId() == R.id.option_edit) {
                     isInEditMode = true;
                     notifyItemChanged(holder.getAdapterPosition());
-                    if (editListener != null) {
-                        editListener.onMoodEventEdit(event, holder.getAdapterPosition());
-                    }
+                    if (editListener != null) editListener.onMoodEventEdit(event, holder.getAdapterPosition());
                     return true;
-                } else if (itemId == R.id.option_delete) {
-                    if (longClickListener != null) {
-                        longClickListener.onMoodEventLongClick(event);
-                    }
+                } else if (item.getItemId() == R.id.option_delete) {
+                    if (longClickListener != null) longClickListener.onMoodEventLongClick(event);
                     return true;
                 }
                 return false;
             });
-
             popup.show();
         });
-
-        if (isFriendPage) {
-            holder.optionsMenuButton.setVisibility(View.GONE);
-        } else {
-            holder.optionsMenuButton.setVisibility(View.VISIBLE);
-        }
     }
 
+    /**
+     * Populates the edit fields for the mood event in the ViewHolder.
+     *
+     * @param holder the ViewHolder to populate
+     * @param event  the mood event to display
+     */
     private void populateEditFields(ViewHolder holder, MoodEventModel event) {
         holder.privateMoodEdit.setChecked(event.isPublic());
         holder.descriptionEdit.setText(event.getDescription());
-
         holder.saveButton.setOnClickListener(v -> {
             MoodEventModel updatedMood = new MoodEventModel(
                     event.getEmotion(),
@@ -264,45 +297,53 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             isInEditMode = false;
             notifyItemChanged(expandedPosition);
         });
-
         holder.cancelButton.setOnClickListener(v -> {
             isInEditMode = false;
             notifyItemChanged(expandedPosition);
         });
     }
 
+    /**
+     * Returns the number of items in the list.
+     *
+     * @return the size of the mood event list
+     */
     @Override
     public int getItemCount() {
         return moodEventList.size();
     }
 
+    /**
+     * ViewHolder for mood event items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView moodText, timestamp, moodEmoji, description, socialSituation;
+        TextView moodText, timestamp, moodEmoji, description, socialSituation, usernameView, locationLabel;
         EditText descriptionEdit;
         CardView cardView;
         View detailsContainer, editContainer;
-        CheckBox privateMoodCheck, privateMoodEdit;
-        Button editButton, deleteButton, saveButton, cancelButton;
-        ImageButton commentButton;
+        CheckBox privateMoodEdit;
+        Button saveButton, cancelButton;
+        ImageButton commentButton, optionsMenuButton;
         MapView mapView;
-        TextView usernameView;
         LinearLayout imageContainer;
-        TextView locationLabel;
-        ImageButton optionsMenuButton;
+        ImageView expandIcon;
 
-
+        /**
+         * Constructor for ViewHolder.
+         *
+         * @param itemView The view for a single item.
+         */
+         // Constructor for ViewHolder
+         // Initializes the views in the ViewHolder
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             moodText = itemView.findViewById(R.id.mood_name);
             timestamp = itemView.findViewById(R.id.timestamp);
             moodEmoji = itemView.findViewById(R.id.mood_emoji);
             cardView = itemView.findViewById(R.id.card_view);
-            commentButton = itemView.findViewById(R.id.comment_button2); //HERE
+            commentButton = itemView.findViewById(R.id.comment_button2);
             detailsContainer = itemView.findViewById(R.id.details_container);
             description = itemView.findViewById(R.id.tv_description);
-
-            editButton = itemView.findViewById(R.id.btn_edit);
-            deleteButton = itemView.findViewById(R.id.btn_delete);
             editContainer = itemView.findViewById(R.id.edit_container);
             descriptionEdit = itemView.findViewById(R.id.et_description_edit);
             privateMoodEdit = itemView.findViewById(R.id.cb_private_mood_edit);
@@ -314,49 +355,66 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
             imageContainer = itemView.findViewById(R.id.image_container);
             locationLabel = itemView.findViewById(R.id.tv_location_label);
             optionsMenuButton = itemView.findViewById(R.id.options_menu_button);
-
+            expandIcon = itemView.findViewById(R.id.expand_icon);
         }
     }
 
+    /**
+     * Adds a new mood event to the list.
+     *
+     * @param newItem the new mood event to add
+     */
     public void addItem(MoodEventModel newItem) {
         moodEventListFull.add(0, newItem);
         moodEventList.add(0, newItem);
-
         new Handler(Looper.getMainLooper()).post(() -> {
             notifyItemInserted(0);
             notifyDataSetChanged();
         });
     }
 
+    /**
+     * Updates the list of mood events.
+     *
+     * @param newList the new list of mood events
+     */
     public void updateList(List<MoodEventModel> newList) {
-        this.moodEventListFull.clear();
-        this.moodEventListFull.addAll(newList);
-        this.moodEventList.clear();
-        this.moodEventList.addAll(newList);
+        moodEventListFull.clear();
+        moodEventListFull.addAll(newList);
+        moodEventList.clear();
+        moodEventList.addAll(newList);
         expandedPosition = -1;
         isInEditMode = false;
         notifyDataSetChanged();
     }
 
-   public void filter(String query, boolean last7Days, Set<String> selectedMoods, boolean isPrivateSelected) {
-       this.moodEventList.clear();
-       long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
-       for (MoodEventModel e : moodEventListFull) {
-           if (e.getTimestamp() == null) continue;
-           boolean matchDate = !last7Days || e.getTimestamp().getTime() >= cutoff;
-           boolean matchQuery = query.isEmpty() || e.getDescription().toLowerCase().contains(query.toLowerCase());
+    /**
+     * Filters the mood events based on the provided criteria.
+     *
+     * @param query            the search query
+     * @param last7Days        whether to filter by the last 7 days
+     * @param selectedMoods    the selected moods
+     * @param isPrivateSelected whether to filter by privacy settings
+     */
+    public void filter(String query, boolean last7Days, Set<String> selectedMoods, boolean isPrivateSelected) {
+        moodEventList.clear();
+        long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
+        for (MoodEventModel e : moodEventListFull) {
+            if (e.getTimestamp() == null) continue;
+            boolean matchDate = !last7Days || e.getTimestamp().getTime() >= cutoff;
+            boolean matchQuery = query.isEmpty() || e.getDescription().toLowerCase().contains(query.toLowerCase());
+            boolean matchMood = selectedMoods.isEmpty() || selectedMoods.contains(e.getEmotion());
+            boolean matchesPrivacy = !isPrivateSelected || e.hasTriggerWarning();
+            if (matchDate && matchQuery && matchMood && matchesPrivacy) moodEventList.add(e);
+        }
+        expandedPosition = -1;
+        isInEditMode = false;
+        notifyDataSetChanged();
+    }
 
-           // Check if this mood event matches any of the selected moods
-           boolean matchMood = selectedMoods.isEmpty() || selectedMoods.contains(e.getEmotion());
-
-           boolean matchesPrivacy = !isPrivateSelected || e.hasTriggerWarning();
-           if (matchDate && matchQuery && matchMood && matchesPrivacy) moodEventList.add(e);
-       }
-       expandedPosition = -1;
-       isInEditMode = false;
-       notifyDataSetChanged();
-   }
-
+    /**
+     * Collapses the currently expanded item.
+     */
     public void collapseExpandedItem() {
         if (expandedPosition != -1) {
             int p = expandedPosition;

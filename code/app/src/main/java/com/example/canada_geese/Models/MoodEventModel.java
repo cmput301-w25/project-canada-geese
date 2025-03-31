@@ -84,6 +84,7 @@ public class MoodEventModel {
         return sdf.format(timestamp);
     }
 
+    // getters and setters for MoodEventModel
     public String getEmoji() {
         return emoji;
     }

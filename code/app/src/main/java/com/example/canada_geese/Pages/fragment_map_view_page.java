@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -76,15 +77,12 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private Chip confusionChip;
     private Chip angerChip;
     private boolean isFriendsMode = false;
-    private ImageButton filterButton;
+    private LinearLayout filterButton;
     private HorizontalScrollView filterScrollView;
     private ChipGroup filterChipGroup;
     private double currentUserLatitude = 0.0;
     private double currentUserLongitude = 0.0;
     private boolean currentLocationAvailable = false;
-
-
-
     private SearchView searchView;
 
     /**
@@ -140,14 +138,14 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         filterScrollView = rootView.findViewById(R.id.filter_scroll_view);
         filterChipGroup = rootView.findViewById(R.id.filter_chip_group);
 
-        setupChipListener(happinessChip, "Happiness");
-        setupChipListener(sadnessChip, "Sadness");
-        setupChipListener(shameChip, "Shame");
-        setupChipListener(surpriseChip, "Surprise");
-        setupChipListener(fearChip, "Fear");
-        setupChipListener(disgustChip, "Disgust");
-        setupChipListener(confusionChip, "Confusion");
-        setupChipListener(angerChip, "Anger");
+        setupChipListener(happinessChip, "Happy");
+        setupChipListener(sadnessChip, "Sad");
+        setupChipListener(shameChip, "Ashamed");
+        setupChipListener(surpriseChip, "Surprised");
+        setupChipListener(fearChip, "Scared");
+        setupChipListener(disgustChip, "Disgusted");
+        setupChipListener(confusionChip, "Confused");
+        setupChipListener(angerChip, "Angry");
 
         // FILTER ICON (triggers the chips)
         filterButton.setOnClickListener(v -> toggleFilterVisibility());
@@ -156,12 +154,17 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         Chip clearAllChip = rootView.findViewById(R.id.chip_clear_all);
         clearAllChip.setOnClickListener(v -> clearAllFilters());
 
-        //happinessChip.setOnCheckedChangeListener((buttonView, isChecked) -> updateMoodFilter("Happiness", isChecked));
-
         setupSearchView();
 
         return rootView;
     }
+
+    /**
+     * Sets up the listener for mood chips to update the selected moods.
+     *
+     * @param chip The Chip view.
+     * @param mood The mood label.
+     */
     private void setupChipListener(Chip chip, String mood) {
         chip.setOnCheckedChangeListener((buttonView, isChecked) -> updateMoodFilter(mood, isChecked));
     }
@@ -170,6 +173,8 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      * Toggles the visibility of the filter scroll view
      */
     private void toggleFilterVisibility() {
+        boolean isSelected = filterButton.isSelected();
+        filterButton.setSelected(!isSelected);
         Log.d("FilterDebug", "Current visibility: " + filterScrollView.getVisibility());
         if (filterScrollView.getVisibility() == View.GONE) {
             filterScrollView.setVisibility(View.VISIBLE);
@@ -195,6 +200,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         selectedMoods.clear();
         filterMoodEvents();
     }
+
+    /**
+     * Updates the selected moods based on the chip selection.
+     *
+     * @param mood The mood label.
+     * @param isSelected Whether the chip is selected or not.
+     */
     public void updateMoodFilter(String mood, boolean isSelected) {
         if (isSelected) {
             selectedMoods.add(mood);
@@ -204,6 +216,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         filterMoodEvents();
     }
 
+    /**
+     * Filters mood events based on selected moods and location.
+     */
     private void filterMoodEvents() {
         List<MoodEventModel> filteredList = new ArrayList<>();
         List<MoodEventModel> sourceList = isFriendsMode ? friendsMoodEventList : moodEventList;
@@ -332,7 +347,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                     MoodEventModel moodEvent = new MoodEventModel(
                             emotion != null ? emotion : "Unknown",
                             description != null ? description : "No description",
-                            timestamp,  // ✅ Directly passing Date object
+                            timestamp,
                             emoji != null ? emoji : "😐",
                             color,
                             triggerWarning,
@@ -363,6 +378,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
             }
         });
     }
+
+    /**
+     * Displays a dialog with mood details.
+     *
+     * @param title   The title of the dialog.
+     * @param details The details to be displayed.
+     */
     private void showMoodDetailsDialog(String title, String details) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(title);
@@ -371,6 +393,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         builder.show();
     }
 
+    /**
+     * Handles the "Friends" button click event to add friends' mood event markers.
+     */
     private void onFriendsButtonClick() {
         isFriendsMode = true;
         if (friendsMoodEventList == null) {
@@ -401,7 +426,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                                         friendsMoodEventList.add(moodEvent);
                                     }
                                 } else {
-                                    // Optional: If location isn’t available yet, either skip or add it anyway
                                     friendsMoodEventList.add(moodEvent);
                                 }
                             }
@@ -418,6 +442,15 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         });
     }
 
+    /**
+     * Calculates the distance between two geographical points using the Haversine formula.
+     *
+     * @param lat1 Latitude of the first point.
+     * @param lon1 Longitude of the first point.
+     * @param lat2 Latitude of the second point.
+     * @param lon2 Longitude of the second point.
+     * @return The distance in kilometers.
+     */
     private double calculateDistanceInKm(double lat1, double lon1, double lat2, double lon2) {
         double earthRadius = 6371.0; // in km
         double dLat = Math.toRadians(lat2 - lat1);
@@ -448,15 +481,15 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      */
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
-            case "Happiness": return "😊";
-            case "Anger": return "😠";
-            case "Sadness": return "😢";
-            case "Fear": return "😨";
+            case "Happy": return "😊";
+            case "Angry": return "😠";
+            case "Sad": return "😢";
+            case "Scared": return "😨";
             case "Calm": return "😌";
-            case "Confusion": return "😕";
-            case "Disgust": return "🤢";
-            case "Shame": return "😳";
-            case "Surprise": return "😮";
+            case "Confused": return "😕";
+            case "Disgusted": return "🤢";
+            case "Ashamed": return "😳";
+            case "Surprised": return "😮";
             default: return "😐";
         }
     }
