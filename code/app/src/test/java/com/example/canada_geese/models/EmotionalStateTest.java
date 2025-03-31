@@ -1,19 +1,15 @@
 package com.example.canada_geese.models;
-
-
+import com.example.canada_geese.R;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-
 import com.example.canada_geese.Models.EmotionalState;
-
 
 public class EmotionalStateTest {
 
-
     @Test
     public void testGetDisplayName() {
-        assertEquals("Happiness", EmotionalState.HAPPY.getDisplayName());
+        assertEquals("Happy", EmotionalState.HAPPY.getDisplayName());
         assertEquals("Anger", EmotionalState.ANGER.getDisplayName());
         assertEquals("Sadness", EmotionalState.SADNESS.getDisplayName());
         assertEquals("Fear", EmotionalState.FEAR.getDisplayName());
@@ -23,7 +19,6 @@ public class EmotionalStateTest {
         assertEquals("Surprise", EmotionalState.SURPRISE.getDisplayName());
         assertEquals("Calm", EmotionalState.CALM.getDisplayName());
     }
-
 
     @Test
     public void testGetColorResId() {
@@ -38,7 +33,6 @@ public class EmotionalStateTest {
         assertEquals(R.color.mood_calm, EmotionalState.CALM.getColorResId());
     }
 
-
     @Test
     public void testGetEmoji() {
         assertEquals("😊", EmotionalState.HAPPY.getEmoji());
@@ -52,27 +46,23 @@ public class EmotionalStateTest {
         assertEquals("😌", EmotionalState.CALM.getEmoji());
     }
 
-
     @Test
     public void testFromStringValid() {
-        assertEquals(EmotionalState.HAPPY, EmotionalState.fromString("Happiness"));
+        assertEquals(EmotionalState.HAPPY, EmotionalState.fromString("Happy"));
         assertEquals(EmotionalState.ANGER, EmotionalState.fromString("Anger"));
         assertEquals(EmotionalState.SADNESS, EmotionalState.fromString("sadness"));
         assertEquals(EmotionalState.SURPRISE, EmotionalState.fromString("SurPriSe"));
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringInvalid() {
         EmotionalState.fromString("NonexistentEmotion");
     }
 
-
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringEmptyString() {
         EmotionalState.fromString("");
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testFromStringNull() {
@@ -91,7 +81,7 @@ public class EmotionalStateTest {
     }
 
     @Test
-    public void testEmotionalStateCount() { assertEquals(9, EmotionalState.values().length);
+    public void testEmotionalStateCount() {
+        assertEquals(9, EmotionalState.values().length);
     }
 }
-
