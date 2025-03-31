@@ -52,6 +52,10 @@ public class FilterBarFragment extends Fragment {
         this.isForFriendsPage = isForFriendsPage;
     }
 
+    /**
+     * Sets the current query string for filtering.
+     * @param query The query string to filter by.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

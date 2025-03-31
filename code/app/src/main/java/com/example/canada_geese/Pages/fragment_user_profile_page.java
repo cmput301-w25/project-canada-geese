@@ -152,8 +152,6 @@ public class fragment_user_profile_page extends Fragment{
         usersAdapter = new UsersAdapter(AllUsers, getContext(), mAuth.getCurrentUser().getUid());
         // Make the list clickable and show user details
         usersAdapter.setOnItemClickListener(new UsersAdapter.onItemClickListener() {
-
-            //GET USER HERE
             @Override
             public void onItemClick(Users users) {
                 // Shows user dialog
@@ -216,9 +214,7 @@ public class fragment_user_profile_page extends Fragment{
             // Show the list of following
             showFollowingList();
         });
-
-
-
+        // Click listener for the followers list view
         searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 menuImageButton.setVisibility(View.GONE);
@@ -228,7 +224,6 @@ public class fragment_user_profile_page extends Fragment{
             }
 
         });
-
         // Search view to filter through database users
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -236,7 +231,6 @@ public class fragment_user_profile_page extends Fragment{
                 filterUsers(query);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.isEmpty()) {
@@ -264,10 +258,9 @@ public class fragment_user_profile_page extends Fragment{
         return rootView;
     }
 
-
-
     /**
-     * Signs out the current user, clears stored login preferences, and redirects to the login screen.
+     * Handles the sign-out process for the user.
+     * Clears shared preferences and navigates back to the LoginActivity.
      */
     private void signOutUser() {
         // Sign out activity on firebase
@@ -337,6 +330,10 @@ public class fragment_user_profile_page extends Fragment{
                     });
         }
     }
+
+    /**
+     * Displays the list of followers for the current user.
+     */
     private void showFollowersList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -352,6 +349,10 @@ public class fragment_user_profile_page extends Fragment{
 
         }
     }
+
+    /**
+     * Displays the list of users that the current user is following.
+     */
     private void showFollowingList() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -366,7 +367,13 @@ public class fragment_user_profile_page extends Fragment{
                     });
         }
     }
-    // Then add this method to filter users based on search query
+
+    /**
+     * Filters the list of users based on the search text.
+     * If the user list is empty, it fetches all users from the database.
+     *
+     * @param searchText The text to filter the user list.
+     */
     private void filterUsers(String searchText) {
         if (AllUsers == null || AllUsers.isEmpty()) {
             // If users haven't been loaded yet, fetch them first
@@ -391,7 +398,11 @@ public class fragment_user_profile_page extends Fragment{
         }
     }
 
-    // Add this helper method to perform the actual filtering
+    /**
+     * Performs the filtering of the user list based on the search text.
+     *
+     * @param searchText The text to filter the user list.
+     */
     private void performFiltering(String searchText) {
         List<Users> filteredList = new ArrayList<>();
         List<Users> secondaryList = new ArrayList<>();
@@ -415,6 +426,11 @@ public class fragment_user_profile_page extends Fragment{
         usersAdapter.updateList(filteredList);
     }
 
+    /**
+     * Sends a follow request to the specified user.
+     *
+     * @param user The user to whom the follow request is sent.
+     */
     private void sendFollowRequest(Users user) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -484,6 +500,10 @@ public class fragment_user_profile_page extends Fragment{
                 });
     }
 
+    /**
+     * Unfollows the specified user by removing the follow request.
+     * @param user
+     */
     private void unFollowRequest(Users user) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {

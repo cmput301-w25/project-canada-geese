@@ -50,6 +50,11 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
         this.listener = listener;
     }
 
+    /**
+     * Updates the list of follow requests and refreshes the RecyclerView.
+     *
+     * @param newRequests the new list of follow requests
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,6 +62,12 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds the data to the ViewHolder for a specific position.
+     *
+     * @param holder   the ViewHolder to bind data to
+     * @param position the position of the item in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FollowRequestModel request = requestList.get(position);
@@ -76,6 +87,11 @@ public class FollowRequestAdapter extends RecyclerView.Adapter<FollowRequestAdap
         });
     }
 
+    /**
+     * Returns the number of items in the list.
+     *
+     * @return the size of the request list
+     */
     @Override
     public int getItemCount() {
         return requestList != null ? requestList.size() : 0;

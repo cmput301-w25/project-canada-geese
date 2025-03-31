@@ -40,8 +40,15 @@ public class RequestsDialogFragment extends DialogFragment {
     private String currentUser;
     private ImageView closeButton;
 
+    /**
+     * Default constructor for RequestsDialogFragment.
+     */
     public RequestsDialogFragment() {}
 
+    /**
+     * Creates a new instance of RequestsDialogFragment.
+     * @return A new instance of RequestsDialogFragment.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -52,6 +59,10 @@ public class RequestsDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * Called when the fragment is created.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

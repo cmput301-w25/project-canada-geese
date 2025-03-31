@@ -83,9 +83,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private double currentUserLatitude = 0.0;
     private double currentUserLongitude = 0.0;
     private boolean currentLocationAvailable = false;
-
-
-
     private SearchView searchView;
 
     /**
@@ -161,6 +158,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
 
         return rootView;
     }
+
+    /**
+     * Sets up the listener for mood chips to update the selected moods.
+     *
+     * @param chip The Chip view.
+     * @param mood The mood label.
+     */
     private void setupChipListener(Chip chip, String mood) {
         chip.setOnCheckedChangeListener((buttonView, isChecked) -> updateMoodFilter(mood, isChecked));
     }
@@ -196,6 +200,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         selectedMoods.clear();
         filterMoodEvents();
     }
+
+    /**
+     * Updates the selected moods based on the chip selection.
+     *
+     * @param mood The mood label.
+     * @param isSelected Whether the chip is selected or not.
+     */
     public void updateMoodFilter(String mood, boolean isSelected) {
         if (isSelected) {
             selectedMoods.add(mood);
@@ -205,6 +216,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         filterMoodEvents();
     }
 
+    /**
+     * Filters mood events based on selected moods and location.
+     */
     private void filterMoodEvents() {
         List<MoodEventModel> filteredList = new ArrayList<>();
         List<MoodEventModel> sourceList = isFriendsMode ? friendsMoodEventList : moodEventList;
@@ -364,6 +378,13 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
             }
         });
     }
+
+    /**
+     * Displays a dialog with mood details.
+     *
+     * @param title   The title of the dialog.
+     * @param details The details to be displayed.
+     */
     private void showMoodDetailsDialog(String title, String details) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(title);
@@ -372,6 +393,9 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         builder.show();
     }
 
+    /**
+     * Handles the "Friends" button click event to add friends' mood event markers.
+     */
     private void onFriendsButtonClick() {
         isFriendsMode = true;
         if (friendsMoodEventList == null) {
@@ -418,6 +442,15 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         });
     }
 
+    /**
+     * Calculates the distance between two geographical points using the Haversine formula.
+     *
+     * @param lat1 Latitude of the first point.
+     * @param lon1 Longitude of the first point.
+     * @param lat2 Latitude of the second point.
+     * @param lon2 Longitude of the second point.
+     * @return The distance in kilometers.
+     */
     private double calculateDistanceInKm(double lat1, double lon1, double lat2, double lon2) {
         double earthRadius = 6371.0; // in km
         double dLat = Math.toRadians(lat2 - lat1);

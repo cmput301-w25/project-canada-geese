@@ -55,22 +55,40 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
 
     private Map<String, String> uidToUsernameMap = new HashMap<>();
 
+    /**
+     * Listener interface for handling mood event interactions.
+     */
     public interface OnMoodEventClickListener {
         void onMoodEventClick(MoodEventModel moodEvent);
     }
-
+    /**
+     * Listener interface for handling long-click interactions on mood events.
+     */
     public interface OnMoodEventLongClickListener {
         boolean onMoodEventLongClick(MoodEventModel moodEvent);
     }
 
+    /**
+     * Listener interface for handling edit interactions on mood events.
+     */
     public interface OnMoodEventEditListener {
         void onMoodEventEdit(MoodEventModel moodEvent, int position);
     }
 
+    /**
+     * Listener interface for handling comment interactions on mood events.
+     */
     public interface OnCommentClickListener {
         void onCommentClick(MoodEventModel moodEvent);
     }
 
+    /**
+     * Constructs a MoodEventAdapter.
+     *
+     * @param moodEventList the list of mood events to display
+     * @param context       the context used for inflating views
+     * @param isFriendPage  whether the adapter is used in a friend's page context
+     */
     public MoodEventAdapter(List<MoodEventModel> moodEventList, Context context, boolean isFriendPage) {
         this.moodEventList = new ArrayList<>(moodEventList);
         this.moodEventListFull = new ArrayList<>(moodEventList);
@@ -78,26 +96,56 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         this.isFriendPage = isFriendPage;
     }
 
+    /**
+     * Sets whether the adapter is used in a friend's page context.
+     *
+     * @param isFriendPage true if used in a friend's page context, false otherwise
+     */
     public void setUidToUsernameMap(Map<String, String> uidToUsernameMap) {
         this.uidToUsernameMap = uidToUsernameMap;
     }
 
+    /**
+     * Sets whether the adapter is used in a friend's page context.
+     *
+     * @param isFriendPage true if used in a friend's page context, false otherwise
+     */
     public void setOnMoodEventClickListener(OnMoodEventClickListener listener) {
         this.clickListener = listener;
     }
 
+    /**
+     * Sets the listener for long-click interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnMoodEventLongClickListener(OnMoodEventLongClickListener listener) {
         this.longClickListener = listener;
     }
 
+    /**
+     * Sets the listener for edit interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnMoodEventEditListener(OnMoodEventEditListener listener) {
         this.editListener = listener;
     }
 
+    /**
+     * Sets the listener for comment interactions on mood events.
+     *
+     * @param listener the listener to set
+     */
     public void setOnCommentClickListener(OnCommentClickListener listener) {
         this.commentClickListener = listener;
     }
 
+    /**
+     * Sets whether the adapter is in edit mode.
+     *
+     * @param isInEditMode true if in edit mode, false otherwise
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -105,6 +153,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds the data to the views in the ViewHolder.
+     *
+     * @param holder   the ViewHolder for the mood event item
+     * @param position the position of the item in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         MoodEventModel event = moodEventList.get(position);
@@ -157,6 +211,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
     }
 
+    /**
+     * Populates the details of the mood event in the ViewHolder.
+     *
+     * @param holder the ViewHolder to populate
+     * @param event  the mood event to display
+     */
     private void populateDetails(ViewHolder holder, MoodEventModel event) {
         holder.socialSituation.setText(event.getSocialSituation() != null ? event.getSocialSituation() : "Not specified");
 
@@ -212,6 +272,12 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
     }
 
+    /**
+     * Populates the edit fields for the mood event in the ViewHolder.
+     *
+     * @param holder the ViewHolder to populate
+     * @param event  the mood event to display
+     */
     private void populateEditFields(ViewHolder holder, MoodEventModel event) {
         holder.privateMoodEdit.setChecked(event.isPublic());
         holder.descriptionEdit.setText(event.getDescription());
@@ -237,11 +303,19 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
     }
 
+    /**
+     * Returns the number of items in the list.
+     *
+     * @return the size of the mood event list
+     */
     @Override
     public int getItemCount() {
         return moodEventList.size();
     }
 
+    /**
+     * ViewHolder for mood event items.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView moodText, timestamp, moodEmoji, description, socialSituation, usernameView, locationLabel;
         EditText descriptionEdit;
@@ -254,6 +328,13 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         LinearLayout imageContainer;
         ImageView expandIcon;
 
+        /**
+         * Constructor for ViewHolder.
+         *
+         * @param itemView The view for a single item.
+         */
+         // Constructor for ViewHolder
+         // Initializes the views in the ViewHolder
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             moodText = itemView.findViewById(R.id.mood_name);
@@ -278,6 +359,11 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         }
     }
 
+    /**
+     * Adds a new mood event to the list.
+     *
+     * @param newItem the new mood event to add
+     */
     public void addItem(MoodEventModel newItem) {
         moodEventListFull.add(0, newItem);
         moodEventList.add(0, newItem);
@@ -287,6 +373,11 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         });
     }
 
+    /**
+     * Updates the list of mood events.
+     *
+     * @param newList the new list of mood events
+     */
     public void updateList(List<MoodEventModel> newList) {
         moodEventListFull.clear();
         moodEventListFull.addAll(newList);
@@ -297,6 +388,14 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         notifyDataSetChanged();
     }
 
+    /**
+     * Filters the mood events based on the provided criteria.
+     *
+     * @param query            the search query
+     * @param last7Days        whether to filter by the last 7 days
+     * @param selectedMoods    the selected moods
+     * @param isPrivateSelected whether to filter by privacy settings
+     */
     public void filter(String query, boolean last7Days, Set<String> selectedMoods, boolean isPrivateSelected) {
         moodEventList.clear();
         long cutoff = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000);
@@ -313,6 +412,9 @@ public class MoodEventAdapter extends RecyclerView.Adapter<MoodEventAdapter.View
         notifyDataSetChanged();
     }
 
+    /**
+     * Collapses the currently expanded item.
+     */
     public void collapseExpandedItem() {
         if (expandedPosition != -1) {
             int p = expandedPosition;

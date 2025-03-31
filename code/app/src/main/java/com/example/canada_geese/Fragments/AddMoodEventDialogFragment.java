@@ -80,8 +80,6 @@ import java.util.Locale;
 /**
  * A dialog fragment that allows the user to add a new mood event.
  */
-
-
 public class AddMoodEventDialogFragment extends DialogFragment {
     private Spinner moodSpinner;
     private Spinner socialSituationSpinner;
@@ -119,44 +117,53 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private boolean isEditMode = false;
     private String documentIdToUpdate = null;
     private ImageView closeButton;
+
+    // Interface for listening to dialog dismiss events
     public interface OnDismissListener {
         void onDismiss();
     }
     private OnDismissListener dismissListener;
+
+    /**
+     * Sets the listener for dialog dismiss events.
+     *
+     * @param listener the listener to set.
+     */
     public void setOnDismissListener(OnDismissListener listener) {
         this.dismissListener = listener;
     }
+
+    /**
+     * Called when the dialog is dismissed.
+     * @param dialog the dialog that was dismissed will be passed into the
+     *               method
+     */
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-
         // Call the listener when the dialog is dismissed
         if (dismissListener != null) {
             dismissListener.onDismiss();
         }
     }
+
     /**
      * Interface for listening to mood event added events.
      */
-
     public interface OnMoodAddedListener {
         void onMoodAdded(MoodEventModel moodEvent);
     }
 
-
     /**
      * Listener for mood event added events.
      */
-
     private OnMoodAddedListener moodAddedListener;
-
 
     /**
      * Sets the listener for mood event added events.
      *
      * @param listener the listener to set.
      */
-
     public void setOnMoodAddedListener(OnMoodAddedListener listener) {
         this.moodAddedListener = listener;
     }
@@ -167,27 +174,23 @@ public class AddMoodEventDialogFragment extends DialogFragment {
      * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
      * @return The View for the fragment's UI, or null.
      */
-
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_add_mood);
-
         dialog.setOnShowListener(dialogInterface -> {
             Window window = ((Dialog) dialogInterface).getWindow();
             if (window != null) {
                 window.setBackgroundDrawableResource(R.drawable.dialog_background);
             }
         });
-
         return dialog;
     }
 
     /**
      * Called when the fragment is visible to the user and actively running.
      */
-
     @Override
     public void onStart() {
         super.onStart();
@@ -199,7 +202,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             }
         }
     }
-
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -213,12 +215,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
      *
      * @return
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_add_mood, container, false);
-
         moodSpinner = view.findViewById(R.id.emotion_spinner);
         addMoodButton = view.findViewById(R.id.add_mood_button);
         selectImageButton = view.findViewById(R.id.camera_button);
@@ -258,17 +258,13 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         );
         socialSituationSpinner.setAdapter(socialAdapter);
 
-
         if (isEditMode && moodToEdit != null) {
             // Change button text
             addMoodButton.setText("Save");
-
             // Description
-
             descriptionInput.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     int currentLength = s.length();
@@ -280,7 +276,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                         descriptionCounter.setText(currentLength + " / 200");
                     }
                 }
-
                 @Override
                 public void afterTextChanged(Editable s) {}
             });
@@ -298,7 +293,6 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                     break;
                 }
             }
-
             // Set social situation spinner
             for (int i = 0; i < socialSituationSpinner.getCount(); i++) {
                 if (socialSituationSpinner.getItemAtPosition(i).toString().equalsIgnoreCase(moodToEdit.getSocialSituation())) {
@@ -492,6 +486,12 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         return view;
     }
 
+    /**
+     * Called when the view is created.
+     *
+     * @param view The view created.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -502,6 +502,12 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Sets up a character counter for the description input field.
+     *
+     * @param descriptionInput The EditText for the description input.
+     * @param descriptionCounter The TextView for displaying the character count.
+     */
     private void setupDescriptionCharacterCounter(EditText descriptionInput, TextView descriptionCounter) {
         descriptionInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -524,6 +530,11 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         });
     }
 
+    /**
+     * Uploads images to Firebase Storage and updates the mood event in the database.
+     *
+     * @param updatedMood The updated mood event model.
+     */
     private void uploadImagesThenUpdateMood(MoodEventModel updatedMood) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -567,6 +578,11 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Updates the mood event in the database.
+     *
+     * @param mood The mood event model to update.
+     */
     private void updateMoodInDatabase(MoodEventModel mood) {
         DatabaseManager.getInstance().updateMoodEvent(mood, documentIdToUpdate, task -> {
             if (task.isSuccessful()) {
@@ -579,6 +595,11 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         });
     }
 
+    /**
+     * Loads an image from a URL and adds it to the images container.
+     *
+     * @param imageUrl The URL of the image to load.
+     */
     private void loadImageFromUrl(String imageUrl) {
         retainedImageUrls.add(imageUrl); // Track what's kept
 
@@ -600,6 +621,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         imagesScrollView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Shows a dialog for selecting the image source (camera or gallery).
+     */
     private void showImageSelectionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Select Image Source");
@@ -619,17 +643,19 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         builder.show();
     }
 
+    /**
+     * Adds the selected image to the gallery.
+     *
+     * @param bitmap The selected image as a Bitmap.
+     */
     private void addImageToGallery(Bitmap bitmap) {
         // Add to the collection
         selectedImages.add(bitmap);
-
         // Inflate the custom image layout
         View imageLayout = LayoutInflater.from(requireContext()).inflate(R.layout.item_image, imagesContainer, false);
-
         // Get references to views
         ImageView imageView = imageLayout.findViewById(R.id.image_view);
         ImageButton deleteButton = imageLayout.findViewById(R.id.btn_delete);
-
         // Set the image
         imageView.setImageBitmap(bitmap);
 
@@ -641,14 +667,15 @@ public class AddMoodEventDialogFragment extends DialogFragment {
                 imagesScrollView.setVisibility(View.GONE);
             }
         });
-
         // Add to the container
         imagesContainer.addView(imageLayout);
-
         // Make sure the scroll view is visible
         imagesScrollView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Asks for camera permission.
+     */
     private void askCameraPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -661,6 +688,10 @@ public class AddMoodEventDialogFragment extends DialogFragment {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
+
+    /**
+     * Launches the camera to take a photo.
+     */
     private void launchCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         try {
@@ -671,18 +702,9 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     }
 
 
-
-/*
-private void askgalleryPermission() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GALLERY_PERMISSION_CODE);
-        } else {
-            openGallery();
-        }
-    }
-*/
-
-
+    /**
+     * Asks for gallery permission.
+     */
     private String getGalleryPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return Manifest.permission.READ_MEDIA_IMAGES;
@@ -691,6 +713,9 @@ private void askgalleryPermission() {
         }
     }
 
+    /**
+     * Asks for gallery permission and opens the photo picker.
+     */
     private void askGalleryPermission() {
         String permission = getGalleryPermission();
         if (ContextCompat.checkSelfPermission(
@@ -703,23 +728,40 @@ private void askgalleryPermission() {
             requestGalleryPermissionLauncher.launch(permission);
         }
     }
+    /**
+     * Opens the photo picker to select an image.
+     */
     private void openPhotoPicker() {
         PickVisualMediaRequest request = new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
                 .build();
         photoPickerLauncher.launch(request);
     }
-
+    /**
+     * Opens the camera to take a photo.
+     */
     private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
     }
-
+    /**
+     * Opens the gallery to select an image.
+     */
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE);
     }
-
+    /**
+     * Saves the mood event with location and image.
+     *
+     * @param moodName The name of the mood.
+     * @param description The description of the mood.
+     * @param triggerWarning Whether to trigger a warning.
+     * @param socialSituation The social situation.
+     * @param latitude The latitude of the location.
+     * @param longitude The longitude of the location.
+     * @param images The list of images.
+     */
     private void saveMoodEventWithLocationAndImage(String moodName, String description,
                                                    boolean triggerWarning, String socialSituation,
                                                    double latitude, double longitude,
@@ -748,6 +790,12 @@ private void askgalleryPermission() {
         }
     }
 
+    /**
+     * Uploads images to Firebase Storage and then saves the mood event.
+     *
+     * @param images The list of images to upload.
+     * @param moodEvent The mood event model to save.
+     */
     private void uploadImagesAndThenSave(ArrayList<Bitmap> images, MoodEventModel moodEvent) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -793,6 +841,12 @@ private void askgalleryPermission() {
                     });
         }
     }
+
+    /**
+     * Finishes adding the mood event and notifies the listener.
+     *
+     * @param moodEvent The mood event model that was added.
+     */
     private void finishAddMood(MoodEventModel moodEvent) {
         Toast.makeText(requireContext(), "Mood Added Successfully!", Toast.LENGTH_SHORT).show();
         if (moodAddedListener != null) {
@@ -800,6 +854,12 @@ private void askgalleryPermission() {
         }
         dismiss();
     }
+
+    /**
+     * Requests location permission from the user.
+     *
+     * @param rootView The root view of the fragment.
+     */
     private void requestLocationPermission(View rootView) {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST);
@@ -807,6 +867,14 @@ private void askgalleryPermission() {
             showUserLocation(rootView);
         }
     }
+
+    /**
+     * Called when the user interacts with the dialog.
+     *
+     * @param requestCode The request code passed in requestPermissions().
+     * @param permissions The requested permissions.
+     * @param grantResults The results of the permission requests.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -835,7 +903,6 @@ private void askgalleryPermission() {
     /**
      * Shows the user's current location on the map.
      */
-
     private void showUserLocation(View rootView) {
         Switch locationCheckbox = rootView.findViewById(R.id.attach_location_checkbox);
         if (locationCheckbox != null && locationCheckbox.isChecked()) { // ✅ Only show map if checked
@@ -881,7 +948,6 @@ private void askgalleryPermission() {
      *
      * @return the current timestamp.
      */
-
     private Date getCurrentTimestamp() {
         return new Date();
     }
@@ -893,7 +959,6 @@ private void askgalleryPermission() {
      * @param emotion the emotion to get the emoji for.
      * @return the emoji corresponding to the given emotion.
      */
-
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
             case "Happy": return "😊";
@@ -909,13 +974,11 @@ private void askgalleryPermission() {
         }
     }
 
-
     /**
      * Returns the color resource ID corresponding to the given emotion.
      * @param emotion the emotion to get the color for
      * @return the color resource ID
      */
-
     private int getColorForEmotion(String emotion) {
         switch (emotion) {
             case "Happy": return R.color.color_happiness;
@@ -930,12 +993,26 @@ private void askgalleryPermission() {
             default: return R.color.colorPrimaryDark;
         }
     }
+
+    /**
+     * Sets the mood event to edit.
+     *
+     * @param mood The mood event model to edit.
+     * @param documentId The document ID of the mood event in the database.
+     */
     public void setMoodToEdit(MoodEventModel mood, String documentId) {
         this.moodToEdit = mood;
         this.isEditMode = true;
         this.documentIdToUpdate = documentId;
     }
 
+    /**
+     * Compresses a bitmap to a specified byte limit.
+     *
+     * @param bitmap The bitmap to compress.
+     * @param maxBytes The maximum size in bytes.
+     * @return The compressed bitmap as a byte array.
+     */
     private byte[] compressBitmapToLimit(Bitmap bitmap, int maxBytes) {
         int quality = 100;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

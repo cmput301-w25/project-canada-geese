@@ -126,6 +126,10 @@ public class CommentModel {
         return map;
     }
 
+    /**
+     * Returns a string representation of this comment.
+     * @return a string representation of the comment
+     */
     @Override
     public String toString() {
         return "CommentModel{" +

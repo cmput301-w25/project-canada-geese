@@ -136,6 +136,9 @@ public class fragment_friends_moods_page extends Fragment {
         return rootView;
     }
 
+    /**
+     * Toggles the visibility of the filter bar.
+     */
     private void toggleFilterBar() {
         boolean isSelected = filterButton.isSelected();
         filterButton.setSelected(!isSelected);

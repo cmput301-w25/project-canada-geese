@@ -52,6 +52,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         notifyDataSetChanged();
     }
 
+    /**
+     * Sets the list of comments.
+     *
+     * @param commentList the list of comments to set
+     */
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +64,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         return new CommentViewHolder(view);
     }
 
+    /**
+     * Binds the data to the views in the ViewHolder.
+     *
+     * @param holder   the ViewHolder for the comment item
+     * @param position the position of the comment in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         CommentModel comment = commentList.get(position);
@@ -94,6 +105,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
     }
 
+    /**
+     * Returns the number of comments in the list.
+     *
+     * @return the size of the comment list
+     */
     @Override
     public int getItemCount() {
         return commentList != null ? commentList.size() : 0;

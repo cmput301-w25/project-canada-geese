@@ -154,6 +154,9 @@ public class fragment_user_moods_page extends Fragment {
         return view;
     }
 
+    /**
+     * Toggles the visibility of the filter bar and the space above the recycler view.
+     */
     private void toggleFilterBar() {
         boolean isSelected = filterButton.isSelected();
         filterButton.setSelected(!isSelected);

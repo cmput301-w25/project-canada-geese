@@ -70,6 +70,12 @@ public class CommentsFragment extends BottomSheetDialogFragment {
         return fragment;
     }
 
+    /**
+     * Creates a new dialog for the fragment.
+     *
+     * @param savedInstanceState The saved instance state.
+     * @return A new BottomSheetDialog.
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
@@ -77,12 +83,23 @@ public class CommentsFragment extends BottomSheetDialogFragment {
         return dialog;
     }
 
+    /**
+     * Creates the view for the fragment.
+     *
+     * @param inflater The LayoutInflater used to inflate the view.
+     * @param container The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState The saved instance state.
+     * @return The created view.
+     */
     @Override
     public View onCreateView(@NonNull android.view.LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_comments_bottom_sheet, container, false);
     }
 
+    /**
+     * Called when the fragment is started. Sets the height of the bottom sheet dialog.
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -100,6 +117,12 @@ public class CommentsFragment extends BottomSheetDialogFragment {
         }
     }
 
+    /**
+     * Called when the view is created. Initializes the UI components and sets up the comment posting functionality.
+     *
+     * @param view The created view.
+     * @param savedInstanceState The saved instance state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

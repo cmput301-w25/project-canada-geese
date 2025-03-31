@@ -90,6 +90,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         this.listener = listener;
     }
 
+    /**
+     * Creates a new ViewHolder for user items.
+     *
+     * @param viewGroup the parent view group
+     * @param i         the view type
+     * @return a new ViewHolder instance
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -97,6 +104,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds user data to the ViewHolder.
+     *
+     * @param holder   the ViewHolder to bind data to
+     * @param position the position of the item in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Users users = filteredUsersList.get(position);
@@ -123,15 +136,20 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         }
     }
 
+    /**
+     * Returns the number of items in the filtered list.
+     *
+     * @return the size of the filtered users list
+     */
     @Override
     public int getItemCount() {
         return filteredUsersList.size();
     }
 
     /**
-     * Displays a dialog with user profile details and follow/unfollow actions.
+     * Shows a dialog with user details and follow/unfollow options.
      *
-     * @param user the user to show
+     * @param user the user whose details are to be shown
      */
     private void showUserDetailsDialog(Users user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
