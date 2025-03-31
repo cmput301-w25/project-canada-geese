@@ -55,7 +55,8 @@
             android:gravity="top"
             android:hint="About"
             android:inputType="textMultiLine"
-            android:lines="6" />
+            android:minLines="1"
+            android:maxLines="10"/>
 
         <Button
             android:id="@+id/save_button"

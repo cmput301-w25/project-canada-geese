@@ -215,7 +215,7 @@
             android:layout_gravity="left|end"
             android:background="@android:color/transparent"
             android:contentDescription="Options menu"
-            android:src="@drawable/ic_more_vert_24"
+            android:src="@drawable/more_horiz_24dp_1f1f1f_fill0_wght400_grad0_opsz24"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
