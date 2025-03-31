@@ -115,6 +115,7 @@ public class AddMoodEventDialogFragment extends DialogFragment {
     private MoodEventModel moodToEdit = null;
     private boolean isEditMode = false;
     private String documentIdToUpdate = null;
+    private ImageView closeButton;
     public interface OnDismissListener {
         void onDismiss();
     }
@@ -223,13 +224,15 @@ public class AddMoodEventDialogFragment extends DialogFragment {
         imagesScrollView = view.findViewById(R.id.images_scroll_view);
         imagesContainer = view.findViewById(R.id.images_container);
         addLocationCheckbox = view.findViewById(R.id.attach_location_checkbox);
+        closeButton = view.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(v -> dismiss());
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
 
 
         String[] moodArray = new String[]{
-                "Happiness 😊", "Anger 😠", "Sadness 😢", "Fear 😨",
-                "Calm 😌", "Confusion 😕", "Disgust 🤢", "Shame 😳", "Surprise 😮"
+                "Happy 😊", "Angry 😠", "Sad 😢", "Scared 😨",
+                "Calm 😌", "Confused 😕", "Disgusted 🤢", "Ashamed 😳", "Surprised 😮"
         };
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -846,15 +849,15 @@ private void askgalleryPermission() {
 
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
-            case "Happiness": return "😊";
-            case "Anger": return "😠";
-            case "Sadness": return "😢";
-            case "Fear": return "😨";
+            case "Happy": return "😊";
+            case "Angry": return "😠";
+            case "Sad": return "😢";
+            case "Scared": return "😨";
             case "Calm": return "😌";
-            case "Confusion": return "😕";
-            case "Disgust": return "🤢";
-            case "Shame": return "😳";
-            case "Surprise": return "😮";
+            case "Confused": return "😕";
+            case "Disgusted": return "🤢";
+            case "Ashamed": return "😳";
+            case "Surprised": return "😮";
             default: return "😐";
         }
     }
@@ -868,15 +871,15 @@ private void askgalleryPermission() {
 
     private int getColorForEmotion(String emotion) {
         switch (emotion) {
-            case "Happiness": return R.color.color_happiness;
-            case "Anger": return R.color.color_anger;
-            case "Sadness": return R.color.color_sadness;
-            case "Fear": return R.color.color_fear;
+            case "Happy": return R.color.color_happiness;
+            case "Angry": return R.color.color_anger;
+            case "Sad": return R.color.color_sadness;
+            case "Scared": return R.color.color_fear;
             case "Calm": return R.color.color_calm;
-            case "Confusion": return R.color.color_confusion;
-            case "Disgust": return R.color.color_disgust;
-            case "Shame": return R.color.color_shame;
-            case "Surprise": return R.color.color_surprise;
+            case "Confused": return R.color.color_confusion;
+            case "Disgusted": return R.color.color_disgust;
+            case "Ashamed": return R.color.color_shame;
+            case "Surprised": return R.color.color_surprise;
             default: return R.color.colorPrimaryDark;
         }
     }

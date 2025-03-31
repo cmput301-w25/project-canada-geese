@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ public class RequestsDialogFragment extends DialogFragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private String currentUser;
+    private ImageView closeButton;
 
     public RequestsDialogFragment() {}
 

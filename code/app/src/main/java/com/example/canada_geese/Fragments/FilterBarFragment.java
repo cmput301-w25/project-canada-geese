@@ -82,14 +82,14 @@ public class FilterBarFragment extends Fragment {
         });
 
 
-        setupMoodChip(view.findViewById(R.id.chip_mood_anger), "Anger");
-        setupMoodChip(view.findViewById(R.id.chip_mood_confusion), "Confusion");
-        setupMoodChip(view.findViewById(R.id.chip_mood_disgust), "Disgust");
-        setupMoodChip(view.findViewById(R.id.chip_mood_fear), "Fear");
-        setupMoodChip(view.findViewById(R.id.chip_mood_happiness), "Happiness");
-        setupMoodChip(view.findViewById(R.id.chip_mood_sadness), "Sadness");
-        setupMoodChip(view.findViewById(R.id.chip_mood_shame), "Shame");
-        setupMoodChip(view.findViewById(R.id.chip_mood_surprise), "Surprise");
+        setupMoodChip(view.findViewById(R.id.chip_mood_anger), "Angry");
+        setupMoodChip(view.findViewById(R.id.chip_mood_confusion), "Confused");
+        setupMoodChip(view.findViewById(R.id.chip_mood_disgust), "Disgusted");
+        setupMoodChip(view.findViewById(R.id.chip_mood_fear), "Scared");
+        setupMoodChip(view.findViewById(R.id.chip_mood_happiness), "Happy");
+        setupMoodChip(view.findViewById(R.id.chip_mood_sadness), "Sad");
+        setupMoodChip(view.findViewById(R.id.chip_mood_shame), "Ashamed");
+        setupMoodChip(view.findViewById(R.id.chip_mood_surprise), "Surprised");
         setupMoodChip(view.findViewById(R.id.chip_mood_calm), "Calm");
     }
 

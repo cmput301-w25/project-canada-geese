@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -76,7 +77,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
     private Chip confusionChip;
     private Chip angerChip;
     private boolean isFriendsMode = false;
-    private ImageButton filterButton;
+    private LinearLayout filterButton;
     private HorizontalScrollView filterScrollView;
     private ChipGroup filterChipGroup;
     private double currentUserLatitude = 0.0;
@@ -140,14 +141,14 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
         filterScrollView = rootView.findViewById(R.id.filter_scroll_view);
         filterChipGroup = rootView.findViewById(R.id.filter_chip_group);
 
-        setupChipListener(happinessChip, "Happiness");
-        setupChipListener(sadnessChip, "Sadness");
-        setupChipListener(shameChip, "Shame");
-        setupChipListener(surpriseChip, "Surprise");
-        setupChipListener(fearChip, "Fear");
-        setupChipListener(disgustChip, "Disgust");
-        setupChipListener(confusionChip, "Confusion");
-        setupChipListener(angerChip, "Anger");
+        setupChipListener(happinessChip, "Happy");
+        setupChipListener(sadnessChip, "Sad");
+        setupChipListener(shameChip, "Ashamed");
+        setupChipListener(surpriseChip, "Surprised");
+        setupChipListener(fearChip, "Scared");
+        setupChipListener(disgustChip, "Disgusted");
+        setupChipListener(confusionChip, "Confused");
+        setupChipListener(angerChip, "Angry");
 
         // FILTER ICON (triggers the chips)
         filterButton.setOnClickListener(v -> toggleFilterVisibility());
@@ -170,6 +171,8 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      * Toggles the visibility of the filter scroll view
      */
     private void toggleFilterVisibility() {
+        boolean isSelected = filterButton.isSelected();
+        filterButton.setSelected(!isSelected);
         Log.d("FilterDebug", "Current visibility: " + filterScrollView.getVisibility());
         if (filterScrollView.getVisibility() == View.GONE) {
             filterScrollView.setVisibility(View.VISIBLE);
@@ -332,7 +335,7 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                     MoodEventModel moodEvent = new MoodEventModel(
                             emotion != null ? emotion : "Unknown",
                             description != null ? description : "No description",
-                            timestamp,  // ✅ Directly passing Date object
+                            timestamp,
                             emoji != null ? emoji : "😐",
                             color,
                             triggerWarning,
@@ -401,7 +404,6 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
                                         friendsMoodEventList.add(moodEvent);
                                     }
                                 } else {
-                                    // Optional: If location isn’t available yet, either skip or add it anyway
                                     friendsMoodEventList.add(moodEvent);
                                 }
                             }
@@ -448,15 +450,15 @@ public class fragment_map_view_page extends Fragment implements OnMapReadyCallba
      */
     private String getEmojiForEmotion(String emotion) {
         switch (emotion) {
-            case "Happiness": return "😊";
-            case "Anger": return "😠";
-            case "Sadness": return "😢";
-            case "Fear": return "😨";
+            case "Happy": return "😊";
+            case "Angry": return "😠";
+            case "Sad": return "😢";
+            case "Scared": return "😨";
             case "Calm": return "😌";
-            case "Confusion": return "😕";
-            case "Disgust": return "🤢";
-            case "Shame": return "😳";
-            case "Surprise": return "😮";
+            case "Confused": return "😕";
+            case "Disgusted": return "🤢";
+            case "Ashamed": return "😳";
+            case "Surprised": return "😮";
             default: return "😐";
         }
     }
